@@ -1,0 +1,5 @@
+rootProject.name = 'SchulgongServer'
+include 'speaker-api'
+include 'backend'
+include 'model'
+
