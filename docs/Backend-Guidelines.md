@@ -56,16 +56,18 @@ The present document provides an outline of the guidelines for the backend.
 ### :file_folder: Project structure
 
 - It is necessary to implement each service within its own separate module. 
-- We have decided to use the following folder structure (as an example). We have chosen to extract the DTOs to enable multiple modules to access them.
+- We have decided to use the following folder structure (as an example). We have chosen to extract the models to enable multiple modules to access them.
+- The directory named "database" serves as the designated location for storing the SQLite files.
 ```md
 ├── at.schulgong.rest-api
 |  ├── controller
 |  ├── dto
-|  ├── model
 |  ├── assembler
 |  ├── message
 |  ├── util
 |  | └── DtoConverter.java
+├── model
+├── database
 ```
 
 ### :clipboard: Testing
