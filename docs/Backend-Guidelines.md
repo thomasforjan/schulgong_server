@@ -57,17 +57,15 @@ The present document provides an outline of the guidelines for the backend.
 
 - It is necessary to implement each service within its own separate module. 
 - We have decided to use the following folder structure (as an example). We have chosen to extract the models to enable multiple modules to access them.
-- The directory named "database" serves as the designated location for storing the SQLite files.
 ```md
 ├── at.schulgong.rest-api
 |  ├── controller
 |  ├── dto
 |  ├── assembler
-|  ├── message
+|  ├── exception 
 |  ├── util
 |  | └── DtoConverter.java
 ├── model
-├── database
 ```
 
 ### :clipboard: Testing
