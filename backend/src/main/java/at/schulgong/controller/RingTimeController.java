@@ -3,14 +3,14 @@ package at.schulgong.controller;
 import at.schulgong.Hour;
 import at.schulgong.Minute;
 import at.schulgong.RingTime;
-import at.schulgong.RingTone;
+import at.schulgong.Ringtone;
 import at.schulgong.assembler.RingTimeModelAssembler;
 import at.schulgong.dto.RingTimeDTO;
 import at.schulgong.exception.EntityNotFoundException;
 import at.schulgong.repository.HourRepository;
 import at.schulgong.repository.MinuteRepository;
 import at.schulgong.repository.RingTimeRepository;
-import at.schulgong.repository.RingToneRepository;
+import at.schulgong.repository.RingtoneRepository;
 import at.schulgong.util.DtoConverter;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.IanaLinkRelations;
@@ -28,7 +28,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @CrossOrigin
 public class RingTimeController {
   private final RingTimeRepository ringTimeRepository;
-  private final RingToneRepository ringToneRepository;
+  private final RingtoneRepository ringToneRepository;
 
   private final HourRepository hourRepository;
 
@@ -38,7 +38,7 @@ public class RingTimeController {
 
 
   public RingTimeController(RingTimeRepository ringTimeRepository, RingTimeModelAssembler assembler,
-                            RingToneRepository ringToneRepository, HourRepository hourRepository, MinuteRepository minuteRepository) {
+                            RingtoneRepository ringToneRepository, HourRepository hourRepository, MinuteRepository minuteRepository) {
     this.ringTimeRepository = ringTimeRepository;
     this.assembler = assembler;
     this.ringToneRepository = ringToneRepository;
@@ -82,7 +82,7 @@ public class RingTimeController {
     /*if (!RequestValidator.checkRequestBodySensor(newRingTime)) {
       return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body("Your sending ringTime data are not correct!");
     }*/
-    RingTone ringTone = ringToneRepository.findById(newRingTime.getRingToneDTO().getId())
+    Ringtone ringTone = ringToneRepository.findById(newRingTime.getRingToneDTO().getId())
       .orElseThrow(() -> new EntityNotFoundException(newRingTime.getRingToneDTO().getId(), "ring tone"));
     Hour hour = hourRepository.findByHour(newRingTime.getPlayTime().getHour());
     Minute minute = minuteRepository.findByMinute(newRingTime.getPlayTime().getMinute());
@@ -112,7 +112,7 @@ public class RingTimeController {
       return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body("Your sending sensor data are not correct!");
     }*/
 
-    RingTone ringTone = DtoConverter.convertDtoToRingTone(newRingTime.getRingToneDTO());
+    Ringtone ringTone = DtoConverter.convertDtoToRingtone(newRingTime.getRingToneDTO());
     Hour hour = hourRepository.findByHour(newRingTime.getPlayTime().getHour());
     Minute minute = minuteRepository.findByMinute(newRingTime.getPlayTime().getMinute());
     RingTime updateRingTime = ringTimeRepository

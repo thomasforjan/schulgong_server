@@ -18,7 +18,7 @@ public class RingTimeDTO  extends RepresentationModel<RingTimeDTO> {
   private long id;
   private String name;
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  private RingToneDTO ringToneDTO;
+  private RingtoneDTO ringToneDTO;
   @JsonFormat(pattern="HH:mm")
   private LocalTime playTime;
   private Date startDate;

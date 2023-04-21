@@ -3,9 +3,9 @@ package at.schulgong.util;
 import at.schulgong.Hour;
 import at.schulgong.Minute;
 import at.schulgong.dto.RingTimeDTO;
-import at.schulgong.dto.RingToneDTO;
+import at.schulgong.dto.RingtoneDTO;
 import at.schulgong.RingTime;
-import at.schulgong.RingTone;
+import at.schulgong.Ringtone;
 
 import java.time.LocalTime;
 
@@ -28,7 +28,7 @@ public class DtoConverter {
 //      .addInfo(ringTime.getAddInfo()).build();
     if (inclusiveRingTone) {
       if (ringTime.getRingTone() != null) {
-        RingToneDTO ringToneDTO = convertRingToneToDTO(ringTime.getRingTone());
+        RingtoneDTO ringToneDTO = convertRingtoneToDTO(ringTime.getRingTone());
         ringTimeDTO.setRingToneDTO(ringToneDTO);
       }
     }
@@ -52,7 +52,7 @@ public class DtoConverter {
     ringTime.setHour(new Hour(ringTimeDTO.getPlayTime().getHour()));
     ringTime.setMinute(new Minute(ringTimeDTO.getPlayTime().getMinute()));
     if (inclusiveRingTone) {
-      RingTone ringTone = convertDtoToRingTone(ringTimeDTO.getRingToneDTO());
+      Ringtone ringTone = convertDtoToRingtone(ringTimeDTO.getRingToneDTO());
       ringTime.setRingTone(ringTone);
     }
 //    ringTime.setAddInfo(ringTimeDTO.getAddInfo());
@@ -61,28 +61,32 @@ public class DtoConverter {
 
   }
 
-  public static RingToneDTO convertRingToneToDTO(RingTone ringTone) {
-    RingToneDTO ringToneDTO = RingToneDTO.builder()
-      .id(ringTone.getId())
-      .name(ringTone.getName())
-      .filename(ringTone.getFilename())
-      .path(ringTone.getPath())
-      .date(ringTone.getDate())
-      .size(ringTone.getSize())
-      .build();
-    return ringToneDTO;
+  /**
+   * Method to convert ringtone object into a ringtoneDTO object
+   *
+   * @param ringtone object of ringtone
+   * @return object of ringtoneDTO
+   */
+  public static RingtoneDTO convertRingtoneToDTO(Ringtone ringtone) {
+    RingtoneDTO ringtoneDTO = RingtoneDTO.builder().id(ringtone.getId()).name(ringtone.getName()).filename(ringtone.getFilename()).path(ringtone.getPath()).date(ringtone.getDate()).size(ringtone.getSize()).build();
+    return ringtoneDTO;
   }
 
-  public static RingTone convertDtoToRingTone(RingToneDTO ringToneDTO){
-    RingTone ringTone = new RingTone();
+  /**
+   * Method to convert ringtoneDTO object into a ringtone object
+   *
+   * @param ringtoneDTO object of ringtoneDTO
+   * @return object of ringtone
+   */
+  public static Ringtone convertDtoToRingtone(RingtoneDTO ringtoneDTO) {
+    Ringtone ringtone = new Ringtone();
 
-    ringTone.setId(ringToneDTO.getId());
-    ringTone.setName(ringToneDTO.getName());
-    ringTone.setFilename(ringToneDTO.getFilename());
-    ringTone.setPath(ringToneDTO.getPath());
-    ringTone.setDate(ringToneDTO.getDate());
-    ringTone.setSize(ringToneDTO.getSize());
-    return ringTone;
+    ringtone.setName(ringtoneDTO.getName());
+    ringtone.setFilename(ringtoneDTO.getFilename());
+    ringtone.setPath(ringtoneDTO.getPath());
+    ringtone.setDate(ringtoneDTO.getDate());
+    ringtone.setSize(ringtoneDTO.getSize());
+    return ringtone;
   }
 
 }

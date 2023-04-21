@@ -5,12 +5,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 @Getter
 @Setter
 @Table(name ="RingTone")
 @NoArgsConstructor
 @Entity
-public class RingTone {
+public class Ringtone {
 
 
   @Id
@@ -24,11 +26,11 @@ public class RingTone {
   @Column(name = "path")
   private String path;
   @Column(name = "date")
-  private String date;
+  private LocalDate date;
   @Column(name = "size")
-  private int size;
+  private double size;
 
-  public RingTone(String name, String filename, String path, String date, int size) {
+  public Ringtone(String name, String filename, String path, LocalDate date, int size) {
     this.name = name;
     this.filename = filename;
     this.path = path;
