@@ -80,13 +80,17 @@ public class RingtoneController {
     }
 
     Ringtone ringtone = getChangedRingtone(song, name);
-    Path filePath = Paths.get(ringtone.getPath());
 
     try {
       File dir = new File(Config.FILEPATH.getPath());
       if (!dir.exists()) {
         dir.mkdirs();
       }
+
+      if (dir.exists()) {
+        ringtone = changeFileName(ringtone, 2);
+      }
+      Path filePath = Paths.get(ringtone.getPath());
       song.transferTo(filePath.toFile());
     } catch (IOException e) {
       return new ResponseEntity<>("Failed to upload", HttpStatus.INTERNAL_SERVER_ERROR);
@@ -188,8 +192,53 @@ public class RingtoneController {
     ringtone.setPath(filePath.toString());
     ringtone.setName(name);
     ringtone.setFilename(multipartFile.getOriginalFilename());
-    ringtone.setSize((double) multipartFile.getSize() / 1000000);
+    ringtone.setSize(Math.round((double) multipartFile.getSize() / 1000000));
     ringtone.setDate(LocalDate.now());
     return ringtone;
   }
+
+  /**
+   * Method to change Filename and Path of a new Post-Request to provide 1:1 relationship between entry and audiofile
+   *
+   * @param ringtone ringtone object of Post-Request
+   * @param i        counter
+   * @return new Ringtone
+   */
+  private Ringtone changeFileName(Ringtone ringtone, int i) {
+    File file = new File(ringtone.getPath());
+
+    if (file.exists()) {
+      // get index of last dot, e.g. "."mp3
+      int lastDotIndex = ringtone.getFilename().lastIndexOf(".");
+      // get format of the audiofile
+      String format = ringtone.getFilename().substring(lastDotIndex);
+      // remove format from Filename
+      String newFileName = ringtone.getFilename().replace(format, "");
+      // check if counter is already set at the filename and if it is before the dot
+      if (newFileName.contains(String.valueOf(i - 1))) {
+        // remove counter from filename
+        newFileName = newFileName.substring(0, newFileName.length() - 1);
+      }
+      // concat filename
+      newFileName = newFileName + i + format;
+
+      // replace old filename with new filename
+      String newPath = ringtone.getPath().replace(ringtone.getFilename(), newFileName);
+      ringtone.setFilename(newFileName);
+      ringtone.setPath(newPath);
+    }
+
+    System.out.println(ringtone.getFilename());
+    System.out.println(ringtone.getPath());
+
+    // if new File already exist, counter +1 and recall changeFileName() with new ringtone object and new counter
+    if (file.exists()) {
+      i++;
+      changeFileName(ringtone, i);
+    }
+
+    return ringtone;
+  }
+
+
 }
