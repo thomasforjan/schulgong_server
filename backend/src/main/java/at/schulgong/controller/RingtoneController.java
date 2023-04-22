@@ -173,7 +173,7 @@ public class RingtoneController {
       RingtoneDTO ringtoneDTO = one(id);
 
       File file = new File(ringtoneDTO.getPath());
-      if (file.exists() && file.canWrite()){
+      if (file.exists() && file.canWrite()) {
         file.delete();
       }
       ringtoneRepository.deleteById(id);
@@ -222,8 +222,9 @@ public class RingtoneController {
       String newFileName = ringtone.getFilename().replace(format, "");
       // check if counter is already set at the filename and if it is before the dot
       if (newFileName.contains(String.valueOf(i - 1))) {
-        // remove counter from filename
-        newFileName = newFileName.substring(0, newFileName.length() - 1);
+        // remove counter from filename (with length of i-1)
+        newFileName = newFileName.substring(0, newFileName.length() - String.valueOf(i - 1).length());
+        System.out.println("if");
       }
       // concat filename
       newFileName = newFileName + i + format;
