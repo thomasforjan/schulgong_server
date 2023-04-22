@@ -2,17 +2,17 @@ package at.schulgong.util;
 
 import at.schulgong.Hour;
 import at.schulgong.Minute;
-import at.schulgong.dto.RingTimeDTO;
+import at.schulgong.dto.RingtimeDTO;
 import at.schulgong.dto.RingtoneDTO;
-import at.schulgong.RingTime;
+import at.schulgong.Ringtime;
 import at.schulgong.Ringtone;
 
 import java.time.LocalTime;
 
 public class DtoConverter {
 
-  public static RingTimeDTO convertRingTimeToDTO(RingTime ringTime, boolean inclusiveRingTone) {
-    RingTimeDTO ringTimeDTO = RingTimeDTO.builder()
+  public static RingtimeDTO convertRingtimeToDTO(Ringtime ringTime, boolean inclusiveRingtone) {
+    RingtimeDTO ringTimeDTO = RingtimeDTO.builder()
       .id(ringTime.getId())
       .name(ringTime.getName())
       .startDate(ringTime.getStartDate())
@@ -26,38 +26,38 @@ public class DtoConverter {
       .sunday(ringTime.isSunday())
       .playTime(LocalTime.of(ringTime.getHour().getHour(), ringTime.getMinute().getMinute())).build();
 //      .addInfo(ringTime.getAddInfo()).build();
-    if (inclusiveRingTone) {
+    if (inclusiveRingtone) {
       if (ringTime.getRingtone() != null) {
         RingtoneDTO ringToneDTO = convertRingtoneToDTO(ringTime.getRingtone());
-        ringTimeDTO.setRingToneDTO(ringToneDTO);
+        ringTimeDTO.setRingtoneDTO(ringToneDTO);
       }
     }
     return ringTimeDTO;
   }
 
-  public static RingTime convertDtoToRingTime(RingTimeDTO ringTimeDTO, boolean inclusiveRingTone){
-    RingTime ringTime = new RingTime();
+  public static Ringtime convertDtoToRingtime(RingtimeDTO ringtimeDTO, boolean inclusiveRingtone){
+    Ringtime ringtime = new Ringtime();
 
-    ringTime.setId(ringTimeDTO.getId());
-    ringTime.setName(ringTimeDTO.getName());
-    ringTime.setStartDate(ringTimeDTO.getStartDate());
-    ringTime.setEndDate(ringTimeDTO.getEndDate());
-    ringTime.setMonday(ringTimeDTO.isMonday());
-    ringTime.setTuesday(ringTimeDTO.isTuesday());
-    ringTime.setWednesday(ringTimeDTO.isWednesday());
-    ringTime.setThursday(ringTimeDTO.isThursday());
-    ringTime.setFriday(ringTimeDTO.isFriday());
-    ringTime.setSaturday(ringTimeDTO.isSaturday());
-    ringTime.setSunday(ringTimeDTO.isSunday());
-    ringTime.setHour(new Hour(ringTimeDTO.getPlayTime().getHour()));
-    ringTime.setMinute(new Minute(ringTimeDTO.getPlayTime().getMinute()));
-    if (inclusiveRingTone) {
-      Ringtone ringTone = convertDtoToRingtone(ringTimeDTO.getRingToneDTO());
-      ringTime.setRingtone(ringTone);
+    ringtime.setId(ringtimeDTO.getId());
+    ringtime.setName(ringtimeDTO.getName());
+    ringtime.setStartDate(ringtimeDTO.getStartDate());
+    ringtime.setEndDate(ringtimeDTO.getEndDate());
+    ringtime.setMonday(ringtimeDTO.isMonday());
+    ringtime.setTuesday(ringtimeDTO.isTuesday());
+    ringtime.setWednesday(ringtimeDTO.isWednesday());
+    ringtime.setThursday(ringtimeDTO.isThursday());
+    ringtime.setFriday(ringtimeDTO.isFriday());
+    ringtime.setSaturday(ringtimeDTO.isSaturday());
+    ringtime.setSunday(ringtimeDTO.isSunday());
+    ringtime.setHour(new Hour(ringtimeDTO.getPlayTime().getHour()));
+    ringtime.setMinute(new Minute(ringtimeDTO.getPlayTime().getMinute()));
+    if (inclusiveRingtone) {
+      Ringtone ringTone = convertDtoToRingtone(ringtimeDTO.getRingtoneDTO());
+      ringtime.setRingtone(ringTone);
     }
 //    ringTime.setAddInfo(ringTimeDTO.getAddInfo());
 
-    return ringTime;
+    return ringtime;
 
   }
 

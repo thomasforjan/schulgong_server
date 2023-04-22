@@ -9,8 +9,8 @@ import java.util.Date;
 @Getter
 @Setter
 @Entity
-@Table(name = "RingTime")
-public class RingTime {
+@Table(name = "Ringtime")
+public class Ringtime {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -13,12 +13,12 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class RingTimeDTO  extends RepresentationModel<RingTimeDTO> {
+public class RingtimeDTO extends RepresentationModel<RingtimeDTO> {
 
   private long id;
   private String name;
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  private RingtoneDTO ringToneDTO;
+  private RingtoneDTO ringtoneDTO;
   @JsonFormat(pattern="HH:mm")
   private LocalTime playTime;
   private Date startDate;
