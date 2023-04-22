@@ -93,7 +93,7 @@ public class RingTimeController {
     if(minute != null) {
       ringTime.setMinute(minute);
     }
-    ringTime.setRingTone(ringTone);
+    ringTime.setRingtone(ringTone);
     RingTimeDTO entityModel = assembler.toModel(ringTimeRepository.save(ringTime));
     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
@@ -119,7 +119,7 @@ public class RingTimeController {
       .findById(id)
       .map(ringTime -> {
         ringTime.setName(newRingTime.getName());
-        ringTime.setRingTone(ringTone);
+        ringTime.setRingtone(ringTone);
         ringTime.setStartDate(newRingTime.getStartDate());
         ringTime.setEndDate(newRingTime.getEndDate());
         ringTime.setMonday(newRingTime.isMonday());

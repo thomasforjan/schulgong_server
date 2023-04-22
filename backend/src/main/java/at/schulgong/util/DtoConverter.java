@@ -27,8 +27,8 @@ public class DtoConverter {
       .playTime(LocalTime.of(ringTime.getHour().getHour(), ringTime.getMinute().getMinute())).build();
 //      .addInfo(ringTime.getAddInfo()).build();
     if (inclusiveRingTone) {
-      if (ringTime.getRingTone() != null) {
-        RingtoneDTO ringToneDTO = convertRingtoneToDTO(ringTime.getRingTone());
+      if (ringTime.getRingtone() != null) {
+        RingtoneDTO ringToneDTO = convertRingtoneToDTO(ringTime.getRingtone());
         ringTimeDTO.setRingToneDTO(ringToneDTO);
       }
     }
@@ -53,7 +53,7 @@ public class DtoConverter {
     ringTime.setMinute(new Minute(ringTimeDTO.getPlayTime().getMinute()));
     if (inclusiveRingTone) {
       Ringtone ringTone = convertDtoToRingtone(ringTimeDTO.getRingToneDTO());
-      ringTime.setRingTone(ringTone);
+      ringTime.setRingtone(ringTone);
     }
 //    ringTime.setAddInfo(ringTimeDTO.getAddInfo());
 
@@ -80,7 +80,7 @@ public class DtoConverter {
    */
   public static Ringtone convertDtoToRingtone(RingtoneDTO ringtoneDTO) {
     Ringtone ringtone = new Ringtone();
-
+    ringtone.setId(ringtoneDTO.getId());
     ringtone.setName(ringtoneDTO.getName());
     ringtone.setFilename(ringtoneDTO.getFilename());
     ringtone.setPath(ringtoneDTO.getPath());

@@ -21,7 +21,7 @@ public class RingTime {
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "ringtone_ID")
-  private Ringtone ringTone;
+  private Ringtone ringtone;
 
   @Column(name = "startdate", columnDefinition = "DATE")
   private Date startDate;
