@@ -81,16 +81,7 @@ public class RingtoneController {
     Ringtone ringtone = getChangedRingtone(song, name);
 
     try {
-      File dir = new File(Config.FILEPATH.getPath());
-      if (!dir.exists()) {
-        dir.mkdirs();
-      }
-
-      if (dir.exists()) {
-        ringtone = changeFileName(ringtone, 2);
-      }
-      Path filePath = Paths.get(ringtone.getPath());
-      song.transferTo(filePath.toFile());
+      saveAudiofile(ringtone, song);
     } catch (IOException e) {
       return new ResponseEntity<>("Failed to upload", HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -129,16 +120,7 @@ public class RingtoneController {
         ringtone.setSize(oldRingtone.getSize());
 
         try {
-          File dir = new File(Config.FILEPATH.getPath());
-          if (!dir.exists()) {
-            dir.mkdirs();
-          }
-
-          if (dir.exists()) {
-            ringtone = changeFileName(ringtone, 2);
-          }
-          Path filePath = Paths.get(ringtone.getPath());
-          newSong.transferTo(filePath.toFile());
+          saveAudiofile(ringtone, newSong);
         } catch (IOException e) {
           return new ResponseEntity<>("Failed to upload", HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -190,6 +172,26 @@ public class RingtoneController {
     if (file.exists() && file.canWrite()) {
       file.delete();
     }
+  }
+
+  /**
+   * Method to save the audiofile in the directory
+   * @param ringtone ringtone object
+   * @param newSong multipart file
+   * @throws IOException if entity not found
+   */
+  private void saveAudiofile(Ringtone ringtone, MultipartFile newSong) throws IOException {
+    File dir = new File(Config.FILEPATH.getPath());
+    if (!dir.exists()) {
+      dir.mkdirs();
+    }
+
+    if (dir.exists()) {
+      ringtone = changeFileName(ringtone, 2);
+    }
+    Path filePath = Paths.get(ringtone.getPath());
+    newSong.transferTo(filePath.toFile());
+
   }
 
   /**
