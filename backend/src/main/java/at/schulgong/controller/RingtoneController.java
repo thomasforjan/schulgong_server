@@ -170,6 +170,12 @@ public class RingtoneController {
   @DeleteMapping("/{id}")
   ResponseEntity<?> deleteRingtone(@PathVariable long id) {
     if (ringtoneRepository.existsById(id)) {
+      RingtoneDTO ringtoneDTO = one(id);
+
+      File file = new File(ringtoneDTO.getPath());
+      if (file.exists() && file.canWrite()){
+        file.delete();
+      }
       ringtoneRepository.deleteById(id);
       return ResponseEntity.noContent().build();
     } else {
