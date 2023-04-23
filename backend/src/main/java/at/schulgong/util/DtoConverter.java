@@ -9,32 +9,52 @@ import at.schulgong.Ringtone;
 
 import java.time.LocalTime;
 
+/**
+ * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
+ * @version 0.1
+ * @implNote DtoConverter to convert ringtoneDTO into ringtone and reverse and ringtimeDTO into ringtime and reverse.
+ * @since April 2023
+ */
 public class DtoConverter {
 
-  public static RingtimeDTO convertRingtimeToDTO(Ringtime ringTime, boolean inclusiveRingtone) {
+  /**
+   * Method to convert ringtime object into a ringtimeDTO object
+   *
+   * @param ringtime object of ringtone
+   * @param inclusiveRingtone boolean
+   * @return object of ringtoneDTO
+   */
+  public static RingtimeDTO convertRingtimeToDTO(Ringtime ringtime, boolean inclusiveRingtone) {
     RingtimeDTO ringTimeDTO = RingtimeDTO.builder()
-      .id(ringTime.getId())
-      .name(ringTime.getName())
-      .startDate(ringTime.getStartDate())
-      .endDate(ringTime.getEndDate())
-      .monday(ringTime.isMonday())
-      .tuesday(ringTime.isTuesday())
-      .wednesday(ringTime.isWednesday())
-      .thursday(ringTime.isThursday())
-      .friday(ringTime.isFriday())
-      .saturday(ringTime.isSaturday())
-      .sunday(ringTime.isSunday())
-      .playTime(LocalTime.of(ringTime.getHour().getHour(), ringTime.getMinute().getMinute())).build();
+      .id(ringtime.getId())
+      .name(ringtime.getName())
+      .startDate(ringtime.getStartDate())
+      .endDate(ringtime.getEndDate())
+      .monday(ringtime.isMonday())
+      .tuesday(ringtime.isTuesday())
+      .wednesday(ringtime.isWednesday())
+      .thursday(ringtime.isThursday())
+      .friday(ringtime.isFriday())
+      .saturday(ringtime.isSaturday())
+      .sunday(ringtime.isSunday())
+      .playTime(LocalTime.of(ringtime.getHour().getHour(), ringtime.getMinute().getMinute())).build();
 //      .addInfo(ringTime.getAddInfo()).build();
     if (inclusiveRingtone) {
-      if (ringTime.getRingtone() != null) {
-        RingtoneDTO ringToneDTO = convertRingtoneToDTO(ringTime.getRingtone());
+      if (ringtime.getRingtone() != null) {
+        RingtoneDTO ringToneDTO = convertRingtoneToDTO(ringtime.getRingtone());
         ringTimeDTO.setRingtoneDTO(ringToneDTO);
       }
     }
     return ringTimeDTO;
   }
 
+  /**
+   * Method to convert ringtimeDTO object into a ringtime object
+   *
+   * @param ringtimeDTO object of ringtimeDTO
+   * @param inclusiveRingtone boolean
+   * @return object of ringtime
+   */
   public static Ringtime convertDtoToRingtime(RingtimeDTO ringtimeDTO, boolean inclusiveRingtone){
     Ringtime ringtime = new Ringtime();
 

@@ -8,6 +8,12 @@ import org.springframework.hateoas.RepresentationModel;
 import java.time.LocalTime;
 import java.util.Date;
 
+/**
+ * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
+ * @version 0.1
+ * @implNote DTO of Ringtime Object
+ * @since April 2023
+ */
 @Getter
 @Setter
 @NoArgsConstructor

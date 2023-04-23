@@ -23,6 +23,13 @@ import java.util.List;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+/**
+ * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
+ * @version 0.1
+ * @implNote Controller to provide CRUD-functionality
+ * @since April 2023
+ */
+
 @RestController
 @RequestMapping("ringtimes")
 @CrossOrigin

@@ -14,6 +14,12 @@ import java.util.List;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+/**
+ * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
+ * @version 0.1
+ * @implNote Assembler to add self and global url to entry to make it Restful
+ * @since April 2023
+ */
 @Component
 public class RingtimeModelAssembler extends RepresentationModelAssemblerSupport<Ringtime, RingtimeDTO> {
 
@@ -24,8 +30,8 @@ public class RingtimeModelAssembler extends RepresentationModelAssemblerSupport<
   /**
    * Converts ringTime entity list to data transfer object (DTO) list.
    *
-   * @param ringtime takes a ringTime object
-   * @return ringTimeDTO
+   * @param ringtime takes a ringtime object
+   * @return ringtimeDTO
    */
   @Override
   public RingtimeDTO toModel(Ringtime ringtime){
@@ -38,8 +44,8 @@ public class RingtimeModelAssembler extends RepresentationModelAssemblerSupport<
   /**
    * Converts ringTime entity list to data transfer object (DTO) list.
    *
-   * @param ringtimesList takes ringTime object list
-   * @return ringTimeDTO list
+   * @param ringtimesList takes ringtime object list
+   * @return ringtimeDTO list
    */
   @Override
   public CollectionModel<RingtimeDTO> toCollectionModel(Iterable<? extends Ringtime> ringtimesList) {
