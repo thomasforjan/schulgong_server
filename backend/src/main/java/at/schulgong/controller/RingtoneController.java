@@ -12,14 +12,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.List;
-
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
@@ -42,7 +40,7 @@ public class RingtoneController {
   }
 
   /**
-   * Get all ringTones.
+   * Get all ringtones.
    *
    * @return all ringtones
    */
@@ -256,6 +254,4 @@ public class RingtoneController {
 
     return ringtone;
   }
-
-
 }

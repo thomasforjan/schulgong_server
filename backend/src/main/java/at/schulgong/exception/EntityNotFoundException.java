@@ -7,6 +7,7 @@ package at.schulgong.exception;
  * @since April 2023
  */
 public class EntityNotFoundException extends RuntimeException {
+
   public EntityNotFoundException(long id, String entity) {
     super("Could not find " + entity + " " + id);
   }

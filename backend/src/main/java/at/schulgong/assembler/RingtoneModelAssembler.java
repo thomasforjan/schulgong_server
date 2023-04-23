@@ -8,10 +8,8 @@ import at.schulgong.util.DtoConverter;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;
 import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
@@ -26,7 +24,6 @@ public class RingtoneModelAssembler extends RepresentationModelAssemblerSupport<
   public RingtoneModelAssembler() {
     super(RingtoneController.class, RingtoneDTO.class);
   }
-
 
   /**
    * Method to change object ringtone to the DTO and to add selfrel and global rel.
