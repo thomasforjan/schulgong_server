@@ -24,7 +24,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
-@RequestMapping("periods")
+@RequestMapping("ringtimes")
 @CrossOrigin
 public class RingtimeController {
   private final RingtimeRepository ringTimeRepository;
