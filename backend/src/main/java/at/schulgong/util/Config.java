@@ -12,7 +12,8 @@ import lombok.Getter;
 public enum Config {
 
   RINGTONE("ringtones", "", "ringtone"),
-  FILEPATH("", "D:/01-Studium/Software Engineering und vernetzte Systeme/4. Semester/Praxisprojekt/Audiofiles", "");
+
+  FILEPATH("", "C:/Users/kralm/Desktop/Audiofiles", "");
 
   private final String url, path, exception;
 

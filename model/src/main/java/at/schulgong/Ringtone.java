@@ -4,17 +4,20 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import java.time.LocalDate;
 
+/**
+ * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
+ * @version 0.1
+ * @implNote Model of ringtone
+ * @since April 2023
+ */
 @Getter
 @Setter
-@Table(name ="RingTone")
+@Table(name = "Ringtone")
 @NoArgsConstructor
 @Entity
 public class Ringtone {
-
-
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id;
@@ -30,7 +33,7 @@ public class Ringtone {
   @Column(name = "size")
   private double size;
 
-  public Ringtone(String name, String filename, String path, LocalDate date, int size) {
+  public Ringtone(String name, String filename, String path, LocalDate date, double size) {
     this.name = name;
     this.filename = filename;
     this.path = path;

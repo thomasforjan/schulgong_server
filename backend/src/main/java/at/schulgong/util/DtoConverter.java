@@ -6,8 +6,8 @@ import at.schulgong.dto.RingtimeDTO;
 import at.schulgong.dto.RingtoneDTO;
 import at.schulgong.Ringtime;
 import at.schulgong.Ringtone;
-
 import java.time.LocalTime;
+
 
 /**
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
@@ -108,5 +108,4 @@ public class DtoConverter {
     ringtone.setSize(ringtoneDTO.getSize());
     return ringtone;
   }
-
 }
