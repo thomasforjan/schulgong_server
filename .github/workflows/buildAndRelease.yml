@@ -1,0 +1,131 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - stable
+      - 'feature/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+      - name: Validate Gradle wrapper
+        uses: gradle/wrapper-validation-action@e6e38bacfdf1a337459f332974bb2327a31aaf4b
+
+      - name: Build backend with Gradle
+        uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
+        with:
+          arguments: :backend:build
+      - uses: actions/upload-artifact@v3
+        with:
+          name: Package-backend
+          path: backend/build/libs
+      - name: Build speaker-api with Gradle
+        uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
+        with:
+          arguments: :speaker-api:build
+      - uses: actions/upload-artifact@v3
+        with:
+          name: Package-speaker-api
+          path: backend/build/libs
+
+  create-release:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/stable'
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+
+      - name: Create Release Notes File
+        env:
+          COMMITTEXT: "${{ github.event.head_commit.message }}"
+        run: |
+          php create-release-notes-file.php
+      - name: Set Tag Output
+        id: set-tag
+        run: echo "::set-output name=tag_name::$(sh get-version.sh)"
+
+      - name: Create Tag
+        uses: actions/github-script@v3
+        env:
+          TAG: ${{ steps.set-tag.outputs.tag_name }}
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            github.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+             ref: "refs/tags/${{ steps.set-tag.outputs.tag_name }}",
+              sha: context.sha
+            })
+      - name: Create release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.set-tag.outputs.tag_name }}
+          bodyFile: './release_notes.txt'
+          token: ${{ secrets.TOKEN_SCHULGONG_SERVER }}
+
+  increment-versionnumber:
+    runs-on: ubuntu-latest
+    needs: create-release
+    if: github.ref == 'refs/heads/stable'
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+      - name: Validate Gradle wrapper
+        uses: gradle/wrapper-validation-action@e6e38bacfdf1a337459f332974bb2327a31aaf4b
+
+      - name: Increase version number
+        if: github.ref == 'refs/heads/stable'
+        uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
+        with:
+          arguments: incrementVersionNumber
+
+      - name: Set Tag Output
+        id: set-versionnumber
+        run: echo "::set-output name=version_number::$(sh get-version.sh)"
+
+      - name: commit stable
+        uses: devops-infra/action-commit-push@master
+        with:
+          github_token: "${{ secrets.TOKEN_SCHULGONG_SERVER }}"
+          commit_prefix: "[AUTO] increment version number to "
+          commit_message: ${{ steps.set-versionnumber.outputs.version_number }}
+          force: true
+      - name: merge stable into main
+        if: github.ref == 'refs/heads/stable'
+        uses: everlytic/branch-merge@1.1.2
+        with:
+          github_token: "${{ secrets.TOKEN_SCHULGONG_SERVER }}"
+          source_ref: ${{ github.ref }}
+          target_branch: 'main'
+          commit_message_template: '[AUTO] Merged {source_ref} into target {target_branch}'
+
+
