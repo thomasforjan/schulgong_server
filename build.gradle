@@ -61,7 +61,7 @@ subprojects {
 
   spotless {
     // optional: limit format enforcement to just the files changed by this feature branch
-    ratchetFrom 'origin/main'
+    ratchetFrom getCurrentGitBranch()
 
     format 'misc', {
       // define the files to apply `misc` to
@@ -82,3 +82,17 @@ subprojects {
   tasks.named('test') {
     useJUnitPlatform()
   }
+
+def getCurrentGitBranch() {
+  def gitBranch = "Unknown branch"
+  try {
+    def workingDir = new File("${project.projectDir}")
+    def result = 'git rev-parse --abbrev-ref HEAD'.execute(null, workingDir)
+    result.waitFor()
+    if (result.exitValue() == 0) {
+      gitBranch = result.text.trim()
+    }
+  } catch (e) {
+  }
+  return gitBranch
+}
