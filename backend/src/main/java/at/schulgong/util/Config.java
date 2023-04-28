@@ -13,7 +13,9 @@ public enum Config {
 
   RINGTONE("ringtones", "", "ringtone"),
 
-  FILEPATH("", "C:/Users/kralm/Desktop/Audiofiles", "");
+  FILEPATH("", "C:/Users/kralm/Desktop/Audiofiles", ""),
+
+  SPEAKER_API_SETTINGS_PATH("","D://01-Studium/Software Engineering und vernetzte Systeme/4. Semester/Praxisprojekt/Python_Speaker_API/speaker_api_settings.json", "");
 
   private final String url, path, exception;
 
