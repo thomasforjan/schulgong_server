@@ -1,11 +1,10 @@
 package at.schulgong.util;
 
-import at.schulgong.Hour;
-import at.schulgong.Minute;
+import at.schulgong.*;
+import at.schulgong.dto.HolidayDTO;
 import at.schulgong.dto.RingtimeDTO;
 import at.schulgong.dto.RingtoneDTO;
-import at.schulgong.Ringtime;
-import at.schulgong.Ringtone;
+
 import java.time.LocalTime;
 
 
@@ -20,25 +19,12 @@ public class DtoConverter {
   /**
    * Method to convert ringtime object into a ringtimeDTO object
    *
-   * @param ringtime object of ringtone
+   * @param ringtime          object of ringtone
    * @param inclusiveRingtone boolean
    * @return object of ringtoneDTO
    */
   public static RingtimeDTO convertRingtimeToDTO(Ringtime ringtime, boolean inclusiveRingtone) {
-    RingtimeDTO ringTimeDTO = RingtimeDTO.builder()
-      .id(ringtime.getId())
-      .name(ringtime.getName())
-      .startDate(ringtime.getStartDate())
-      .endDate(ringtime.getEndDate())
-      .monday(ringtime.isMonday())
-      .tuesday(ringtime.isTuesday())
-      .wednesday(ringtime.isWednesday())
-      .thursday(ringtime.isThursday())
-      .friday(ringtime.isFriday())
-      .saturday(ringtime.isSaturday())
-      .sunday(ringtime.isSunday())
-      .playTime(LocalTime.of(ringtime.getHour().getHour(), ringtime.getMinute().getMinute())).build();
-//      .addInfo(ringTime.getAddInfo()).build();
+    RingtimeDTO ringTimeDTO = RingtimeDTO.builder().id(ringtime.getId()).name(ringtime.getName()).startDate(ringtime.getStartDate()).endDate(ringtime.getEndDate()).monday(ringtime.isMonday()).tuesday(ringtime.isTuesday()).wednesday(ringtime.isWednesday()).thursday(ringtime.isThursday()).friday(ringtime.isFriday()).saturday(ringtime.isSaturday()).sunday(ringtime.isSunday()).playTime(LocalTime.of(ringtime.getHour().getHour(), ringtime.getMinute().getMinute())).build();
     if (inclusiveRingtone) {
       if (ringtime.getRingtone() != null) {
         RingtoneDTO ringToneDTO = convertRingtoneToDTO(ringtime.getRingtone());
@@ -51,11 +37,11 @@ public class DtoConverter {
   /**
    * Method to convert ringtimeDTO object into a ringtime object
    *
-   * @param ringtimeDTO object of ringtimeDTO
+   * @param ringtimeDTO       object of ringtimeDTO
    * @param inclusiveRingtone boolean
    * @return object of ringtime
    */
-  public static Ringtime convertDtoToRingtime(RingtimeDTO ringtimeDTO, boolean inclusiveRingtone){
+  public static Ringtime convertDtoToRingtime(RingtimeDTO ringtimeDTO, boolean inclusiveRingtone) {
     Ringtime ringtime = new Ringtime();
 
     ringtime.setId(ringtimeDTO.getId());
@@ -108,4 +94,32 @@ public class DtoConverter {
     ringtone.setSize(ringtoneDTO.getSize());
     return ringtone;
   }
+
+  /**
+   * Method to convert holiday object into a holidayDTO object
+   *
+   * @param holiday object of holiday
+   * @return object of holidayDTO
+   */
+  public static HolidayDTO convertHolidayToDTO(Holiday holiday) {
+    HolidayDTO holidayDTO = HolidayDTO.builder().id(holiday.getId()).startDate(holiday.getStartDate()).endDate(holiday.getEndDate()).name(holiday.getName()).build();
+    return holidayDTO;
+  }
+
+  /**
+   * Method to convert holidayDTO object into a holiday object
+   *
+   * @param holidayDTO object of holiday
+   * @return object of holiday
+   */
+  public static Holiday convertDtoToHoliday(HolidayDTO holidayDTO) {
+    Holiday holiday = new Holiday();
+    holiday.setId(holidayDTO.getId());
+    holiday.setStartDate(holidayDTO.getStartDate());
+    holiday.setEndDate(holidayDTO.getEndDate());
+    holiday.setName(holidayDTO.getName());
+    return holiday;
+  }
+
+
 }

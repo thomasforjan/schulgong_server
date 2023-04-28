@@ -12,8 +12,9 @@ import lombok.Getter;
 public enum Config {
 
   RINGTONE("ringtones", "", "ringtone"),
-
+  HOLIDAY("holidays", "", "holiday"),
   FILEPATH("", "C:/Users/kralm/Desktop/Audiofiles", "");
+
 
   private final String url, path, exception;
 
