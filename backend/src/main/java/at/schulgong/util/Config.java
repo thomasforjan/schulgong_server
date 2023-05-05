@@ -10,18 +10,24 @@ import lombok.Getter;
  */
 @Getter
 public enum Config {
+    RINGTONE("ringtones", "", "ringtone"),
+    HOLIDAY("holidays", "", "holiday"),
+    FILEPATH(
+            "",
+            "D://01-Studium/Software Engineering und vernetzte"
+                    + " Systeme/4.Semester/Praxisprojekt/Audiofiles",
+            ""),
 
-  RINGTONE("ringtones", "", "ringtone"),
+    SPEAKER_API_SETTINGS_PATH(
+            "",
+            "D://01-Studium/Software Engineering und vernetzte Systeme/4."
+                + " Semester/Praxisprojekt/schulgong_server/backend/src/main/resources/python/config/speaker_api_settings.json",
+            "");
+    private final String url, path, exception;
 
-  FILEPATH("", "C:/Users/kralm/Desktop/Audiofiles", ""),
-
-  SPEAKER_API_SETTINGS_PATH("","D://01-Studium/Software Engineering und vernetzte Systeme/4. Semester/Praxisprojekt/Python_Speaker_API/speaker_api_settings.json", "");
-
-  private final String url, path, exception;
-
-  Config(String url, String path, String exception) {
-    this.url = url;
-    this.path = path;
-    this.exception = exception;
-  }
+    Config(String url, String path, String exception) {
+        this.url = url;
+        this.path = path;
+        this.exception = exception;
+    }
 }
