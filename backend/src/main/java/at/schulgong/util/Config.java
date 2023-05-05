@@ -30,4 +30,5 @@ public enum Config {
         this.path = path;
         this.exception = exception;
     }
+
 }
