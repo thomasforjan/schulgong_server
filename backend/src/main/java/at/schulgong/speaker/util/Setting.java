@@ -2,6 +2,8 @@ package at.schulgong.speaker.util;
 
 import lombok.*;
 
+import java.time.LocalTime;
+
 @Setter
 @Getter
 @AllArgsConstructor
@@ -11,5 +13,6 @@ public class Setting {
 
   private String type;
   private String executedFilePath;
+  private LocalTime loadRingtimeTime;
 
 }

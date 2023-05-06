@@ -34,7 +34,6 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin
 public class RingtimeController {
 
-    //  @Resource(name = "playRingtonesBean")
     private final PlayRingtones playRingtones;
 
     private final RingtimeRepository ringTimeRepository;

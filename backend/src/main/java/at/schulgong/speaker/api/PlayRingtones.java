@@ -1,6 +1,9 @@
 package at.schulgong.speaker.api;
 
+import at.schulgong.dto.HolidayDTO;
 import at.schulgong.dto.RingtimeDTO;
+import at.schulgong.speaker.util.ReadSettingFile;
+import at.schulgong.speaker.util.Setting;
 import at.schulgong.speaker.util.SpeakerActionStatus;
 import jakarta.annotation.PostConstruct;
 
@@ -8,11 +11,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Timer;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -23,16 +22,16 @@ import org.springframework.web.context.annotation.ApplicationScope;
 // @Component
 // @ApplicationScope
 // @Service
-public class PlayRingtones implements Runnable {
+public class PlayRingtones {
 
   @Autowired
   private PlayRingtonesService playRingtonesService;
+  private Timer timer;
+  private List<RingtimeDTO> ringtimeDTOList;
 
-  private Thread worker;
-  private static final AtomicBoolean running = new AtomicBoolean(false);
-  private static final AtomicBoolean interrupt = new AtomicBoolean(false);
-  private static Timer timer;
-  private static List<RingtimeDTO> ringtimeDTOList;
+  private List<RingtimeTask> ringtimeTaskList;
+
+  private Setting setting;
 
   @Bean
   @ApplicationScope
@@ -52,67 +51,64 @@ public class PlayRingtones implements Runnable {
 
   @PostConstruct
   public void init() {
+    setting = ReadSettingFile.getSettingFromConfigFile();
+    timer = new Timer();
+    runEveryDayTask();
+    ringtimeTaskList = new ArrayList<>();
     System.out.println("POST CONSTRACT");
     loadRingtimes();
     playRingtonesFromRingtimes();
   }
 
   public void playRingtonesFromRingtimes() {
-    worker = new Thread(this);
-    worker.start();
+    if (ringtimeDTOList != null && ringtimeDTOList.size() > 0) {
+      LocalDateTime ldtActualPlayTime = LocalDateTime.of(LocalDate.now(), ringtimeDTOList.get(0).getPlayTime());
+      if (ldtActualPlayTime != null && LocalDateTime.now().isAfter(ldtActualPlayTime)) {
+        ringtimeDTOList.remove(0);
+      }
+      for (RingtimeDTO ringtime : ringtimeDTOList) {
+        ldtActualPlayTime = LocalDateTime.of(LocalDate.now(), ringtime.getPlayTime());
+        startRingtimeTask(ldtActualPlayTime, ringtime);
+      }
+    }
   }
 
   public void stop() {
-    interrupt.set(true);
-    running.set(false);
     if (timer != null) {
       timer.cancel();
     }
   }
 
+  public void start() {
+    timer = new Timer();
+  }
+
   public void restart() {
     System.out.println("RESTART");
-    stop();
+    stopTasks();
     loadRingtimes();
     playRingtonesFromRingtimes();
   }
 
-  @Override
-  public void run() {
-    running.set(false);
-    do {
-      if (ringtimeDTOList != null && ringtimeDTOList.size() > 0) {
-        LocalDateTime ldtActualPlayTime = LocalDateTime.of(LocalDate.now(), ringtimeDTOList.get(0).getPlayTime());
-        if (ldtActualPlayTime != null && !running.get() && LocalDateTime.now().isAfter(ldtActualPlayTime)) {
-          running.set(true);
-          ringtimeDTOList.remove(0);
-          continue;
-        }
-        if (ldtActualPlayTime != null
-          && (!running.get() && LocalDateTime.now().isBefore(ldtActualPlayTime)
-          || running.get()
-          && LocalDateTime.now().isAfter(ldtActualPlayTime))) {
-          ldtActualPlayTime =
-            LocalDateTime.of(LocalDate.now(), ringtimeDTOList.get(0).getPlayTime());
-          startTimer(ldtActualPlayTime, ringtimeDTOList.get(0));
-          ringtimeDTOList.remove(0);
-        }
-        running.set(true);
-      } else {
-        running.set(false);
+  private void stopTasks() {
+    if (ringtimeTaskList != null && ringtimeTaskList.size() > 0) {
+      for (RingtimeTask task : ringtimeTaskList) {
+        task.cancel();
       }
-    } while (running.get() && !interrupt.get());
+      ringtimeTaskList = new ArrayList<>();
+    }
   }
 
   public SpeakerActionStatus executeSpeakerAction(String[] argsList) {
     return SpeakerApi.runSpeakerApi(argsList);
   }
 
-  private void startTimer(LocalDateTime ldtPlayTime, RingtimeDTO ringtimeDTO) {
+  private void startRingtimeTask(LocalDateTime ldtPlayTime, RingtimeDTO ringtimeDTO) {
     Date date = Date.from(ldtPlayTime.atZone(ZoneId.systemDefault()).toInstant());
     try {
-      timer = new Timer();
-      timer.schedule(new RingtimeTask(ringtimeDTO, this), date);
+      RingtimeTask ringtimeTask = new RingtimeTask(ringtimeDTO, this);
+      ringtimeTaskList.add(ringtimeTask);
+      timer.schedule(ringtimeTask, date);
     } catch (Exception e) {
     }
   }
@@ -150,6 +146,26 @@ public class PlayRingtones implements Runnable {
       }
     }
     return false;
+  }
+
+  public boolean checkLoadHoliday(HolidayDTO holidayDTO) {
+    LocalDate ld = LocalDate.now();
+    if ((ld.isEqual(holidayDTO.getStartDate()) || ld.isAfter(holidayDTO.getStartDate())) && ld.isBefore(holidayDTO.getEndDate())) {
+      return true;
+    }
+    return false;
+  }
+
+  private void runEveryDayTask() {
+    LocalDateTime ldt = LocalDateTime.of(LocalDate.now(), setting.getLoadRingtimeTime());
+    Date date = Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
+    long period = 1000L * 60L * 60L * 24L;
+    timer.scheduleAtFixedRate(new TimerTask() {
+      @Override
+      public void run() {
+        restart();
+      }
+    }, date, period);
   }
 
 }

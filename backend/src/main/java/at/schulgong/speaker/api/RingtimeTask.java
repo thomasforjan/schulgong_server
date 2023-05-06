@@ -26,8 +26,6 @@ public class RingtimeTask extends TimerTask {
     public RingtimeTask(RingtimeDTO ringtimeDTO, PlayRingtones playRingtones) {
         this.ringtimeDTO = ringtimeDTO;
         this.playRingtones = playRingtones;
-        //    this.args = new String[] {SpeakerCommand.PLAY_URI.getCommand(),
-        // ringtimeDTO.getRingtoneDTO().getPath()};
     }
 
     @Override
@@ -37,9 +35,6 @@ public class RingtimeTask extends TimerTask {
             convertPath(this.ringtimeDTO.getRingtoneDTO().getPath())
         };
         playRingtones.executeSpeakerAction(argsList);
-        if (!cancel.get()) {
-            System.out.println("RING RING RING");
-        }
     }
 
     public PlayRingtones getPlayRingtones() {

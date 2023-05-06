@@ -5,6 +5,7 @@ import at.schulgong.assembler.HolidayModelAssembler;
 import at.schulgong.dto.HolidayDTO;
 import at.schulgong.exception.EntityNotFoundException;
 import at.schulgong.repository.HolidayRepository;
+import at.schulgong.speaker.api.PlayRingtones;
 import at.schulgong.util.Config;
 import at.schulgong.util.DtoConverter;
 import org.springframework.hateoas.CollectionModel;
@@ -27,10 +28,12 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RequestMapping("holidays")
 @CrossOrigin
 public class HolidayController {
+  private final PlayRingtones playRingtones;
   private final HolidayRepository holidayRepository;
   private final HolidayModelAssembler assembler;
 
-  public HolidayController(HolidayRepository holidayRepository, HolidayModelAssembler assembler) {
+  public HolidayController(PlayRingtones playRingtones, HolidayRepository holidayRepository, HolidayModelAssembler assembler) {
+    this.playRingtones = playRingtones;
     this.holidayRepository = holidayRepository;
     this.assembler = assembler;
   }
@@ -68,6 +71,9 @@ public class HolidayController {
   ResponseEntity<?> newHoliday(@RequestBody HolidayDTO newHoliday) {
     Holiday holiday = DtoConverter.convertDtoToHoliday(newHoliday);
     HolidayDTO entityModel = assembler.toModel(holidayRepository.save(holiday));
+    if (playRingtones.checkLoadHoliday(newHoliday)) {
+      playRingtones.restart();
+    }
     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
@@ -94,7 +100,9 @@ public class HolidayController {
     });
 
     HolidayDTO entityModel = assembler.toModel(updateHoliday);
-
+    if (playRingtones.checkLoadHoliday(newHoliday)) {
+      playRingtones.restart();
+    }
     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
@@ -108,6 +116,9 @@ public class HolidayController {
   ResponseEntity<?> deleteHoliday(@PathVariable long id) {
     if (holidayRepository.existsById(id)) {
       holidayRepository.deleteById(id);
+      if (playRingtones.checkLoadHoliday(this.one(id))) {
+        playRingtones.restart();
+      }
       return ResponseEntity.noContent().build();
     } else {
       throw new EntityNotFoundException(id, Config.HOLIDAY.getException());
