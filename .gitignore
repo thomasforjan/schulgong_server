@@ -35,3 +35,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Python build file ###
+*.pyc
