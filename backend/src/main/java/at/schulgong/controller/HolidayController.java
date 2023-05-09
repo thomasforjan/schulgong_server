@@ -115,8 +115,12 @@ public class HolidayController {
   @DeleteMapping("/{id}")
   ResponseEntity<?> deleteHoliday(@PathVariable long id) {
     if (holidayRepository.existsById(id)) {
-      holidayRepository.deleteById(id);
+      boolean updatePlayRingtones = false;
       if (playRingtones.checkLoadHoliday(this.one(id))) {
+        updatePlayRingtones = true;
+      }
+      holidayRepository.deleteById(id);
+      if (updatePlayRingtones) {
         playRingtones.restart();
       }
       return ResponseEntity.noContent().build();

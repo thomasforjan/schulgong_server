@@ -56,7 +56,6 @@ public class PlayRingtones {
     runEveryDayTask();
     ringtimeTaskList = new ArrayList<>();
     System.out.println("POST CONSTRACT");
-    loadRingtimes();
     playRingtonesFromRingtimes();
   }
 
@@ -119,7 +118,7 @@ public class PlayRingtones {
       ringtimeDTO.getStartDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
     LocalDate endDate =
       ringtimeDTO.getEndDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-    if ((ld.isEqual(startDate) || ld.isAfter(startDate)) && ld.isBefore(endDate)) {
+    if ((ld.isEqual(startDate) || ld.isAfter(startDate)) && (ld.isEqual(endDate) || ld.isBefore(endDate))) {
       DayOfWeek dayOfWeek = LocalDate.now().getDayOfWeek();
       switch (dayOfWeek) {
         case MONDAY -> {
@@ -150,7 +149,8 @@ public class PlayRingtones {
 
   public boolean checkLoadHoliday(HolidayDTO holidayDTO) {
     LocalDate ld = LocalDate.now();
-    if ((ld.isEqual(holidayDTO.getStartDate()) || ld.isAfter(holidayDTO.getStartDate())) && ld.isBefore(holidayDTO.getEndDate())) {
+    if ((ld.isEqual(holidayDTO.getStartDate()) || ld.isAfter(holidayDTO.getStartDate()))
+      && (ld.isEqual(holidayDTO.getEndDate()) || ld.isBefore(holidayDTO.getEndDate()))) {
       return true;
     }
     return false;
