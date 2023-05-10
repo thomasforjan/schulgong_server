@@ -58,6 +58,22 @@ public class HolidayController {
     return assembler.toModel(holiday);
   }
 
+
+  /**
+   * Get holiday from today.
+   *
+   * @return one holiday
+   */
+  @GetMapping("/today")
+  public ResponseEntity<Long> today() {
+    List<Holiday> holidays = holidayRepository.findHolidaysAtCurrentDate();
+    if (holidays != null && !holidays.isEmpty()) {
+      return ResponseEntity.ok(holidays.get(0).getId());
+    }else {
+      return ResponseEntity.ok(0L);
+    }
+  }
+
   /**
    * Add new holiday.
    *
