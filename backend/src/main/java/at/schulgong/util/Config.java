@@ -10,17 +10,14 @@ import lombok.Getter;
  */
 @Getter
 public enum Config {
+    RINGTONE("ringtones", "", "ringtone"),
+    HOLIDAY("holidays", "", "holiday"),
+    FILEPATH("", "C:/Users/rayle/Desktop/Audiofiles", "");
+    private final String url, path, exception;
 
-  RINGTONE("ringtones", "", "ringtone"),
-  HOLIDAY("holidays", "", "holiday"),
-  FILEPATH("", "C:/Users/kralm/Desktop/Audiofiles", "");
-
-
-  private final String url, path, exception;
-
-  Config(String url, String path, String exception) {
-    this.url = url;
-    this.path = path;
-    this.exception = exception;
-  }
+    Config(String url, String path, String exception) {
+        this.url = url;
+        this.path = path;
+        this.exception = exception;
+    }
 }
