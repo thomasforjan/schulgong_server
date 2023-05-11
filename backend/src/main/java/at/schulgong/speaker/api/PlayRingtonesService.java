@@ -49,7 +49,7 @@ public class PlayRingtonesService {
   public List<RingtimeDTO> findRingtimeForCurrentDateAndWeekday() {
     List<RingtimeDTO> ringtimeDTOList = new ArrayList<>();
 
-    StringBuilder query = new StringBuilder("SELECT r FROM Ringtime r WHERE CURDATE() between r.startDate and r.endDate and ");
+    StringBuilder query = new StringBuilder("SELECT r FROM Ringtime r WHERE CURDATE() between r.startDate and IFNULL(r.endDate, CURDATE()) and ");
     switch (LocalDate.now().getDayOfWeek()) {
       case MONDAY -> query.append("r.monday = true");
       case TUESDAY -> query.append("r.tuesday = true");
