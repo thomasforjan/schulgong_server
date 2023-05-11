@@ -37,7 +37,7 @@ def discover_by_name():
           print("exception: No speaker was found")
     except:
         print("exception: An exception occurred in the method discover_by_name")
-    return []
+    return None
 
 def discover_all():
     print("command: discover_all")
