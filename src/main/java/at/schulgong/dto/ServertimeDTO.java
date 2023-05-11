@@ -1,12 +1,13 @@
 package at.schulgong.dto;
 
+import lombok.*;
 import org.springframework.hateoas.RepresentationModel;
 
 /**
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
- * @version 0.1
+ * @version 0.2
  * @implNote DTO of server time Object
- * @since April 2023
+ * @since May 2023
  */
 @Getter
 @Setter
@@ -14,5 +15,5 @@ import org.springframework.hateoas.RepresentationModel;
 @AllArgsConstructor
 @Builder
 public class ServertimeDTO extends RepresentationModel<ServertimeDTO> {
-    private String time;
+  private String time;
 }

@@ -1,12 +1,13 @@
 package at.schulgong.dto;
 
+import lombok.*;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.time.LocalDate;
 
 /**
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
- * @version 0.1
+ * @version 0.2
  * @implNote DTO of holiday Object
  * @since April 2023
  */
