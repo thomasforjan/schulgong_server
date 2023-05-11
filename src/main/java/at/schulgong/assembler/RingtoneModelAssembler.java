@@ -1,8 +1,8 @@
 package at.schulgong.assembler;
 
-import at.schulgong.Ringtone;
 import at.schulgong.controller.RingtoneController;
 import at.schulgong.dto.RingtoneDTO;
+import at.schulgong.model.Ringtone;
 import at.schulgong.util.Config;
 import at.schulgong.util.DtoConverter;
 import org.springframework.hateoas.CollectionModel;
@@ -17,12 +17,16 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 /**
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
- * @version 0.1
+ * @version 0.2
  * @implNote Assembler to add self and global url to entry to make it Restful
  * @since April 2023
  */
 @Component
 public class RingtoneModelAssembler extends RepresentationModelAssemblerSupport<Ringtone, RingtoneDTO> {
+
+  /**
+   * Constructor of assembler
+   */
   public RingtoneModelAssembler() {
     super(RingtoneController.class, RingtoneDTO.class);
   }
@@ -50,7 +54,6 @@ public class RingtoneModelAssembler extends RepresentationModelAssemblerSupport<
   @Override
   public CollectionModel<RingtoneDTO> toCollectionModel(Iterable<? extends Ringtone> ringtoneList) {
     List<RingtoneDTO> ringtoneDTOS = new ArrayList<>();
-
     for (Ringtone ringtone : ringtoneList) {
       RingtoneDTO ringtoneDTO = DtoConverter.convertRingtoneToDTO(ringtone);
       ringtoneDTO.add(linkTo(methodOn(RingtoneController.class).one(ringtoneDTO.getId())).withSelfRel());

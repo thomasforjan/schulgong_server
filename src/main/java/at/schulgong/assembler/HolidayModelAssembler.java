@@ -1,8 +1,8 @@
 package at.schulgong.assembler;
 
-import at.schulgong.Holiday;
 import at.schulgong.controller.HolidayController;
 import at.schulgong.dto.HolidayDTO;
+import at.schulgong.model.Holiday;
 import at.schulgong.util.Config;
 import at.schulgong.util.DtoConverter;
 import org.springframework.hateoas.CollectionModel;
@@ -17,12 +17,16 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 /**
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
- * @version 0.1
+ * @version 0.2
  * @implNote Assembler to add self and global url to entry to make it Restful
  * @since April 2023
  */
 @Component
 public class HolidayModelAssembler extends RepresentationModelAssemblerSupport<Holiday, HolidayDTO> {
+
+  /**
+   * Constructor of assembler
+   */
   public HolidayModelAssembler() {
     super(HolidayController.class, HolidayDTO.class);
   }
@@ -50,7 +54,6 @@ public class HolidayModelAssembler extends RepresentationModelAssemblerSupport<H
   @Override
   public CollectionModel<HolidayDTO> toCollectionModel(Iterable<? extends Holiday> holidaysList) {
     List<HolidayDTO> holidayDTOS = new ArrayList<>();
-
     for (Holiday holiday : holidaysList) {
       HolidayDTO holidayDTO = DtoConverter.convertHolidayToDTO(holiday);
       holidayDTO.add(linkTo(methodOn(HolidayController.class).one(holidayDTO.getId())).withSelfRel());
@@ -59,5 +62,4 @@ public class HolidayModelAssembler extends RepresentationModelAssemblerSupport<H
     }
     return CollectionModel.of(holidayDTOS);
   }
-
 }
