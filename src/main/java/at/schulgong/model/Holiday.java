@@ -9,7 +9,7 @@ import java.time.LocalDate;
 
 /**
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
- * @version 0.1
+ * @version 0.2
  * @implNote Model of holiday
  * @since April 2023
  */

@@ -4,11 +4,16 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
+ * @version 0.2
+ * @implNote Model of minutes
+ * @since April 2023
+ */
 @Getter
 @Setter
 @Entity
 @Table(name = "Minute")
-@NamedQuery(name = "Minute.findByMinute", query = "SELECT m FROM Minute m WHERE m.minute=:minute")
 public class Minute {
 
   @Id
@@ -18,7 +23,8 @@ public class Minute {
   @Column(name = "minute")
   private int minute;
 
-  public Minute() {}
+  public Minute() {
+  }
 
   public Minute(int minute) {
     this.minute = minute;

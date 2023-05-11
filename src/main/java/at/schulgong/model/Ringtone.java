@@ -4,11 +4,12 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 import java.time.LocalDate;
 
 /**
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
- * @version 0.1
+ * @version 0.2
  * @implNote Model of ringtone
  * @since April 2023
  */
@@ -32,12 +33,4 @@ public class Ringtone {
   private LocalDate date;
   @Column(name = "size")
   private double size;
-
-  public Ringtone(String name, String filename, String path, LocalDate date, double size) {
-    this.name = name;
-    this.filename = filename;
-    this.path = path;
-    this.date = date;
-    this.size = size;
-  }
 }

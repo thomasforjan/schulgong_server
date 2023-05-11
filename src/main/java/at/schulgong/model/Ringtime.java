@@ -1,12 +1,17 @@
 package at.schulgong.model;
 
-import at.schulgong.Ringtone;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDate;
 
+/**
+ * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
+ * @version 0.2
+ * @implNote Model of ringtime
+ * @since April 2023
+ */
 @Getter
 @Setter
 @Entity
@@ -25,10 +30,10 @@ public class Ringtime {
   private Ringtone ringtone;
 
   @Column(name = "startdate", columnDefinition = "DATE")
-  private Date startDate;
+  private LocalDate startDate;
 
   @Column(name = "enddate", columnDefinition = "DATE")
-  private Date endDate;
+  private LocalDate endDate;
 
   @Column(name = "monday")
   private boolean monday;
@@ -58,9 +63,4 @@ public class Ringtime {
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "minute_ID")
   private Minute minute;
-
- /* @Column(name = "addinfo")
-  private String addInfo;*/
-
-
 }
