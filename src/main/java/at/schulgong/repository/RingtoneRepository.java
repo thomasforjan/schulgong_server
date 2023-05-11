@@ -1,11 +1,11 @@
 package at.schulgong.repository;
 
-import at.schulgong.Ringtone;
+import at.schulgong.model.Ringtone;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
- * @version 0.1
+ * @version 0.2
  * @implNote Repository of Ringtone
  * @since April 2023
  */

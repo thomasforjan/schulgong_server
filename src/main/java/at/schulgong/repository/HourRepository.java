@@ -1,14 +1,17 @@
 package at.schulgong.repository;
 
-import at.schulgong.Hour;
+import at.schulgong.model.Hour;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 /**
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
- * @version 0.1
+ * @version 0.2
  * @implNote Repository of Hour
  * @since April 2023
  */
 public interface HourRepository extends JpaRepository<Hour, Long> {
-  public Hour findByHour(int hour);
+  @Query("SELECT h FROM Hour h WHERE h.hour=:hour")
+  Hour findByHour(@Param("hour") Integer hour);
 }
