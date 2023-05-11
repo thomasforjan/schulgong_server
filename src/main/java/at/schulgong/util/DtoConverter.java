@@ -3,13 +3,14 @@ package at.schulgong.util;
 import at.schulgong.dto.HolidayDTO;
 import at.schulgong.dto.RingtimeDTO;
 import at.schulgong.dto.RingtoneDTO;
+import at.schulgong.model.*;
 
 import java.time.LocalTime;
 
 
 /**
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
- * @version 0.1
+ * @version 0.2
  * @implNote DtoConverter to convert ringtoneDTO into ringtone and reverse and ringtimeDTO into ringtime and reverse.
  * @since April 2023
  */
@@ -60,10 +61,7 @@ public class DtoConverter {
       Ringtone ringTone = convertDtoToRingtone(ringtimeDTO.getRingtoneDTO());
       ringtime.setRingtone(ringTone);
     }
-//    ringTime.setAddInfo(ringTimeDTO.getAddInfo());
-
     return ringtime;
-
   }
 
   /**
@@ -119,6 +117,4 @@ public class DtoConverter {
     holiday.setName(holidayDTO.getName());
     return holiday;
   }
-
-
 }
