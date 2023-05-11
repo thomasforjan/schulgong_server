@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -86,8 +87,11 @@ public class HolidayController {
    */
   @PutMapping("/{id}")
   ResponseEntity<?> replaceHoliday(@RequestBody HolidayDTO newHoliday, @PathVariable Long id) {
-
+    final AtomicBoolean isLoadRingtimes = new AtomicBoolean(false);
     Holiday updateHoliday = holidayRepository.findById(id).map(holiday -> {
+      if (playRingtones.checkLoadHoliday(DtoConverter.convertHolidayToDTO(holiday))) {
+        isLoadRingtimes.set(true);
+      }
       holiday.setStartDate(newHoliday.getStartDate());
       holiday.setEndDate(newHoliday.getEndDate());
       holiday.setName(newHoliday.getName());
@@ -100,7 +104,7 @@ public class HolidayController {
     });
 
     HolidayDTO entityModel = assembler.toModel(updateHoliday);
-    if (playRingtones.checkLoadHoliday(newHoliday)) {
+    if (isLoadRingtimes.get() || playRingtones.checkLoadHoliday(newHoliday)) {
       playRingtones.restart();
     }
     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);

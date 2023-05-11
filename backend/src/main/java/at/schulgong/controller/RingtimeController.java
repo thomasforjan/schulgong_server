@@ -19,6 +19,7 @@ import at.schulgong.util.DtoConverter;
 
 import java.time.LocalTime;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.IanaLinkRelations;
@@ -140,7 +141,7 @@ public class RingtimeController {
         /*if (!RequestValidator.checkRequestBodySensor(newRingtime) && id <= 0) {
           return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body("Your sending sensor data are not correct!");
         }*/
-
+    final AtomicBoolean isLoadRingtimes = new AtomicBoolean(false);
     Ringtone ringtone = DtoConverter.convertDtoToRingtone(newRingtime.getRingtoneDTO());
     Hour hour = hourRepository.findByHour(newRingtime.getPlayTime().getHour());
     Minute minute = minuteRepository.findByMinute(newRingtime.getPlayTime().getMinute());
@@ -149,6 +150,9 @@ public class RingtimeController {
         .findById(id)
         .map(
           ringtime -> {
+            if (playRingtones.checkLoadRingtimes(DtoConverter.convertRingtimeToDTO(ringtime, false))) {
+              isLoadRingtimes.set(true);
+            }
             ringtime.setName(newRingtime.getName());
             ringtime.setRingtone(ringtone);
             ringtime.setStartDate(newRingtime.getStartDate());
@@ -174,7 +178,7 @@ public class RingtimeController {
           });
 
     RingtimeDTO entityModel = assembler.toModel(updateRingtime);
-    if (playRingtones.checkLoadRingtimes(newRingtime)) {
+    if (isLoadRingtimes.get() || playRingtones.checkLoadRingtimes(newRingtime)) {
       playRingtones.restart();
     }
     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
