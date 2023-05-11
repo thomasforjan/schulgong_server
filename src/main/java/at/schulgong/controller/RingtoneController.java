@@ -1,15 +1,16 @@
 package at.schulgong.controller;
 
-import at.schulgong.Ringtone;
 import at.schulgong.assembler.RingtoneModelAssembler;
 import at.schulgong.dto.RingtoneDTO;
 import at.schulgong.exception.EntityNotFoundException;
+import at.schulgong.model.Ringtone;
 import at.schulgong.repository.RingtoneRepository;
 import at.schulgong.util.Config;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -24,7 +25,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 /**
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
- * @version 0.1
+ * @version 0.2
  * @implNote Controller to provide CRUD-functionality
  * @since April 2023
  */
@@ -35,6 +36,12 @@ public class RingtoneController {
   private final RingtoneRepository ringtoneRepository;
   private final RingtoneModelAssembler assembler;
 
+  /**
+   * Controller for ringtone
+   *
+   * @param ringtoneRepository Repository of ringtone
+   * @param assembler          Assembler of ringtone
+   */
   public RingtoneController(RingtoneRepository ringtoneRepository, RingtoneModelAssembler assembler) {
     this.ringtoneRepository = ringtoneRepository;
     this.assembler = assembler;
@@ -76,15 +83,12 @@ public class RingtoneController {
     if (!song.getContentType().contains("audio")) {
       return new ResponseEntity<>("False datatype", HttpStatus.BAD_REQUEST);
     }
-
     Ringtone ringtone = getChangedRingtone(song, name);
-
     try {
       saveAudiofile(ringtone, song);
     } catch (IOException e) {
       return new ResponseEntity<>("Failed to upload", HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
     RingtoneDTO entityModel = assembler.toModel(ringtoneRepository.save(ringtone));
     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
@@ -103,28 +107,23 @@ public class RingtoneController {
     if (newSong != null && !newSong.getContentType().contains("audio")) {
       return new ResponseEntity<>("False datatype", HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
     Ringtone updateRingtone = (Ringtone) ringtoneRepository.findById(id).map(ringtone -> {
       // Update name
       ringtone.setName(name);
-
       // Update song if a new song is provided
       if (newSong != null) {
         deleteAudioFile(one(id).getPath());
         Ringtone oldRingtone = getChangedRingtone(newSong, name);
-        System.out.println(oldRingtone.getId());
         ringtone.setFilename(oldRingtone.getFilename());
         ringtone.setPath(oldRingtone.getPath());
         ringtone.setDate(oldRingtone.getDate());
         ringtone.setSize(oldRingtone.getSize());
-
         try {
           saveAudiofile(ringtone, newSong);
         } catch (IOException e) {
           return new ResponseEntity<>("Failed to upload", HttpStatus.INTERNAL_SERVER_ERROR);
         }
       }
-
       return ringtoneRepository.save(ringtone);
     }).orElseGet(() -> {
       if (newSong != null) {
@@ -138,7 +137,6 @@ public class RingtoneController {
         return ringtoneRepository.save(newRingtone);
       }
     });
-
     RingtoneDTO entityModel = assembler.toModel(updateRingtone);
     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
@@ -150,7 +148,7 @@ public class RingtoneController {
    * @return deleted ringtone
    */
   @DeleteMapping("/{id}")
-  ResponseEntity<?> deleteRingtone(@PathVariable long id) {
+  ResponseEntity<RingtoneDTO> deleteRingtone(@PathVariable long id) {
     if (ringtoneRepository.existsById(id)) {
       RingtoneDTO ringtoneDTO = one(id);
       ringtoneRepository.deleteById(id);
@@ -175,8 +173,9 @@ public class RingtoneController {
 
   /**
    * Method to save the audiofile in the directory
+   *
    * @param ringtone ringtone object
-   * @param newSong multipart file
+   * @param newSong  multipart file
    * @throws IOException if entity not found
    */
   private void saveAudiofile(Ringtone ringtone, MultipartFile newSong) throws IOException {
@@ -184,13 +183,11 @@ public class RingtoneController {
     if (!dir.exists()) {
       dir.mkdirs();
     }
-
     if (dir.exists()) {
       ringtone = changeFileName(ringtone, 2);
     }
     Path filePath = Paths.get(ringtone.getPath());
     newSong.transferTo(filePath.toFile());
-
   }
 
   /**
@@ -202,7 +199,6 @@ public class RingtoneController {
    */
   private Ringtone getChangedRingtone(MultipartFile multipartFile, String name) {
     Ringtone ringtone = new Ringtone();
-
     Path filePath = Paths.get(Config.FILEPATH.getPath() + File.separator + multipartFile.getOriginalFilename());
     ringtone.setPath(filePath.toString());
     ringtone.setName(name);
@@ -221,7 +217,6 @@ public class RingtoneController {
    */
   private Ringtone changeFileName(Ringtone ringtone, int i) {
     File file = new File(ringtone.getPath());
-
     if (file.exists()) {
       // get index of last dot, e.g. "."mp3
       int lastDotIndex = ringtone.getFilename().lastIndexOf(".");
@@ -233,26 +228,19 @@ public class RingtoneController {
       if (newFileName.contains(String.valueOf(i - 1))) {
         // remove counter from filename (with length of i-1)
         newFileName = newFileName.substring(0, newFileName.length() - String.valueOf(i - 1).length());
-        System.out.println("if");
       }
       // concat filename
       newFileName = newFileName + i + format;
-
       // replace old filename with new filename
       String newPath = ringtone.getPath().replace(ringtone.getFilename(), newFileName);
       ringtone.setFilename(newFileName);
       ringtone.setPath(newPath);
     }
-
-    System.out.println(ringtone.getFilename());
-    System.out.println(ringtone.getPath());
-
     // if new File already exist, counter +1 and recall changeFileName() with new ringtone object and new counter
     if (file.exists()) {
       i++;
       changeFileName(ringtone, i);
     }
-
     return ringtone;
   }
 }

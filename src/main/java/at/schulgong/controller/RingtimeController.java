@@ -1,24 +1,25 @@
 package at.schulgong.controller;
 
-import at.schulgong.Hour;
-import at.schulgong.Minute;
-import at.schulgong.Ringtime;
-import at.schulgong.Ringtone;
 import at.schulgong.assembler.RingtimeModelAssembler;
 import at.schulgong.dto.RingtimeDTO;
 import at.schulgong.dto.ServertimeDTO;
 import at.schulgong.exception.EntityNotFoundException;
+import at.schulgong.model.Hour;
+import at.schulgong.model.Minute;
+import at.schulgong.model.Ringtime;
+import at.schulgong.model.Ringtone;
 import at.schulgong.repository.HourRepository;
 import at.schulgong.repository.MinuteRepository;
 import at.schulgong.repository.RingtimeRepository;
 import at.schulgong.repository.RingtoneRepository;
+import at.schulgong.util.Config;
 import at.schulgong.util.DtoConverter;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -27,7 +28,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 /**
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
- * @version 0.1
+ * @version 0.2
  * @implNote Controller to provide CRUD-functionality
  * @since April 2023
  */
@@ -35,75 +36,61 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RequestMapping("ringtimes")
 @CrossOrigin
 public class RingtimeController {
-  private final RingtimeRepository ringTimeRepository;
-  private final RingtoneRepository ringToneRepository;
-
+  private final RingtimeRepository ringtimeRepository;
+  private final RingtoneRepository ringtoneRepository;
   private final HourRepository hourRepository;
-
   private final MinuteRepository minuteRepository;
-
   private final RingtimeModelAssembler assembler;
 
-  public RingtimeController(
-    RingtimeRepository ringTimeRepository,
-    RingtimeModelAssembler assembler,
-    RingtoneRepository ringToneRepository,
-    HourRepository hourRepository,
-    MinuteRepository minuteRepository) {
-    this.ringTimeRepository = ringTimeRepository;
+  /**
+   * Controller of Ringtime
+   *
+   * @param ringtimeRepository Repository of ringtime
+   * @param assembler          assembler of ringtime
+   * @param ringtoneRepository Repository of ringtone
+   * @param hourRepository     Repository of hour
+   * @param minuteRepository   Repository of minute
+   */
+  public RingtimeController(RingtimeRepository ringtimeRepository, RingtimeModelAssembler assembler, RingtoneRepository ringtoneRepository, HourRepository hourRepository, MinuteRepository minuteRepository) {
+    this.ringtimeRepository = ringtimeRepository;
     this.assembler = assembler;
-    this.ringToneRepository = ringToneRepository;
+    this.ringtoneRepository = ringtoneRepository;
     this.hourRepository = hourRepository;
     this.minuteRepository = minuteRepository;
   }
 
   /**
-   * Get all ringTime.
+   * Get all ringtimes.
    *
-   * @return all ringTime
+   * @return all ringtime
    */
   @GetMapping
   public CollectionModel<RingtimeDTO> all() {
-    LocalTime lt = LocalTime.of(8, 0);
-    List<Ringtime> ringtimes = ringTimeRepository.findAll();
-    return assembler
-      .toCollectionModel(ringtimes)
-      .add(linkTo(methodOn(RingtimeController.class).all()).withRel("ringTimes"));
+    List<Ringtime> ringtimes = ringtimeRepository.findAll();
+    return assembler.toCollectionModel(ringtimes).add(linkTo(methodOn(RingtimeController.class).all()).withRel(Config.RINGTIME.getUrl()));
   }
 
   /**
-   * Get particular ringTime by specific id.
+   * Get particular ringtime by specific id.
    *
-   * @param id takes ringTime id
-   * @return specific ringTime based on its id
+   * @param id takes ringtime id
+   * @return specific ringtime based on its id
    */
   @GetMapping(value = "{id}")
   public RingtimeDTO one(@PathVariable long id) {
-    Ringtime ringTime =
-      ringTimeRepository
-        .findById(id)
-        .orElseThrow(() -> new EntityNotFoundException(id, "ring time"));
-    return assembler.toModel(ringTime);
+    Ringtime ringtime = ringtimeRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id, Config.RINGTIME.getException()));
+    return assembler.toModel(ringtime);
   }
 
   /**
    * Add new sensor.
    *
-   * @param newRingtime takes given ringTime body values
+   * @param newRingtime takes given ringtime body values
    * @return new sensor
    */
   @PostMapping
-  ResponseEntity<?> newRingtime(@RequestBody RingtimeDTO newRingtime) {
-        /*if (!RequestValidator.checkRequestBodySensor(newRingtime)) {
-          return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body("Your sending ringtime data are not correct!");
-        }*/
-    Ringtone ringtone =
-      ringToneRepository
-        .findById(newRingtime.getRingtoneDTO().getId())
-        .orElseThrow(
-          () ->
-            new EntityNotFoundException(
-              newRingtime.getRingtoneDTO().getId(), "ring tone"));
+  ResponseEntity<RingtimeDTO> newRingtime(@RequestBody RingtimeDTO newRingtime) {
+    Ringtone ringtone = ringtoneRepository.findById(newRingtime.getRingtoneDTO().getId()).orElseThrow(() -> new EntityNotFoundException(newRingtime.getRingtoneDTO().getId(), Config.RINGTIME.getException()));
     Hour hour = hourRepository.findByHour(newRingtime.getPlayTime().getHour());
     Minute minute = minuteRepository.findByMinute(newRingtime.getPlayTime().getMinute());
     Ringtime ringtime = DtoConverter.convertDtoToRingtime(newRingtime, false);
@@ -114,76 +101,59 @@ public class RingtimeController {
       ringtime.setMinute(minute);
     }
     ringtime.setRingtone(ringtone);
-    RingtimeDTO entityModel = assembler.toModel(ringTimeRepository.save(ringtime));
-    return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
-      .body(entityModel);
+    RingtimeDTO entityModel = assembler.toModel(ringtimeRepository.save(ringtime));
+    return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
   /**
-   * Update a particular ringTime based on its id.
+   * Update a particular ringtime based on its id.
    *
-   * @param newRingtime takes given ringTime body values
-   * @param id          takes ringTime id
-   * @return updated ringTime
+   * @param newRingtime takes given ringtime body values
+   * @param id          takes ringtime id
+   * @return updated ringtime
    */
   @PutMapping("{id}")
-  ResponseEntity<?> replaceRingtime(@RequestBody RingtimeDTO newRingtime, @PathVariable long id) {
-
-        /*if (!RequestValidator.checkRequestBodySensor(newRingtime) && id <= 0) {
-          return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body("Your sending sensor data are not correct!");
-        }*/
-
+  ResponseEntity<RingtimeDTO> replaceRingtime(@RequestBody RingtimeDTO newRingtime, @PathVariable long id) {
     Ringtone ringtone = DtoConverter.convertDtoToRingtone(newRingtime.getRingtoneDTO());
     Hour hour = hourRepository.findByHour(newRingtime.getPlayTime().getHour());
     Minute minute = minuteRepository.findByMinute(newRingtime.getPlayTime().getMinute());
-    Ringtime updateRingtime =
-      ringTimeRepository
-        .findById(id)
-        .map(
-          ringtime -> {
-            ringtime.setName(newRingtime.getName());
-            ringtime.setRingtone(ringtone);
-            ringtime.setStartDate(newRingtime.getStartDate());
-            ringtime.setEndDate(newRingtime.getEndDate());
-            ringtime.setMonday(newRingtime.isMonday());
-            ringtime.setTuesday(newRingtime.isTuesday());
-            ringtime.setWednesday(newRingtime.isWednesday());
-            ringtime.setThursday(newRingtime.isThursday());
-            ringtime.setFriday(newRingtime.isFriday());
-            ringtime.setSaturday(newRingtime.isSaturday());
-            ringtime.setSunday(newRingtime.isSunday());
-            ringtime.setHour(hour);
-            ringtime.setMinute(minute);
-            //        ringTime.setAddInfo(newRingtime.getAddInfo());
-            return ringTimeRepository.save(ringtime);
-          })
-        .orElseGet(
-          () -> {
-            newRingtime.setId(id);
-            Ringtime ringTime =
-              DtoConverter.convertDtoToRingtime(newRingtime, true);
-            return ringTimeRepository.save(ringTime);
-          });
-
+    Ringtime updateRingtime = ringtimeRepository.findById(id).map(ringtime -> {
+      ringtime.setName(newRingtime.getName());
+      ringtime.setRingtone(ringtone);
+      ringtime.setStartDate(newRingtime.getStartDate());
+      ringtime.setEndDate(newRingtime.getEndDate());
+      ringtime.setMonday(newRingtime.isMonday());
+      ringtime.setTuesday(newRingtime.isTuesday());
+      ringtime.setWednesday(newRingtime.isWednesday());
+      ringtime.setThursday(newRingtime.isThursday());
+      ringtime.setFriday(newRingtime.isFriday());
+      ringtime.setSaturday(newRingtime.isSaturday());
+      ringtime.setSunday(newRingtime.isSunday());
+      ringtime.setHour(hour);
+      ringtime.setMinute(minute);
+      return ringtimeRepository.save(ringtime);
+    }).orElseGet(() -> {
+      newRingtime.setId(id);
+      Ringtime ringtime = DtoConverter.convertDtoToRingtime(newRingtime, true);
+      return ringtimeRepository.save(ringtime);
+    });
     RingtimeDTO entityModel = assembler.toModel(updateRingtime);
-
-    return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
-      .body(entityModel);
+    return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
   /**
-   * Delete a particular ringTime based on its id.
+   * Delete a particular ringtime based on its id.
    *
-   * @param id takes ringTime id
-   * @return deleted ringTime
+   * @param id takes ringtime id
+   * @return deleted ringtime
    */
   @DeleteMapping("{id}")
-  ResponseEntity<?> deleteRingtime(@PathVariable long id) {
-    if (ringTimeRepository.existsById(id)) {
-      ringTimeRepository.deleteById(id);
+  ResponseEntity<RingtimeDTO> deleteRingtime(@PathVariable long id) {
+    if (ringtimeRepository.existsById(id)) {
+      ringtimeRepository.deleteById(id);
       return ResponseEntity.noContent().build();
     } else {
-      throw new EntityNotFoundException(id, "ring time");
+      throw new EntityNotFoundException(id, Config.RINGTIME.getException());
     }
   }
 
@@ -196,9 +166,9 @@ public class RingtimeController {
    */
   @GetMapping("/server-time")
   public ResponseEntity<ServertimeDTO> getServerTime() {
-    LocalDateTime serverTime = LocalDateTime.now();
-    String formattedServerTime = DateTimeFormatter.ISO_DATE_TIME.format(serverTime);
-    ServertimeDTO serverTimeDTO = new ServertimeDTO(formattedServerTime);
-    return ResponseEntity.ok(serverTimeDTO);
+    LocalDateTime servertime = LocalDateTime.now();
+    String formattedServertime = DateTimeFormatter.ISO_DATE_TIME.format(servertime);
+    ServertimeDTO servertimeDTO = new ServertimeDTO(formattedServertime);
+    return ResponseEntity.ok(servertimeDTO);
   }
 }

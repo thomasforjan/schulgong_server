@@ -1,15 +1,16 @@
 package at.schulgong.controller;
 
-import at.schulgong.Holiday;
 import at.schulgong.assembler.HolidayModelAssembler;
 import at.schulgong.dto.HolidayDTO;
 import at.schulgong.exception.EntityNotFoundException;
+import at.schulgong.model.Holiday;
 import at.schulgong.repository.HolidayRepository;
 import at.schulgong.util.Config;
 import at.schulgong.util.DtoConverter;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -18,7 +19,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 /**
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
- * @version 0.1
+ * @version 0.2
  * @implNote Controller to provide CRUD-functionality
  * @since April 2023
  */
@@ -29,6 +30,12 @@ public class HolidayController {
   private final HolidayRepository holidayRepository;
   private final HolidayModelAssembler assembler;
 
+  /**
+   * Constructor for holidays
+   *
+   * @param holidayRepository Repository of holidays
+   * @param assembler         Assembler of holidays
+   */
   public HolidayController(HolidayRepository holidayRepository, HolidayModelAssembler assembler) {
     this.holidayRepository = holidayRepository;
     this.assembler = assembler;
@@ -68,7 +75,7 @@ public class HolidayController {
     List<Holiday> holidays = holidayRepository.findHolidaysAtCurrentDate();
     if (holidays != null && !holidays.isEmpty()) {
       return ResponseEntity.ok(holidays.get(0).getId());
-    }else {
+    } else {
       return ResponseEntity.ok(0L);
     }
   }
@@ -80,7 +87,7 @@ public class HolidayController {
    * @return new holiday
    */
   @PostMapping
-  ResponseEntity<?> newHoliday(@RequestBody HolidayDTO newHoliday) {
+  ResponseEntity<HolidayDTO> newHoliday(@RequestBody HolidayDTO newHoliday) {
     Holiday holiday = DtoConverter.convertDtoToHoliday(newHoliday);
     HolidayDTO entityModel = assembler.toModel(holidayRepository.save(holiday));
     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
@@ -94,8 +101,7 @@ public class HolidayController {
    * @return updated holiday
    */
   @PutMapping("/{id}")
-  ResponseEntity<?> replaceHoliday(@RequestBody HolidayDTO newHoliday, @PathVariable Long id) {
-
+  ResponseEntity<HolidayDTO> replaceHoliday(@RequestBody HolidayDTO newHoliday, @PathVariable Long id) {
     Holiday updateHoliday = holidayRepository.findById(id).map(holiday -> {
       holiday.setStartDate(newHoliday.getStartDate());
       holiday.setEndDate(newHoliday.getEndDate());
@@ -107,9 +113,7 @@ public class HolidayController {
       Holiday holiday = DtoConverter.convertDtoToHoliday(newHoliday);
       return holidayRepository.save(holiday);
     });
-
     HolidayDTO entityModel = assembler.toModel(updateHoliday);
-
     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
@@ -120,7 +124,7 @@ public class HolidayController {
    * @return deleted holiday
    */
   @DeleteMapping("/{id}")
-  ResponseEntity<?> deleteHoliday(@PathVariable long id) {
+  ResponseEntity<HolidayDTO> deleteHoliday(@PathVariable long id) {
     if (holidayRepository.existsById(id)) {
       holidayRepository.deleteById(id);
       return ResponseEntity.noContent().build();
