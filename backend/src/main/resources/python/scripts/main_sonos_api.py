@@ -8,6 +8,9 @@ def main():
 
     subparsers = parser.add_subparsers(dest='command')
 
+    # discover speakers by name or all command
+    subparsers.add_parser('discover')
+
     # discover speakers by name command
     subparsers.add_parser('discover_by_name')
 
@@ -86,7 +89,9 @@ def main():
 
     args = parser.parse_args()
 
-    if args.command == 'discover_by_name':
+    if args.command == 'discover':
+        sonosapi.discover()
+    elif args.command == 'discover_by_name':
         sonosapi.discover_by_name()
     elif args.command == 'discover_all':
         sonosapi.discover_all()
