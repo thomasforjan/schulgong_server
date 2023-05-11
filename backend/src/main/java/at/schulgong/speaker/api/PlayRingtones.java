@@ -43,7 +43,7 @@ public class PlayRingtones {
 
   public void loadRingtimes() {
     ringtimeDTOList = new ArrayList<>();
-    if (playRingtonesService.getCountOfHolidayAtCurrentDate() == 0) {
+    if (!playRingtonesService.isHolidayAtCurrentDate()) {
       System.out.println("NO HOLIDAYS");
       ringtimeDTOList = playRingtonesService.findRingtimeForCurrentDateAndWeekday();
     }

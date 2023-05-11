@@ -4,6 +4,8 @@ import at.schulgong.Holiday;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
+
 /**
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
  * @version 0.1
@@ -12,6 +14,9 @@ import org.springframework.data.jpa.repository.Query;
  */
 public interface HolidayRepository extends JpaRepository<Holiday, Long> {
 
-    @Query("SELECT COUNT(h.id) FROM Holiday h WHERE CURDATE() BETWEEN h.startDate AND h.endDate")
-    int getCountOfHolidayAtCurrentDate();
+  @Query("SELECT COUNT(h.id) FROM Holiday h WHERE CURDATE() BETWEEN h.startDate AND h.endDate")
+  int getCountOfHolidayAtCurrentDate();
+
+  @Query("SELECT h FROM Holiday h WHERE CURDATE() BETWEEN h.startDate AND h.endDate")
+  List<Holiday> findHolidaysAtCurrentDate();
 }

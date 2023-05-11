@@ -1,5 +1,6 @@
 package at.schulgong.speaker.api;
 
+import at.schulgong.Holiday;
 import at.schulgong.Ringtime;
 import at.schulgong.dto.RingtimeDTO;
 import at.schulgong.repository.HolidayRepository;
@@ -47,6 +48,7 @@ public class PlayRingtonesService {
 
   public List<RingtimeDTO> findRingtimeForCurrentDateAndWeekday() {
     List<RingtimeDTO> ringtimeDTOList = new ArrayList<>();
+
     StringBuilder query = new StringBuilder("SELECT r FROM Ringtime r WHERE CURDATE() between r.startDate and r.endDate and ");
     switch (LocalDate.now().getDayOfWeek()) {
       case MONDAY -> query.append("r.monday = true");
@@ -71,8 +73,13 @@ public class PlayRingtonesService {
     return ringtimeDTOList;
   }
 
-  public int getCountOfHolidayAtCurrentDate() {
-    return holidayRepository.getCountOfHolidayAtCurrentDate();
+  public boolean isHolidayAtCurrentDate() {
+    List<Holiday> holidayList = holidayRepository.findHolidaysAtCurrentDate();
+    boolean isHoliday = false;
+    if (holidayList != null && holidayList.size() > 0) {
+      isHoliday = true;
+    }
+    return isHoliday;
   }
 
 }
