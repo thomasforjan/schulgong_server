@@ -12,7 +12,6 @@ import org.springframework.data.jpa.repository.Query;
  * @since April 2023
  */
 public interface HolidayRepository extends JpaRepository<Holiday, Long> {
-
     @Query("SELECT h FROM Holiday h WHERE CURDATE() BETWEEN h.startDate AND h.endDate")
     List<Holiday> findHolidaysAtCurrentDate();
 }

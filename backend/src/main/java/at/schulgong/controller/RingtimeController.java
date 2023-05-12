@@ -9,6 +9,7 @@ import at.schulgong.Ringtime;
 import at.schulgong.Ringtone;
 import at.schulgong.assembler.RingtimeModelAssembler;
 import at.schulgong.dto.RingtimeDTO;
+import at.schulgong.dto.ServertimeDTO;
 import at.schulgong.exception.EntityNotFoundException;
 import at.schulgong.repository.HourRepository;
 import at.schulgong.repository.MinuteRepository;
@@ -17,7 +18,9 @@ import at.schulgong.repository.RingtoneRepository;
 import at.schulgong.speaker.api.PlayRingtones;
 import at.schulgong.util.DtoConverter;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -38,14 +41,10 @@ import org.springframework.web.bind.annotation.*;
 public class RingtimeController {
 
   private final PlayRingtones playRingtones;
-
   private final RingtimeRepository ringTimeRepository;
   private final RingtoneRepository ringToneRepository;
-
   private final HourRepository hourRepository;
-
   private final MinuteRepository minuteRepository;
-
   private final RingtimeModelAssembler assembler;
 
   public RingtimeController(
@@ -100,9 +99,6 @@ public class RingtimeController {
    */
   @PostMapping
   ResponseEntity<?> newRingtime(@RequestBody RingtimeDTO newRingtime) {
-        /*if (!RequestValidator.checkRequestBodySensor(newRingtime)) {
-          return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body("Your sending ringtime data are not correct!");
-        }*/
     Ringtone ringtone =
       ringToneRepository
         .findById(newRingtime.getRingtoneDTO().getId())
@@ -137,11 +133,8 @@ public class RingtimeController {
    */
   @PutMapping("{id}")
   ResponseEntity<?> replaceRingtime(@RequestBody RingtimeDTO newRingtime, @PathVariable long id) {
-
-        /*if (!RequestValidator.checkRequestBodySensor(newRingtime) && id <= 0) {
-          return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body("Your sending sensor data are not correct!");
-        }*/
     final AtomicBoolean isLoadRingtimes = new AtomicBoolean(false);
+
     Ringtone ringtone = DtoConverter.convertDtoToRingtone(newRingtime.getRingtoneDTO());
     Hour hour = hourRepository.findByHour(newRingtime.getPlayTime().getHour());
     Minute minute = minuteRepository.findByMinute(newRingtime.getPlayTime().getMinute());
@@ -153,6 +146,7 @@ public class RingtimeController {
             if (playRingtones.checkLoadRingtimes(DtoConverter.convertRingtimeToDTO(ringtime, false))) {
               isLoadRingtimes.set(true);
             }
+
             ringtime.setName(newRingtime.getName());
             ringtime.setRingtone(ringtone);
             ringtime.setStartDate(newRingtime.getStartDate());
@@ -166,7 +160,6 @@ public class RingtimeController {
             ringtime.setSunday(newRingtime.isSunday());
             ringtime.setHour(hour);
             ringtime.setMinute(minute);
-            //        ringTime.setAddInfo(newRingtime.getAddInfo());
             return ringTimeRepository.save(ringtime);
           })
         .orElseGet(
@@ -178,6 +171,7 @@ public class RingtimeController {
           });
 
     RingtimeDTO entityModel = assembler.toModel(updateRingtime);
+
     if (isLoadRingtimes.get() || playRingtones.checkLoadRingtimes(newRingtime)) {
       playRingtones.restart();
     }
@@ -206,5 +200,20 @@ public class RingtimeController {
     } else {
       throw new EntityNotFoundException(id, "ring time");
     }
+  }
+
+  /**
+   * Retrieves the current server time. This method is responsible for handling GET requests to
+   * the "/server-time" endpoint. It fetches the current server time, formats it using the
+   * ISO_DATE_TIME pattern, and then returns it as a ServertimeDTO wrapped in a ResponseEntity.
+   *
+   * @return a ResponseEntity containing the ServertimeDTO with the current server time
+   */
+  @GetMapping("/server-time")
+  public ResponseEntity<ServertimeDTO> getServerTime() {
+    LocalDateTime serverTime = LocalDateTime.now();
+    String formattedServerTime = DateTimeFormatter.ISO_DATE_TIME.format(serverTime);
+    ServertimeDTO serverTimeDTO = new ServertimeDTO(formattedServerTime);
+    return ResponseEntity.ok(serverTimeDTO);
   }
 }
