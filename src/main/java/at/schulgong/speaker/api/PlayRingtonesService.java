@@ -57,7 +57,7 @@ public class PlayRingtonesService {
     TypedQuery<Ringtime> typedQuery =
       entityManager.createQuery(query.toString(), Ringtime.class);
     List<Ringtime> ringtimeList = typedQuery.getResultList();
-    if (ringtimeList != null && ringtimeList.size() > 0) {
+    if (ringtimeList != null && !ringtimeList.isEmpty()) {
       for (Ringtime r : ringtimeList) {
         if (LocalTime.now()
           .isBefore(LocalTime.of(r.getHour().getHour(), r.getMinute().getMinute()))) {
@@ -76,7 +76,6 @@ public class PlayRingtonesService {
    */
   public boolean isHolidayAtCurrentDate() {
     List<Holiday> holidayList = holidayRepository.findHolidaysAtCurrentDate();
-    boolean isHoliday = holidayList != null && holidayList.size() > 0;
-    return isHoliday;
+    return holidayList != null && !holidayList.isEmpty();
   }
 }
