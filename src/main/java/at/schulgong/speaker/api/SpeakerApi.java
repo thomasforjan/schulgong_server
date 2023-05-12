@@ -12,7 +12,7 @@ import java.io.InputStreamReader;
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
  * @version 0.1
  * @implNote Api for running scripts to control network speaker
- * @since Mai 2023
+ * @since May 2023
  */
 public class SpeakerApi {
   /**

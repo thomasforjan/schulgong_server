@@ -19,7 +19,7 @@ import java.util.List;
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
  * @version 0.1
  * @implNote Service class to get specific data from database
- * @since Mai 2023
+ * @since May 2023
  */
 @Service
 public class PlayRingtonesService {

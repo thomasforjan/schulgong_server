@@ -2,6 +2,7 @@ package at.schulgong.speaker.api;
 
 import at.schulgong.dto.RingtimeDTO;
 import at.schulgong.speaker.util.SpeakerCommand;
+import lombok.NoArgsConstructor;
 
 import java.util.TimerTask;
 
@@ -9,16 +10,14 @@ import java.util.TimerTask;
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
  * @version 0.1
  * @implNote Task to execute speaker control at a specific time
- * @since Mai 2023
+ * @since May 2023
  */
+@NoArgsConstructor
 public class RingtimeTask extends TimerTask {
 
   private PlayRingtones playRingtones;
 
   private RingtimeDTO ringtimeDTO;
-
-  public RingtimeTask() {
-  }
 
   public RingtimeTask(RingtimeDTO ringtimeDTO, PlayRingtones playRingtones) {
     this.ringtimeDTO = ringtimeDTO;
