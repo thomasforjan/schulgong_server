@@ -4,6 +4,7 @@ import lombok.*;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 /**
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
@@ -18,6 +19,20 @@ import java.time.LocalDate;
 @Builder
 public class HolidayDTO extends RepresentationModel<HolidayDTO> {
   private long id;
-  private LocalDate startDate, endDate;
+  private LocalDate startDate;
+  private LocalDate endDate;
   private String name;
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof HolidayDTO that)) return false;
+    if (!super.equals(o)) return false;
+    return id == that.id && Objects.equals(startDate, that.startDate) && Objects.equals(endDate, that.endDate) && Objects.equals(name, that.name);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), id, startDate, endDate, name);
+  }
 }

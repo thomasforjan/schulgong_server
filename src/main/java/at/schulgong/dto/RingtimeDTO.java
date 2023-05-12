@@ -7,6 +7,7 @@ import org.springframework.hateoas.RepresentationModel;
 
 import java.time.LocalTime;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
@@ -37,4 +38,17 @@ public class RingtimeDTO extends RepresentationModel<RingtimeDTO> {
   private boolean friday;
   private boolean saturday;
   private boolean sunday;
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof RingtimeDTO that)) return false;
+    if (!super.equals(o)) return false;
+    return id == that.id && monday == that.monday && tuesday == that.tuesday && wednesday == that.wednesday && thursday == that.thursday && friday == that.friday && saturday == that.saturday && sunday == that.sunday && Objects.equals(name, that.name) && Objects.equals(ringtoneDTO, that.ringtoneDTO) && Objects.equals(playTime, that.playTime) && Objects.equals(startDate, that.startDate) && Objects.equals(endDate, that.endDate);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), id, name, ringtoneDTO, playTime, startDate, endDate, monday, tuesday, wednesday, thursday, friday, saturday, sunday);
+  }
 }
