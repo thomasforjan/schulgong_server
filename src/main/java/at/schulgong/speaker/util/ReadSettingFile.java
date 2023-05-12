@@ -19,7 +19,7 @@ public class ReadSettingFile {
   /**
    * Method to get settings from the config-file
    *
-   * @return
+   * @return settings
    */
   public static Setting getSettingFromConfigFile() {
     ObjectMapper objectMapper = new ObjectMapper();

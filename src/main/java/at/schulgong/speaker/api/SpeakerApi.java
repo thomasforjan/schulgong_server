@@ -15,6 +15,7 @@ import java.io.InputStreamReader;
  * @since May 2023
  */
 public class SpeakerApi {
+  private static final String PYTHON_STRING = "python";
   /**
    * Run specified script for control network speaker
    *
@@ -23,7 +24,7 @@ public class SpeakerApi {
    */
   public static SpeakerActionStatus runSpeakerApi(String[] args) {
     switch (ReadSettingFile.getSettingFromConfigFile().getType().toLowerCase()) {
-      case "python":
+      case PYTHON_STRING:
         return runPythonScript(args);
       case "java":
         return runJarFile(args);
@@ -45,11 +46,11 @@ public class SpeakerApi {
       ProcessBuilder processBuilder = null;
       if (args != null) {
         if (args.length > 1) {
-          processBuilder = new ProcessBuilder("python", filePath, args[0], args[1]);
+          processBuilder = new ProcessBuilder(PYTHON_STRING, filePath, args[0], args[1]);
         } else if (args.length > 0) {
-          processBuilder = new ProcessBuilder("python", filePath, args[0]);
+          processBuilder = new ProcessBuilder(PYTHON_STRING, filePath, args[0]);
         } else {
-          processBuilder = new ProcessBuilder("python", filePath);
+          processBuilder = new ProcessBuilder(PYTHON_STRING, filePath);
         }
       }
       if (processBuilder != null) {
@@ -64,7 +65,8 @@ public class SpeakerApi {
         readScriptOutput(bfr, speakerActionStatus);
       }
 
-    } catch (Exception e) {
+    } catch (InterruptedException | IOException e) {
+      e.printStackTrace();
     }
     return speakerActionStatus;
   }
@@ -84,7 +86,7 @@ public class SpeakerApi {
    *
    * @param bfr                 Buffered Raader
    * @param speakerActionStatus Output from script in form of SpeakerActionStatus
-   * @throws IOException
+   * @throws IOException throws ioException
    */
   private static void readScriptOutput(
     BufferedReader bfr, SpeakerActionStatus speakerActionStatus) throws IOException {
@@ -93,17 +95,15 @@ public class SpeakerApi {
     if (bfr != null) {
       while ((line = bfr.readLine()) != null) {
         String[] pythonOutput = line.split(":");
-        if (pythonOutput != null && pythonOutput.length > 1) {
+        if (pythonOutput.length > 1) {
           switch (pythonOutput[0]) {
             case "command":
               try {
                 if (speakerActionStatus.getSpeakerCommand() == null) {
-
                   speakerActionStatus.setSpeakerCommand(
                     SpeakerCommand.fromCommand(pythonOutput[1].trim()));
                 }
               } catch (IllegalArgumentException e) {
-
                 speakerActionStatus.setSpeakerCommand(null);
               }
               break;
@@ -132,12 +132,12 @@ public class SpeakerApi {
    * @return output in one string
    */
   private static String getFullOutputLine(String[] pythonOutput) {
-    String fullOutputLine = pythonOutput[1].trim();
+    StringBuilder fullOutPutLine = new StringBuilder(pythonOutput[1].trim());
     if (pythonOutput.length > 2) {
       for (int i = 2; i < pythonOutput.length; i++) {
-        fullOutputLine += pythonOutput[i];
+        fullOutPutLine.append(pythonOutput[i]);
       }
     }
-    return fullOutputLine;
+    return fullOutPutLine.toString();
   }
 }

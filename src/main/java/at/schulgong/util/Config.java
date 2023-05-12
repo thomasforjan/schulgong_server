@@ -17,7 +17,9 @@ public enum Config {
   FILEPATH("", "C:/Users/kralm/Desktop/Audiofiles", ""),
   SPEAKER_API_SETTINGS_PATH("", "C:/Users/kralm/OneDrive/Dokumente/Schule/IdeaProjects/FH-Burgenland/4. Semester/Praxisprojekt/schulgong_server/src/main/resources/python/config/speaker_api_settings.json", "");
 
-  private final String url, path, exception;
+  private final String url;
+  private final String path;
+  private final String exception;
 
   /**
    * Constructor of enum

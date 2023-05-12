@@ -25,11 +25,9 @@ public class DtoConverter {
    */
   public static RingtimeDTO convertRingtimeToDTO(Ringtime ringtime, boolean inclusiveRingtone) {
     RingtimeDTO ringTimeDTO = RingtimeDTO.builder().id(ringtime.getId()).name(ringtime.getName()).startDate(ringtime.getStartDate()).endDate(ringtime.getEndDate()).monday(ringtime.isMonday()).tuesday(ringtime.isTuesday()).wednesday(ringtime.isWednesday()).thursday(ringtime.isThursday()).friday(ringtime.isFriday()).saturday(ringtime.isSaturday()).sunday(ringtime.isSunday()).playTime(LocalTime.of(ringtime.getHour().getHour(), ringtime.getMinute().getMinute())).build();
-    if (inclusiveRingtone) {
-      if (ringtime.getRingtone() != null) {
+    if (inclusiveRingtone && (ringtime.getRingtone() != null)) {
         RingtoneDTO ringToneDTO = convertRingtoneToDTO(ringtime.getRingtone());
         ringTimeDTO.setRingtoneDTO(ringToneDTO);
-      }
     }
     return ringTimeDTO;
   }
@@ -71,8 +69,7 @@ public class DtoConverter {
    * @return object of ringtoneDTO
    */
   public static RingtoneDTO convertRingtoneToDTO(Ringtone ringtone) {
-    RingtoneDTO ringtoneDTO = RingtoneDTO.builder().id(ringtone.getId()).name(ringtone.getName()).filename(ringtone.getFilename()).path(ringtone.getPath()).date(ringtone.getDate()).size(ringtone.getSize()).build();
-    return ringtoneDTO;
+    return RingtoneDTO.builder().id(ringtone.getId()).name(ringtone.getName()).filename(ringtone.getFilename()).path(ringtone.getPath()).date(ringtone.getDate()).size(ringtone.getSize()).build();
   }
 
   /**
@@ -99,8 +96,7 @@ public class DtoConverter {
    * @return object of holidayDTO
    */
   public static HolidayDTO convertHolidayToDTO(Holiday holiday) {
-    HolidayDTO holidayDTO = HolidayDTO.builder().id(holiday.getId()).startDate(holiday.getStartDate()).endDate(holiday.getEndDate()).name(holiday.getName()).build();
-    return holidayDTO;
+    return HolidayDTO.builder().id(holiday.getId()).startDate(holiday.getStartDate()).endDate(holiday.getEndDate()).name(holiday.getName()).build();
   }
 
   /**
