@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.util.Date;
 
 /**
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
@@ -30,10 +30,10 @@ public class Ringtime {
   private Ringtone ringtone;
 
   @Column(name = "startdate", columnDefinition = "DATE")
-  private LocalDate startDate;
+  private Date startDate;
 
   @Column(name = "enddate", columnDefinition = "DATE")
-  private LocalDate endDate;
+  private Date endDate;
 
   @Column(name = "monday")
   private boolean monday;

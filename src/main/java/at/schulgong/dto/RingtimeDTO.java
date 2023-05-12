@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import org.springframework.hateoas.RepresentationModel;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Date;
 
 /**
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
@@ -27,8 +27,9 @@ public class RingtimeDTO extends RepresentationModel<RingtimeDTO> {
   private RingtoneDTO ringtoneDTO;
   @JsonFormat(pattern = "HH:mm")
   private LocalTime playTime;
-  private LocalDate startDate;
-  private LocalDate endDate;
+  private Date startDate;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Date endDate;
   private boolean monday;
   private boolean tuesday;
   private boolean wednesday;

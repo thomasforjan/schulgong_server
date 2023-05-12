@@ -12,6 +12,7 @@ import at.schulgong.repository.HourRepository;
 import at.schulgong.repository.MinuteRepository;
 import at.schulgong.repository.RingtimeRepository;
 import at.schulgong.repository.RingtoneRepository;
+import at.schulgong.speaker.api.PlayRingtones;
 import at.schulgong.util.Config;
 import at.schulgong.util.DtoConverter;
 import org.springframework.hateoas.CollectionModel;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -36,6 +38,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RequestMapping("ringtimes")
 @CrossOrigin
 public class RingtimeController {
+  private final PlayRingtones playRingtones;
   private final RingtimeRepository ringtimeRepository;
   private final RingtoneRepository ringtoneRepository;
   private final HourRepository hourRepository;
@@ -51,7 +54,8 @@ public class RingtimeController {
    * @param hourRepository     Repository of hour
    * @param minuteRepository   Repository of minute
    */
-  public RingtimeController(RingtimeRepository ringtimeRepository, RingtimeModelAssembler assembler, RingtoneRepository ringtoneRepository, HourRepository hourRepository, MinuteRepository minuteRepository) {
+  public RingtimeController(PlayRingtones playRingtones, RingtimeRepository ringtimeRepository, RingtimeModelAssembler assembler, RingtoneRepository ringtoneRepository, HourRepository hourRepository, MinuteRepository minuteRepository) {
+    this.playRingtones = playRingtones;
     this.ringtimeRepository = ringtimeRepository;
     this.assembler = assembler;
     this.ringtoneRepository = ringtoneRepository;
@@ -102,6 +106,9 @@ public class RingtimeController {
     }
     ringtime.setRingtone(ringtone);
     RingtimeDTO entityModel = assembler.toModel(ringtimeRepository.save(ringtime));
+    if (playRingtones.checkLoadRingtimes(newRingtime)) {
+      playRingtones.restart();
+    }
     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
@@ -114,10 +121,14 @@ public class RingtimeController {
    */
   @PutMapping("{id}")
   ResponseEntity<RingtimeDTO> replaceRingtime(@RequestBody RingtimeDTO newRingtime, @PathVariable long id) {
+    final AtomicBoolean isLoadRingtimes = new AtomicBoolean(false);
     Ringtone ringtone = DtoConverter.convertDtoToRingtone(newRingtime.getRingtoneDTO());
     Hour hour = hourRepository.findByHour(newRingtime.getPlayTime().getHour());
     Minute minute = minuteRepository.findByMinute(newRingtime.getPlayTime().getMinute());
     Ringtime updateRingtime = ringtimeRepository.findById(id).map(ringtime -> {
+      if (playRingtones.checkLoadRingtimes(DtoConverter.convertRingtimeToDTO(ringtime, false))) {
+        isLoadRingtimes.set(true);
+      }
       ringtime.setName(newRingtime.getName());
       ringtime.setRingtone(ringtone);
       ringtime.setStartDate(newRingtime.getStartDate());
@@ -138,6 +149,9 @@ public class RingtimeController {
       return ringtimeRepository.save(ringtime);
     });
     RingtimeDTO entityModel = assembler.toModel(updateRingtime);
+    if (isLoadRingtimes.get() || playRingtones.checkLoadRingtimes(newRingtime)) {
+      playRingtones.restart();
+    }
     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
 
@@ -150,7 +164,11 @@ public class RingtimeController {
   @DeleteMapping("{id}")
   ResponseEntity<RingtimeDTO> deleteRingtime(@PathVariable long id) {
     if (ringtimeRepository.existsById(id)) {
+      boolean updatePlayRingtones = playRingtones.checkLoadRingtimes(this.one(id));
       ringtimeRepository.deleteById(id);
+      if (updatePlayRingtones) {
+        playRingtones.restart();
+      }
       return ResponseEntity.noContent().build();
     } else {
       throw new EntityNotFoundException(id, Config.RINGTIME.getException());
