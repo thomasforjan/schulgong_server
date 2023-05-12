@@ -1,5 +1,11 @@
 package at.schulgong.speaker.util;
 
+/**
+ * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
+ * @version 0.1
+ * @implNote Commands for controlling network speaker
+ * @since Mai 2023
+ */
 public enum SpeakerCommand {
     DISCOVER_BY_NAME("discover_by_name"),
     DISCOVER_ALL("discover_all"),

@@ -12,11 +12,7 @@ import lombok.Getter;
 public enum Config {
     RINGTONE("ringtones", "", "ringtone"),
     HOLIDAY("holidays", "", "holiday"),
-    FILEPATH(
-            "",
-            "D://01-Studium/Software Engineering und vernetzte"
-                    + " Systeme/4.Semester/Praxisprojekt/Audiofiles",
-            ""),
+    FILEPATH("", "C://Users/phili/OneDrive/Desktop/sonos_music", ""),
 
     SPEAKER_API_SETTINGS_PATH(
             "",
@@ -30,5 +26,4 @@ public enum Config {
         this.path = path;
         this.exception = exception;
     }
-
 }

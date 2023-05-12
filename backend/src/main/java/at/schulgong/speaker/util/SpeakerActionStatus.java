@@ -2,6 +2,12 @@ package at.schulgong.speaker.util;
 
 import lombok.*;
 
+/**
+ * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
+ * @version 0.1
+ * @implNote Output from the speaker scripts
+ * @since Mai 2023
+ */
 @Setter
 @Getter
 @NoArgsConstructor
