@@ -39,7 +39,7 @@ public class RingtimeTask extends TimerTask {
   /**
    * Convert a path in the correct form
    *
-   * @param path
+   * @param path path of ringtone
    * @return Path
    */
   private String convertPath(String path) {
