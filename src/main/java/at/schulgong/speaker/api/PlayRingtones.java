@@ -67,9 +67,9 @@ public class PlayRingtones {
    * Start the tasks for play rintones from ring times
    */
   public void playRingtonesFromRingtimes() {
-    if (ringtimeDTOList != null && ringtimeDTOList.size() > 0) {
+    if (ringtimeDTOList != null && !ringtimeDTOList.isEmpty()) {
       LocalDateTime ldtActualPlayTime = LocalDateTime.of(LocalDate.now(), ringtimeDTOList.get(0).getPlayTime());
-      if (ldtActualPlayTime != null && LocalDateTime.now().isAfter(ldtActualPlayTime)) {
+      if (LocalDateTime.now().isAfter(ldtActualPlayTime)) {
         ringtimeDTOList.remove(0);
       }
       for (RingtimeDTO ringtime : ringtimeDTOList) {
@@ -93,7 +93,7 @@ public class PlayRingtones {
    * Stop all tasks
    */
   private void stopTasks() {
-    if (ringtimeTaskList != null && ringtimeTaskList.size() > 0) {
+    if (ringtimeTaskList != null && !ringtimeTaskList.isEmpty()) {
       for (RingtimeTask task : ringtimeTaskList) {
         task.cancel();
       }
@@ -124,6 +124,7 @@ public class PlayRingtones {
       ringtimeTaskList.add(ringtimeTask);
       timer.schedule(ringtimeTask, date);
     } catch (Exception e) {
+      e.printStackTrace();
     }
   }
 
