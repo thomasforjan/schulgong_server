@@ -1,0 +1,142 @@
+package at.schulgong.speaker.api;
+
+import at.schulgong.speaker.util.ReadSettingFile;
+import at.schulgong.speaker.util.SpeakerActionStatus;
+import at.schulgong.speaker.util.SpeakerCommand;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+/**
+ * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
+ * @version 0.1
+ * @implNote Api for running scripts to control network speaker
+ * @since Mai 2023
+ */
+public class SpeakerApi {
+    /**
+     * Run specified script for control network speaker
+     *
+     * @param args Array containing speaker command inclusive arguments
+     * @return Output from the executed script in form of SpeakerActionStatus
+     */
+    public static SpeakerActionStatus runSpeakerApi(String[] args) {
+        switch (ReadSettingFile.getSettingFromConfigFile().getType().toLowerCase()) {
+            case "python":
+                return runPythonScript(args);
+            case "java":
+                return runJarFile(args);
+            default:
+                return null;
+        }
+    }
+
+    /**
+     * Run python script to control network speaker
+     *
+     * @param args Array containing speaker command inclusive arguments
+     * @return Output from the executed script in form of SpeakerActionStatus
+     */
+    private static SpeakerActionStatus runPythonScript(String[] args) {
+        SpeakerActionStatus speakerActionStatus = null;
+        try {
+            String filePath = ReadSettingFile.getSettingFromConfigFile().getExecutedFilePath();
+            ProcessBuilder processBuilder = null;
+            if (args != null) {
+                if (args.length > 1) {
+                    processBuilder = new ProcessBuilder("python", filePath, args[0], args[1]);
+                } else if (args.length > 0) {
+                    processBuilder = new ProcessBuilder("python", filePath, args[0]);
+                } else {
+                    processBuilder = new ProcessBuilder("python", filePath);
+                }
+            }
+            if (processBuilder != null) {
+                processBuilder.redirectErrorStream(true);
+
+                Process process = processBuilder.start();
+                BufferedReader bfr =
+                        new BufferedReader(new InputStreamReader(process.getInputStream()));
+                int exitCode = process.waitFor();
+                speakerActionStatus = SpeakerActionStatus.builder().exitCode(exitCode).build();
+                System.out.println("Exit Code : " + exitCode);
+                readScriptOutput(bfr, speakerActionStatus);
+            }
+
+        } catch (Exception e) {
+        }
+        return speakerActionStatus;
+    }
+
+    /**
+     * Run jar file to control network speaker
+     *
+     * @param args Array containing speaker command inclusive arguments
+     * @return Output from the executed script in form of SpeakerActionStatus
+     */
+    private static SpeakerActionStatus runJarFile(String[] args) {
+        return null;
+    }
+
+    /**
+     * Read output from running scripts
+     *
+     * @param bfr Buffered Raader
+     * @param speakerActionStatus Output from script in form of SpeakerActionStatus
+     * @throws IOException
+     */
+    private static void readScriptOutput(
+            BufferedReader bfr, SpeakerActionStatus speakerActionStatus) throws IOException {
+        String line = "";
+        System.out.println("Running Python starts: " + line);
+        if (bfr != null) {
+            while ((line = bfr.readLine()) != null) {
+                String[] pythonOutput = line.split(":");
+                if (pythonOutput != null && pythonOutput.length > 1) {
+                    switch (pythonOutput[0]) {
+                        case "command":
+                            try {
+                                if (speakerActionStatus.getSpeakerCommand() == null) {
+
+                                    speakerActionStatus.setSpeakerCommand(
+                                            SpeakerCommand.fromCommand(pythonOutput[1].trim()));
+                                }
+                            } catch (IllegalArgumentException e) {
+
+                                speakerActionStatus.setSpeakerCommand(null);
+                            }
+                            break;
+                        case "information":
+                            speakerActionStatus.setInformation(getFullOutputLine(pythonOutput));
+                            break;
+                        case "exception":
+                            speakerActionStatus.setException(getFullOutputLine(pythonOutput));
+                            break;
+                        case "speakerList":
+                            speakerActionStatus.setSpeakerList(getFullOutputLine(pythonOutput));
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                System.out.println("Python Output: " + line);
+            }
+        }
+    }
+
+    /**
+     * Get output line of script output in one string
+     *
+     * @param pythonOutput Array of the script output
+     * @return output in one string
+     */
+    private static String getFullOutputLine(String[] pythonOutput) {
+        String fullOutputLine = pythonOutput[1].trim();
+        if (pythonOutput.length > 2) {
+            for (int i = 2; i < pythonOutput.length; i++) {
+                fullOutputLine += pythonOutput[i];
+            }
+        }
+        return fullOutputLine;
+    }
+}
