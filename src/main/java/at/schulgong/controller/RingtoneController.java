@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
@@ -80,7 +81,7 @@ public class RingtoneController {
   @PostMapping
   ResponseEntity<?> newRingtone(@RequestParam("song") MultipartFile song, @RequestParam("name") String name) {
     // check if ContentType of the Post Request (MultipartFile) is audio
-    if (!song.getContentType().contains("audio")) {
+    if (checkIfRightContentType(song.getContentType())) {
       return new ResponseEntity<>("False datatype", HttpStatus.BAD_REQUEST);
     }
     Ringtone ringtone = getChangedRingtone(song, name);
@@ -104,7 +105,7 @@ public class RingtoneController {
   @PutMapping("/{id}")
   ResponseEntity<?> replaceRingtone(@RequestParam(value = "song", required = false) MultipartFile newSong, @RequestParam("name") String name, @PathVariable long id) {
     // check if ContentType of the Post Request (MultipartFile) is an audiofile
-    if (newSong != null && !newSong.getContentType().contains("audio")) {
+    if (newSong != null && checkIfRightContentType(newSong.getContentType())) {
       return new ResponseEntity<>("False datatype", HttpStatus.INTERNAL_SERVER_ERROR);
     }
     Ringtone updateRingtone = (Ringtone) ringtoneRepository.findById(id).map(ringtone -> {
@@ -137,6 +138,7 @@ public class RingtoneController {
         return ringtoneRepository.save(newRingtone);
       }
     });
+
     RingtoneDTO entityModel = assembler.toModel(updateRingtone);
     return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
   }
@@ -166,8 +168,12 @@ public class RingtoneController {
    */
   private void deleteAudioFile(String path) {
     File file = new File(path);
-    if (file.exists() && file.canWrite()) {
-      file.delete();
+    try {
+      if (file.exists() && file.canWrite()) {
+        Files.delete(Paths.get(path));
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
     }
   }
 
@@ -242,5 +248,9 @@ public class RingtoneController {
       changeFileName(ringtone, i);
     }
     return ringtone;
+  }
+
+  private boolean checkIfRightContentType(String contentType) {
+    return contentType == null || !contentType.contains("audio");
   }
 }
