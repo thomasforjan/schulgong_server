@@ -1,5 +1,5 @@
 {
   "type": "python",
-  "executedFilePath": "python/config/main_sonos_api.py",
+  "executedFilePath": "src/main/resources/python/scripts/main_sonos_api.py",
   "loadRingtimeTime": "00:01"
 }
