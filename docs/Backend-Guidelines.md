@@ -1,4 +1,4 @@
-# PPR - Schulgong - Backend-Guidelines 
+# PPR - Schulgong - Backend-Guidelines
 
 <hr>
 
@@ -11,11 +11,8 @@ The present document provides an outline of the guidelines for the backend.
 ### :wrench: Environment Setup:
 
 - Java Version 17
-
 - Gradle 7.6.1
-
 - Git (required)
-
 - IntelliJ IDEA JetBrains (Recommended)
 
 <hr>
@@ -23,11 +20,8 @@ The present document provides an outline of the guidelines for the backend.
 ### :book: Naming convention for variables
 
 - All variables must be written in English!
-
 - In addition, the variables must be in camelCase!
-
 - Meaningful variable names e.g.: totalAmount;
-
 - The naming convention for a list must be for e.g.: personList;
 
 #### Java Doc (Documentation):
@@ -55,18 +49,23 @@ The present document provides an outline of the guidelines for the backend.
 
 ### :file_folder: Project structure
 
-- It is necessary to implement each service within its own separate module. 
+- It is necessary to implement each service within its own separate module.
 - We have decided to use the following folder structure (as an example). We have chosen to extract the models to enable multiple modules to access them.
+
 ```md
 ├── at.schulgong.rest-api
+|  ├── assembler
 |  ├── controller
 |  ├── dto
-|  ├── assembler
 |  ├── exception 
+|  ├── model
+|  ├── repository
+|  ├── speaker
 |  ├── util
-|  | └── DtoConverter.java
-├── model
+|    └── Config.java
+|    └── DtoConverter.java
 ```
 
 ### :clipboard: Testing
+
 For every implemented class, a corresponding test class and associated JUnit tests must also be written, for example "DtoConverterTest.java".

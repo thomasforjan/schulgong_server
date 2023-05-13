@@ -1,4 +1,4 @@
-# PPR - Schulgong - GIT-Guidelines 
+# PPR - Schulgong - GIT-Guidelines
 
 <hr>
 
@@ -37,17 +37,15 @@ Remove timeouts which were used to mitigate the racing issue but are obsolete no
 
 Reviewed-by: Z
 
-Issue: #123
+Issue: Closes #123
+
 <hr>
 
 ### :warning: Issues
 
 - First create an issue on GitHub, after that connect the issue to Jira.
-
 - The issue number must be on the footer in the commit message.
-
 - Select a label for an issue if possible
-
 - Select assignee if possible
 
 <hr>
@@ -65,11 +63,9 @@ When a POST-Request is submitted with an empty Body, an exception will be thrown
 #### General information
 
 - stable (versions)
-
 - bugfix/feature-name
-
 - feature/feature-name
-
+- refactor/feature-name
 - main (versions)
 
 Please create for each feature implementation an own branch.
