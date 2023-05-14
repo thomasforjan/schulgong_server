@@ -2,7 +2,7 @@ import soco
 import json
 import os
 
-SPEAKER_CONFIG_FILE_URL = "C:/Users/kralm/OneDrive/Dokumente/Schule/IdeaProjects/FH-Burgenland/4. Semester/Praxisprojekt/schulgong_server/src/main/resources/python/config/speaker_config.json"
+SPEAKER_CONFIG_FILE_URL = "src/main/resources/python/config/speaker_config.json"
 START_PATH_URI = "x-file-cifs://DESKTOP-Q0STA8D"
 
 def discover():
