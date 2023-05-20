@@ -30,7 +30,7 @@ public class PlayRingtones {
   private PlayRingtonesService playRingtonesService;
   private Timer timer;
   private List<RingtimeDTO> ringtimeDTOList;
-  private List<RingtimeTask> ringtimeTaskList;
+  private List<PlayRingtoneTask> playRingtoneTaskList;
   private Setting setting;
 
   @Bean
@@ -58,7 +58,7 @@ public class PlayRingtones {
     setting = ReadSettingFile.getSettingFromConfigFile();
     timer = new Timer();
     runEveryDayTask();
-    ringtimeTaskList = new ArrayList<>();
+    playRingtoneTaskList = new ArrayList<>();
     System.out.println("POST CONSTRACT");
     playRingtonesFromRingtimes();
   }
@@ -93,11 +93,11 @@ public class PlayRingtones {
    * Stop all tasks
    */
   private void stopTasks() {
-    if (ringtimeTaskList != null && !ringtimeTaskList.isEmpty()) {
-      for (RingtimeTask task : ringtimeTaskList) {
+    if (playRingtoneTaskList != null && !playRingtoneTaskList.isEmpty()) {
+      for (PlayRingtoneTask task : playRingtoneTaskList) {
         task.cancel();
       }
-      ringtimeTaskList = new ArrayList<>();
+      playRingtoneTaskList = new ArrayList<>();
     }
   }
 
@@ -120,8 +120,8 @@ public class PlayRingtones {
   private void startRingtimeTask(LocalDateTime ldtPlayTime, RingtimeDTO ringtimeDTO) {
     Date date = Date.from(ldtPlayTime.atZone(ZoneId.systemDefault()).toInstant());
     try {
-      RingtimeTask ringtimeTask = new RingtimeTask(ringtimeDTO, this);
-      ringtimeTaskList.add(ringtimeTask);
+      PlayRingtoneTask ringtimeTask = new PlayRingtoneTask(ringtimeDTO, this);
+      playRingtoneTaskList.add(ringtimeTask);
       timer.schedule(ringtimeTask, date);
     } catch (Exception e) {
       e.printStackTrace();

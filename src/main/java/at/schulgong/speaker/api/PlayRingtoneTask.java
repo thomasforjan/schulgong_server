@@ -13,13 +13,13 @@ import java.util.TimerTask;
  * @since May 2023
  */
 @NoArgsConstructor
-public class RingtimeTask extends TimerTask {
+public class PlayRingtoneTask extends TimerTask {
 
   private PlayRingtones playRingtones;
 
   private RingtimeDTO ringtimeDTO;
 
-  public RingtimeTask(RingtimeDTO ringtimeDTO, PlayRingtones playRingtones) {
+  public PlayRingtoneTask(RingtimeDTO ringtimeDTO, PlayRingtones playRingtones) {
     this.ringtimeDTO = ringtimeDTO;
     this.playRingtones = playRingtones;
   }
