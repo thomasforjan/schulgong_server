@@ -243,7 +243,7 @@ def set_play_mode(playmode):
         if str(playmode).lower() == "normal" or str(playmode).lower() == "repeat_all" or str(playmode).lower() == "shuffle" or  str(playmode).lower() == "shuffle_norepeat":
             soco_speaker = discover()
             if(soco_speaker is not None):
-                soco_speaker.set_play_mode = playmode
+                soco_speaker.play_mode = playmode
         else:
             print("exception: Please set a correct playmode (normal, repeat_all, shuffle, shuffle_norepeat)")
     except:
