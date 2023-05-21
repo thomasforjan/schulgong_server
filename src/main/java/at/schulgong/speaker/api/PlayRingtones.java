@@ -2,15 +2,20 @@ package at.schulgong.speaker.api;
 
 import at.schulgong.dto.HolidayDTO;
 import at.schulgong.dto.RingtimeDTO;
+import at.schulgong.dto.RingtoneDTO;
 import at.schulgong.speaker.util.ReadSettingFile;
 import at.schulgong.speaker.util.Setting;
 import at.schulgong.speaker.util.SpeakerActionStatus;
+import at.schulgong.speaker.util.SpeakerCommand;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.context.annotation.ApplicationScope;
+import ws.schild.jave.EncoderException;
+import ws.schild.jave.MultimediaObject;
 
+import java.io.File;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -30,8 +35,10 @@ public class PlayRingtones {
   private PlayRingtonesService playRingtonesService;
   private Timer timer;
   private List<RingtimeDTO> ringtimeDTOList;
-  private List<RingtimeTask> ringtimeTaskList;
+  private List<PlayRingtoneTask> playRingtoneTaskList;
+  private PlayRingtoneTask playAlarmTask;
   private Setting setting;
+  private boolean isPlayingAlarm;
 
   @Bean
   @ApplicationScope
@@ -58,13 +65,13 @@ public class PlayRingtones {
     setting = ReadSettingFile.getSettingFromConfigFile();
     timer = new Timer();
     runEveryDayTask();
-    ringtimeTaskList = new ArrayList<>();
+    playRingtoneTaskList = new ArrayList<>();
     System.out.println("POST CONSTRACT");
     playRingtonesFromRingtimes();
   }
 
   /**
-   * Start the tasks for play rintones from ring times
+   * Start the tasks for play ringtones from ring times
    */
   public void playRingtonesFromRingtimes() {
     if (ringtimeDTOList != null && !ringtimeDTOList.isEmpty()) {
@@ -83,21 +90,23 @@ public class PlayRingtones {
    * Restarts the tasks for playing ringtones
    */
   public void restart() {
-    System.out.println("RESTART");
-    stopTasks();
-    loadRingtimes();
-    playRingtonesFromRingtimes();
+    if (!isPlayingAlarm) {
+      System.out.println("RESTART");
+      stopTasks();
+      loadRingtimes();
+      playRingtonesFromRingtimes();
+    }
   }
 
   /**
    * Stop all tasks
    */
   private void stopTasks() {
-    if (ringtimeTaskList != null && !ringtimeTaskList.isEmpty()) {
-      for (RingtimeTask task : ringtimeTaskList) {
+    if (playRingtoneTaskList != null && !playRingtoneTaskList.isEmpty()) {
+      for (PlayRingtoneTask task : playRingtoneTaskList) {
         task.cancel();
       }
-      ringtimeTaskList = new ArrayList<>();
+      playRingtoneTaskList = new ArrayList<>();
     }
   }
 
@@ -120,8 +129,8 @@ public class PlayRingtones {
   private void startRingtimeTask(LocalDateTime ldtPlayTime, RingtimeDTO ringtimeDTO) {
     Date date = Date.from(ldtPlayTime.atZone(ZoneId.systemDefault()).toInstant());
     try {
-      RingtimeTask ringtimeTask = new RingtimeTask(ringtimeDTO, this);
-      ringtimeTaskList.add(ringtimeTask);
+      PlayRingtoneTask ringtimeTask = new PlayRingtoneTask(ringtimeDTO.getRingtoneDTO(), this);
+      playRingtoneTaskList.add(ringtimeTask);
       timer.schedule(ringtimeTask, date);
     } catch (Exception e) {
       e.printStackTrace();
@@ -182,14 +191,83 @@ public class PlayRingtones {
    * Task which run one time every day to load the ring time for the actual day
    */
   private void runEveryDayTask() {
-    LocalDateTime ldt = LocalDateTime.of(LocalDate.now(), setting.getLoadRingtimeTime());
-    Date date = Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
-    long period = 1000L * 60L * 60L * 24L;
-    timer.scheduleAtFixedRate(new TimerTask() {
-      @Override
-      public void run() {
-        restart();
-      }
-    }, date, period);
+    if (!isPlayingAlarm) {
+      LocalDateTime ldt = LocalDateTime.of(LocalDate.now(), setting.getLoadRingtimeTime());
+      Date date = Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
+      long period = 1000L * 60L * 60L * 24L;
+      timer.scheduleAtFixedRate(new TimerTask() {
+        @Override
+        public void run() {
+          restart();
+        }
+      }, date, period);
+    }
   }
+
+  /**
+   * Start playing the alarm
+   */
+  public void playAlarm() {
+    isPlayingAlarm = true;
+    stopTasks();
+    RingtoneDTO ringtoneDTO = playRingtonesService.getRingtoneAlarm();
+    System.out.println(ringtoneDTO.getPath());
+    if (ringtoneDTO != null) {
+      runAlarmTask(ringtoneDTO);
+    }
+  }
+
+  /**
+   * Stop the alarm
+   */
+  public void stopAlarm() {
+    isPlayingAlarm = false;
+    playAlarmTask.cancel();
+    String[] argsListStop = {
+      SpeakerCommand.STOP.getCommand(),
+    };
+    executeSpeakerAction(argsListStop);
+    restart();
+  }
+
+  /**
+   * Task which run the task for playing the alarm
+   */
+  private void runAlarmTask(RingtoneDTO ringtoneDTO) {
+    try {
+      playAlarmTask = new PlayRingtoneTask(ringtoneDTO, this);
+      LocalDateTime ldt = LocalDateTime.now();
+      Date date = Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
+      long duration = getDurationOfMusicFile(ringtoneDTO.getPath());
+      timer.scheduleAtFixedRate(
+        playAlarmTask,
+        date,
+        duration);
+    }catch (EncoderException e) {
+      e.printStackTrace();
+    }
+  }
+
+  /**
+   * Get the duration of the music file
+   *
+   * @param filePath of the music file
+   * @return duration of the music file
+   * @throws EncoderException
+   */
+  private long getDurationOfMusicFile(String filePath) throws EncoderException {
+    File alarmFile = new File(filePath);
+    MultimediaObject mmo = new MultimediaObject(alarmFile);
+    return mmo.getInfo().getDuration();
+  }
+
+  /**
+   * Getter for the attribute isPlayingAlarm
+   *
+   * @return isPlayingAlarm
+   */
+  public boolean isPlayingAlarm() {
+    return isPlayingAlarm;
+  }
+
 }

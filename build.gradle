@@ -57,6 +57,7 @@ implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1
 implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.15.0'
 implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.15.0'
 implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.33'
+  implementation 'ws.schild:jave-all-deps:3.3.1'
 }
 
 spotbugs {

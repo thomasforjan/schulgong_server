@@ -1,6 +1,6 @@
 package at.schulgong.speaker.api;
 
-import at.schulgong.dto.RingtimeDTO;
+import at.schulgong.dto.RingtoneDTO;
 import at.schulgong.speaker.util.SpeakerCommand;
 import lombok.NoArgsConstructor;
 
@@ -13,14 +13,14 @@ import java.util.TimerTask;
  * @since May 2023
  */
 @NoArgsConstructor
-public class RingtimeTask extends TimerTask {
+public class PlayRingtoneTask extends TimerTask {
 
   private PlayRingtones playRingtones;
 
-  private RingtimeDTO ringtimeDTO;
+  private RingtoneDTO ringtoneDTO;
 
-  public RingtimeTask(RingtimeDTO ringtimeDTO, PlayRingtones playRingtones) {
-    this.ringtimeDTO = ringtimeDTO;
+  public PlayRingtoneTask(RingtoneDTO ringtoneDTO, PlayRingtones playRingtones) {
+    this.ringtoneDTO = ringtoneDTO;
     this.playRingtones = playRingtones;
   }
 
@@ -31,7 +31,7 @@ public class RingtimeTask extends TimerTask {
   public void run() {
     String[] argsList = {
       SpeakerCommand.PLAY_URI.getCommand(),
-      convertPath(this.ringtimeDTO.getRingtoneDTO().getPath())
+      convertPath(this.ringtoneDTO.getPath())
     };
     playRingtones.executeSpeakerAction(argsList);
   }
@@ -42,7 +42,7 @@ public class RingtimeTask extends TimerTask {
    * @param path path of ringtone
    * @return Path
    */
-  private String convertPath(String path) {
+  public static String convertPath(String path) {
     String os = System.getProperty("os.name");
     if (os.contains("Windows")) {
       path = path.replace("\\", "/");
