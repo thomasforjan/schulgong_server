@@ -14,7 +14,8 @@ public enum Config {
     RINGTIME("ringtimes", "", "ringtime"),
     HOLIDAY("holidays", "", "holiday"),
     SPEAKER_API_SETTINGS_PATH("", "src/main/resources/python/config/speaker_api_settings.json", ""),
-    FILEPATH("", "Audiofiles", "");
+    FILEPATH("", "Audiofiles", ""),
+    ANNOUNCEMENT_PATH("", "C:/Users/phili/OneDrive/Desktop/sonos_music/Durchsage.mp3", "");
 
     private final String url;
     private final String path;
