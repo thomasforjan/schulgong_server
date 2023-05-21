@@ -71,7 +71,7 @@ public class PlayRingtones {
   }
 
   /**
-   * Start the tasks for play rintones from ring times
+   * Start the tasks for play ringtones from ring times
    */
   public void playRingtonesFromRingtimes() {
     if (ringtimeDTOList != null && !ringtimeDTOList.isEmpty()) {
@@ -204,6 +204,9 @@ public class PlayRingtones {
     }
   }
 
+  /**
+   * Start playing the alarm
+   */
   public void playAlarm() {
     isPlayingAlarm = true;
     stopTasks();
@@ -214,6 +217,9 @@ public class PlayRingtones {
     }
   }
 
+  /**
+   * Stop the alarm
+   */
   public void stopAlarm() {
     isPlayingAlarm = false;
     playAlarmTask.cancel();
@@ -225,7 +231,7 @@ public class PlayRingtones {
   }
 
   /**
-   * Task which run one time every day to load the ring time for the actual day
+   * Task which run the task for playing the alarm
    */
   private void runAlarmTask(RingtoneDTO ringtoneDTO) {
     try {
@@ -242,12 +248,24 @@ public class PlayRingtones {
     }
   }
 
+  /**
+   * Get the duration of the music file
+   *
+   * @param filePath of the music file
+   * @return duration of the music file
+   * @throws EncoderException
+   */
   private long getDurationOfMusicFile(String filePath) throws EncoderException {
     File alarmFile = new File(filePath);
     MultimediaObject mmo = new MultimediaObject(alarmFile);
     return mmo.getInfo().getDuration();
   }
 
+  /**
+   * Getter for the attribute isPlayingAlarm
+   *
+   * @return isPlayingAlarm
+   */
   public boolean isPlayingAlarm() {
     return isPlayingAlarm;
   }

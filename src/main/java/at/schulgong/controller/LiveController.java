@@ -1,15 +1,9 @@
 package at.schulgong.controller;
 
 import at.schulgong.speaker.api.PlayRingtones;
-import at.schulgong.util.AudioConverter;
-import at.schulgong.util.Config;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 /**
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
@@ -32,16 +26,6 @@ public class LiveController {
     this.playRingtones = playRingtones;
   }
 
-  //  /**
-  //   * Get isPlayingAlarm flag.
-  //   *
-  //   * @return isPlayingAlarm flag
-  //   */
-  //  @GetMapping("alarm/isplaying")
-  //  public LiveDTO alarmIsPlaying() {
-  //    return LiveDTO.builder().isPlayingAlarm(playRingtones.isPlayingAlarm()).build();
-  //  }
-
   /**
    * Get isPlayingAlarm flag.
    *
@@ -49,14 +33,11 @@ public class LiveController {
    */
   @GetMapping("alarm/isplaying")
   public ResponseEntity<Boolean> alarmIsPlaying() {
-    System.out.println(
-      "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-    System.out.println(playRingtones.isPlayingAlarm());
     return ResponseEntity.ok(playRingtones.isPlayingAlarm());
   }
 
   /**
-   * Add new sensor.
+   * Start or stop playing the alarm.
    *
    * @param isPlayingAlarm flag if alarm has to start or stop
    * @return no Content
