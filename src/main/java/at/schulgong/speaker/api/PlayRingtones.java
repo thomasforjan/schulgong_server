@@ -7,6 +7,7 @@ import at.schulgong.speaker.util.ReadSettingFile;
 import at.schulgong.speaker.util.Setting;
 import at.schulgong.speaker.util.SpeakerActionStatus;
 import at.schulgong.speaker.util.SpeakerCommand;
+import at.schulgong.util.Config;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -39,6 +40,8 @@ public class PlayRingtones {
   private PlayRingtoneTask playAlarmTask;
   private Setting setting;
   private boolean isPlayingAlarm;
+  private boolean isPlayingAnnouncement;
+
 
   @Bean
   @ApplicationScope
@@ -90,7 +93,7 @@ public class PlayRingtones {
    * Restarts the tasks for playing ringtones
    */
   public void restart() {
-    if (!isPlayingAlarm) {
+    if (!isPlayingAlarm && !isPlayingAnnouncement) {
       System.out.println("RESTART");
       stopTasks();
       loadRingtimes();
@@ -191,7 +194,7 @@ public class PlayRingtones {
    * Task which run one time every day to load the ring time for the actual day
    */
   private void runEveryDayTask() {
-    if (!isPlayingAlarm) {
+    if (!isPlayingAlarm && !isPlayingAnnouncement) {
       LocalDateTime ldt = LocalDateTime.of(LocalDate.now(), setting.getLoadRingtimeTime());
       Date date = Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
       long period = 1000L * 60L * 60L * 24L;
@@ -243,6 +246,42 @@ public class PlayRingtones {
         playAlarmTask,
         date,
         duration);
+    }catch (EncoderException e) {
+      e.printStackTrace();
+    }
+  }
+
+  public void playAnnouncement() {
+    isPlayingAnnouncement = true;
+    stopTasks();
+    if(isPlayingAlarm) {
+      playAlarmTask.cancel();
+    }
+    executePlayAnnouncement();
+    runActionsAfterAnnouncement();
+  }
+
+  private void executePlayAnnouncement() {
+    String[] argsListPlayAlarm = {
+      SpeakerCommand.PLAY_URI.getCommand(),
+      PlayRingtoneTask.convertPath(Config.ANNOUNCEMENT_PATH.getPath())
+    };
+    executeSpeakerAction(argsListPlayAlarm);
+  }
+
+  private void runActionsAfterAnnouncement() {
+    try {
+      timer.schedule(new TimerTask() {
+        @Override
+        public void run() {
+          if (isPlayingAlarm) {
+            playAlarm();
+          }else {
+            restart();
+          }
+          isPlayingAnnouncement = false;
+        }
+      }, getDurationOfMusicFile(Config.ANNOUNCEMENT_PATH.getPath()));
     }catch (EncoderException e) {
       e.printStackTrace();
     }
