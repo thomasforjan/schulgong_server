@@ -1,6 +1,7 @@
 package at.schulgong.speaker.api;
 
 import at.schulgong.dto.HolidayDTO;
+import at.schulgong.dto.PlaylistSongDTO;
 import at.schulgong.dto.RingtimeDTO;
 import at.schulgong.dto.RingtoneDTO;
 import at.schulgong.speaker.util.ReadSettingFile;
@@ -226,9 +227,7 @@ public class PlayRingtones {
   public void stopAlarm() {
     isPlayingAlarm = false;
     playAlarmTask.cancel();
-    String[] argsListStop = {
-      SpeakerCommand.STOP.getCommand(),
-    };
+    String[] argsListStop = {SpeakerCommand.STOP.getCommand(),};
     executeSpeakerAction(argsListStop);
     restart();
   }
@@ -242,11 +241,8 @@ public class PlayRingtones {
       LocalDateTime ldt = LocalDateTime.now();
       Date date = Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
       long duration = getDurationOfMusicFile(ringtoneDTO.getPath());
-      timer.scheduleAtFixedRate(
-        playAlarmTask,
-        date,
-        duration);
-    }catch (EncoderException e) {
+      timer.scheduleAtFixedRate(playAlarmTask, date, duration);
+    } catch (EncoderException e) {
       e.printStackTrace();
     }
   }
@@ -254,7 +250,7 @@ public class PlayRingtones {
   public void playAnnouncement() {
     isPlayingAnnouncement = true;
     stopTasks();
-    if(isPlayingAlarm) {
+    if (isPlayingAlarm) {
       playAlarmTask.cancel();
     }
     executePlayAnnouncement();
@@ -262,10 +258,7 @@ public class PlayRingtones {
   }
 
   private void executePlayAnnouncement() {
-    String[] argsListPlayAlarm = {
-      SpeakerCommand.PLAY_URI.getCommand(),
-      PlayRingtoneTask.convertPath(Config.ANNOUNCEMENT_PATH.getPath())
-    };
+    String[] argsListPlayAlarm = {SpeakerCommand.PLAY_URI.getCommand(), PlayRingtoneTask.convertPath(Config.ANNOUNCEMENT_PATH.getPath())};
     executeSpeakerAction(argsListPlayAlarm);
   }
 
@@ -276,13 +269,13 @@ public class PlayRingtones {
         public void run() {
           if (isPlayingAlarm) {
             playAlarm();
-          }else {
+          } else {
             restart();
           }
           isPlayingAnnouncement = false;
         }
       }, getDurationOfMusicFile(Config.ANNOUNCEMENT_PATH.getPath()));
-    }catch (EncoderException e) {
+    } catch (EncoderException e) {
       e.printStackTrace();
     }
   }
@@ -309,4 +302,13 @@ public class PlayRingtones {
     return isPlayingAlarm;
   }
 
+  public void setPlaylist(List<PlaylistSongDTO> playlistSongDTOList) {
+    playlistSongDTOList.sort(Comparator.comparingLong(PlaylistSongDTO::getIndex));
+    String[] argsList = new String[]{SpeakerCommand.CLEAR_QUEUE.getCommand()};
+    executeSpeakerAction(argsList);
+    for (PlaylistSongDTO playlistSongDTO : playlistSongDTOList) {
+      argsList = new String[]{SpeakerCommand.ADD_URI_TO_QUEUE.getCommand(), PlayRingtoneTask.convertPath(playlistSongDTO.getFilePath())};
+      executeSpeakerAction(argsList);
+    }
+  }
 }
