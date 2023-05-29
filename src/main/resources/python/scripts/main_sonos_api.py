@@ -65,6 +65,12 @@ def main():
     parser_remove_from_queue = subparsers.add_parser('remove_from_queue')
     parser_remove_from_queue.add_argument('index', type=int, help='Index of the removed song in the queue')
 
+    # Get playlist position
+    subparsers.add_parser('get_playlist_position')
+
+    # Get position
+    subparsers.add_parser('get_position')
+
     # Set volume command
     parser_set_volume = subparsers.add_parser('set_volume')
     parser_set_volume.add_argument(
@@ -86,6 +92,11 @@ def main():
     # Get speaker info command
     subparsers.add_parser('get_speaker_info')
 
+    # Get current media info
+    subparsers.add_parser('get_current_media_info')
+
+    # Get playlist info
+    subparsers.add_parser('get_playlist_info')
 
     args = parser.parse_args()
 
@@ -125,6 +136,10 @@ def main():
         sonosapi.clear_queue()
     elif args.command == 'remove_from_queue':
         sonosapi.remove_from_queue(args.index)
+    elif args.command == 'get_playlist_position':
+        sonosapi.get_playlist_position()
+    elif args.command == 'get_position':
+        sonosapi.get_position()
     elif args.command == 'set_volume':
         sonosapi.set_volume(args.volume)
     elif args.command == 'get_volume':
@@ -135,6 +150,10 @@ def main():
         sonosapi.set_play_mode(args.playmode)
     elif args.command == 'get_speaker_info':
         sonosapi.get_speaker_info()
+    elif args.command == 'get_current_media_info':
+        sonosapi.get_current_media_info()
+    elif args.command == 'get_playlist_info':
+        sonosapi.get_playlist_info()
     else:
         parser.print_help()
 

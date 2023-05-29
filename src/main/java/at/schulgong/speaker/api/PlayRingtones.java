@@ -1,9 +1,7 @@
 package at.schulgong.speaker.api;
 
-import at.schulgong.dto.HolidayDTO;
-import at.schulgong.dto.PlaylistSongDTO;
-import at.schulgong.dto.RingtimeDTO;
-import at.schulgong.dto.RingtoneDTO;
+import at.schulgong.dto.*;
+import at.schulgong.model.PlaylistSong;
 import at.schulgong.speaker.util.ReadSettingFile;
 import at.schulgong.speaker.util.Setting;
 import at.schulgong.speaker.util.SpeakerActionStatus;
@@ -42,6 +40,9 @@ public class PlayRingtones {
   private Setting setting;
   private boolean isPlayingAlarm;
   private boolean isPlayingAnnouncement;
+  private boolean isPlayingFromQueue;
+  private boolean isPlayingPlaylist;
+
 
 
   @Bean
@@ -94,7 +95,7 @@ public class PlayRingtones {
    * Restarts the tasks for playing ringtones
    */
   public void restart() {
-    if (!isPlayingAlarm && !isPlayingAnnouncement) {
+    if (!isPlayingAlarm && !isPlayingAnnouncement && !isPlayingPlaylist) {
       System.out.println("RESTART");
       stopTasks();
       loadRingtimes();
@@ -195,7 +196,7 @@ public class PlayRingtones {
    * Task which run one time every day to load the ring time for the actual day
    */
   private void runEveryDayTask() {
-    if (!isPlayingAlarm && !isPlayingAnnouncement) {
+    if (!isPlayingAlarm && !isPlayingAnnouncement && !isPlayingPlaylist) {
       LocalDateTime ldt = LocalDateTime.of(LocalDate.now(), setting.getLoadRingtimeTime());
       Date date = Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
       long period = 1000L * 60L * 60L * 24L;
@@ -302,6 +303,92 @@ public class PlayRingtones {
     return isPlayingAlarm;
   }
 
+  /**
+   * Getter for the attribute isPlayingFromQueue
+   *
+   * @return isPlayingFromQueue
+   */
+  public boolean isPlayingFromQueue() {
+    return isPlayingFromQueue;
+  }
+
+  /**
+   * Setter for the attribute isPlayingFromQueue
+   *
+   * @param playingFromQueue
+   */
+  public void setPlayingFromQueue(boolean playingFromQueue) {
+    isPlayingFromQueue = playingFromQueue;
+  }
+
+  /**
+   * Execute commands for the network speaker to control the playlist
+   *
+   * @param speakerCommandDTO Command for executing on the network speaker
+   * @param playlistList List of all songs in the playlist
+   * @return speakerActionStatus - Return value from the network speaker
+   */
+  public SpeakerActionStatus controlPlaylist(SpeakerCommandDTO speakerCommandDTO, List<PlaylistSong> playlistList) {
+    if (!isPlayingAlarm && !isPlayingAnnouncement) {
+      String command = speakerCommandDTO.getCommand();
+      SpeakerCommand speakerCommand;
+      String[] argsListPlaylist = new String[0];
+      if (command.equals("PLAY") || command.equals("NEXT") || command.equals("PREVIOUS")) {
+        if (isPlayingFromQueue) {
+          switch (command) {
+            case "PLAY":
+              isPlayingPlaylist = true;
+              argsListPlaylist = new String[]{SpeakerCommand.PLAY.getCommand()};
+              break;
+            case "NEXT":
+              argsListPlaylist = new String[]{SpeakerCommand.NEXT_SONG_QUEUE.getCommand()};
+              break;
+            case "PREVIOUS":
+              argsListPlaylist = new String[]{SpeakerCommand.PREVIOUS_SONG_QUEUE.getCommand()};
+              break;
+            default:
+              break;
+          }
+        } else {
+          switch (command) {
+            case "PLAY":
+              isPlayingPlaylist = true;
+              argsListPlaylist = new String[]{SpeakerCommand.PLAY_FROM_QUEUE.getCommand(), "0"};
+              break;
+            case "NEXT":
+              String position = "0";
+              if (playlistList.size() > 1) {
+                position = "1";
+              }
+              argsListPlaylist = new String[]{SpeakerCommand.PLAY_FROM_QUEUE.getCommand(), position};
+              break;
+            case "PREVIOUS":
+              argsListPlaylist = new String[]{SpeakerCommand.PLAY_FROM_QUEUE.getCommand(), "" + (playlistList.size() - 1)};
+              break;
+            default:
+              break;
+          }
+          isPlayingFromQueue = true;
+        }
+      } else if (command.equals("STOP")) {
+        isPlayingPlaylist = false;
+        argsListPlaylist = new String[]{SpeakerCommand.PAUSE.getCommand()};
+      } else if (command.equals("VOLUME")) {
+        argsListPlaylist = new String[]{SpeakerCommand.SET_VOLUME.getCommand(), speakerCommandDTO.getParameter()};
+      } else if (command.equals("MUTE")) {
+        argsListPlaylist = new String[]{SpeakerCommand.MUTE.getCommand(), speakerCommandDTO.getParameter()};
+      }
+      return executeSpeakerAction(argsListPlaylist);
+    }
+    return new SpeakerActionStatus();
+  }
+
+
+  /**
+   * Set the playlist on the network speakers
+   *
+   * @param playlistSongDTOList - List of all songs for the playlist
+   */
   public void setPlaylist(List<PlaylistSongDTO> playlistSongDTOList) {
     playlistSongDTOList.sort(Comparator.comparingLong(PlaylistSongDTO::getIndex));
     String[] argsList = new String[]{SpeakerCommand.CLEAR_QUEUE.getCommand()};

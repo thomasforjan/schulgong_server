@@ -94,7 +94,7 @@ public class SpeakerApi {
     System.out.println("Running Python starts: " + line);
     if (bfr != null) {
       while ((line = bfr.readLine()) != null) {
-        String[] pythonOutput = line.split(":");
+        String[] pythonOutput = line.split("=");
         if (pythonOutput.length > 1) {
           switch (pythonOutput[0]) {
             case "command":
