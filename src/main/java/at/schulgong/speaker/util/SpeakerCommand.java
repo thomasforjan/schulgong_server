@@ -16,6 +16,8 @@ public enum SpeakerCommand {
   PLAY_URI("play_uri"),
   ADD_URI_TO_QUEUE("add_uri_to_queue"),
   PLAY_FROM_QUEUE("play_from_queue"),
+  GET_PLAYLIST_POSITION("get_playlist_position"),
+  GET_POSITION("get_position"),
   GET_QUEUE("get_queue"),
   NEXT_SONG_QUEUE("next_song_queue"),
   PREVIOUS_SONG_QUEUE("previous_song_queue"),
@@ -25,7 +27,9 @@ public enum SpeakerCommand {
   GET_VOLUME("get_volume"),
   SEEK("seek"),
   SET_PLAY_MODE("set_play_mode"),
-  GET_SPEAKER_INFO("get_speaker_info");
+  GET_SPEAKER_INFO("get_speaker_info"),
+  GET_CURRENT_MEDIA_INFO("get_current_media_info"),
+  GET_PLAYLIST_INFO("get_playlist_info");
   private final String command;
 
   SpeakerCommand(String command) {
