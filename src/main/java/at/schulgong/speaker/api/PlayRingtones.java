@@ -256,6 +256,7 @@ public class PlayRingtones {
    * Play the announcement
    */
   public void playAnnouncement() {
+    isPlayingFromQueue = false;
     isPlayingAnnouncement = true;
     stopTasks();
     if (isPlayingAlarm) {
@@ -462,6 +463,8 @@ public class PlayRingtones {
     executeSpeakerAction(argsPlay);
     String[] argsSeek = new String[]{SpeakerCommand.SEEK.getCommand(), position};
     executeSpeakerAction(argsSeek);
+    isPlayingPlaylist = true;
+    isPlayingFromQueue = true;
   }
 
 }
