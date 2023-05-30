@@ -1,10 +1,7 @@
 package at.schulgong.controller;
 
 import at.schulgong.assembler.SongModelAssembler;
-import at.schulgong.dto.PlaylistDTO;
-import at.schulgong.dto.PlaylistSongDTO;
-import at.schulgong.dto.SavePlaylistDTO;
-import at.schulgong.dto.SongDTO;
+import at.schulgong.dto.*;
 import at.schulgong.exception.EntityNotFoundException;
 import at.schulgong.model.PlaylistSong;
 import at.schulgong.model.Song;
@@ -12,12 +9,15 @@ import at.schulgong.repository.PlaylistSongRepository;
 import at.schulgong.repository.SongRepository;
 import at.schulgong.speaker.api.PlayRingtones;
 import at.schulgong.speaker.util.PlaylistInfo;
+import at.schulgong.speaker.util.SpeakerActionStatus;
+import at.schulgong.speaker.util.SpeakerCommand;
 import at.schulgong.speaker.util.SpeakerState;
 import at.schulgong.util.AudioConverter;
 import at.schulgong.util.Config;
 import at.schulgong.util.DtoConverter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import jakarta.websocket.server.PathParam;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -164,25 +164,29 @@ public class LiveController {
         playlistSongDTOList.add(DtoConverter.convertPlaylistSongToDTO(p));
       }
       playlistSongDTOList.sort(Comparator.comparingLong(PlaylistSongDTO::getIndex));
-      try {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        PlaylistInfo playlistInfo = new PlaylistInfo(60, true, true, 1, SpeakerState.PLAYING.getState());
-        actualPlaylistSongDTO = playlistSongDTOList.get(playlistInfo.getPosition() == 0 ? 0 : playlistInfo.getPosition() - 1);
-        if (!playlistInfo.isPlayingFromQueue()) {
-          speakerState = SpeakerState.STOPPED;
-        } else {
-          speakerState = SpeakerState.fromState(playlistInfo.getSpeakerState());
-        }
-        playlistDTO = PlaylistDTO.builder()
-          .speakerState(speakerState)
-          .volume(playlistInfo.getVolume())
-          .mute(playlistInfo.isMute())
-          .actualSong(actualPlaylistSongDTO)
-          .songDTOList(playlistSongDTOList).build();
+      String[] argsListCurrentMediaInfo = {SpeakerCommand.GET_PLAYLIST_INFO.getCommand()};
+      SpeakerActionStatus speakerActionStatus = playRingtones.executeSpeakerAction(argsListCurrentMediaInfo);
+      if(speakerActionStatus.getInformation() != null) {
+        try {
+          ObjectMapper objectMapper = new ObjectMapper();
+          objectMapper.registerModule(new JavaTimeModule());
+          PlaylistInfo playlistInfo = objectMapper.readValue(speakerActionStatus.getInformation(), PlaylistInfo.class);
+          actualPlaylistSongDTO = playlistSongDTOList.get(playlistInfo.getPosition() == 0 ? 0 : playlistInfo.getPosition() - 1);
+          if (!playlistInfo.isPlayingFromQueue()) {
+            speakerState = SpeakerState.STOPPED;
+          } else {
+            speakerState = SpeakerState.fromState(playlistInfo.getSpeakerState());
+          }
+          playlistDTO = PlaylistDTO.builder()
+            .speakerState(speakerState)
+            .volume(playlistInfo.getVolume())
+            .mute(playlistInfo.isMute())
+            .actualSong(actualPlaylistSongDTO)
+            .songDTOList(playlistSongDTOList).build();
 
-      } catch (Exception e) {
-        e.printStackTrace();
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
       }
     }
     return ResponseEntity.ok(playlistDTO);
@@ -211,6 +215,48 @@ public class LiveController {
     } catch (
       Exception e) {
       return ResponseEntity.badRequest().build();
+    }
+    return ResponseEntity.ok().build();
+  }
+
+  /**
+   * Control playlist.
+   *
+   * @param speakerCommandDTO takes SpeakerCommandDTO
+   * @return status ok or badRequest
+   */
+  @PostMapping("music/control")
+  ResponseEntity controlPlaylist(@RequestBody SpeakerCommandDTO speakerCommandDTO) {
+    SpeakerActionStatus speakerActionStatus = playRingtones.controlPlaylist(speakerCommandDTO, playRingtones.isPlayingFromQueue() ? null : playlistRepository.findAll());
+    if (speakerActionStatus.getExitCode() == 0
+      && (speakerActionStatus.getException() == null || speakerActionStatus.getException().isEmpty())) {
+      return ResponseEntity.ok().build();
+    }
+    return ResponseEntity.badRequest().build();
+  }
+
+  /**
+   * Set playlist on network speaker
+   *
+   * @param force Flag if set playlist is running
+   * @return response status
+   */
+  @PostMapping("music/songs/set/playlist/{force}")
+  ResponseEntity<?> setPlaylistOnNetworkSpeaker(
+    @PathParam("force") boolean force) {
+    try {
+      if(force || !playRingtones.isPlayingFromQueue()) {
+        List<PlaylistSong> playlistSongList = playlistRepository.findAll();
+        if(playlistSongList != null) {
+          List<PlaylistSongDTO> playlistSongDTOList = new ArrayList<>();
+          for (PlaylistSong playlistSong : playlistSongList) {
+            playlistSongDTOList.add(DtoConverter.convertPlaylistSongToDTO(playlistSong));
+          }
+          playRingtones.setPlaylist(playlistSongDTOList);
+        }
+      }
+    }catch (Exception e) {
+      return ResponseEntity.internalServerError().build();
     }
     return ResponseEntity.ok().build();
   }
