@@ -2,11 +2,11 @@ package at.schulgong.speaker.api;
 
 import at.schulgong.dto.*;
 import at.schulgong.model.PlaylistSong;
-import at.schulgong.speaker.util.ReadSettingFile;
-import at.schulgong.speaker.util.Setting;
-import at.schulgong.speaker.util.SpeakerActionStatus;
-import at.schulgong.speaker.util.SpeakerCommand;
+import at.schulgong.speaker.util.*;
 import at.schulgong.util.Config;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -42,6 +42,8 @@ public class PlayRingtones {
   private boolean isPlayingAnnouncement;
   private boolean isPlayingFromQueue;
   private boolean isPlayingPlaylist;
+  private String position;
+  private String playlistPosition;
 
 
 
@@ -213,6 +215,8 @@ public class PlayRingtones {
    * Start playing the alarm
    */
   public void playAlarm() {
+    isPlayingFromQueue = false;
+    isPlayingPlaylist = false;
     isPlayingAlarm = true;
     stopTasks();
     RingtoneDTO ringtoneDTO = playRingtonesService.getRingtoneAlarm();
@@ -248,21 +252,33 @@ public class PlayRingtones {
     }
   }
 
+  /**
+   * Play the announcement
+   */
   public void playAnnouncement() {
     isPlayingAnnouncement = true;
     stopTasks();
     if (isPlayingAlarm) {
       playAlarmTask.cancel();
     }
+    if(isPlayingPlaylist) {
+      getPlaylistState();
+    }
     executePlayAnnouncement();
     runActionsAfterAnnouncement();
   }
 
+  /**
+   * Execute the command for playing the announcement on the network speaker
+   */
   private void executePlayAnnouncement() {
     String[] argsListPlayAlarm = {SpeakerCommand.PLAY_URI.getCommand(), PlayRingtoneTask.convertPath(Config.ANNOUNCEMENT_PATH.getPath())};
     executeSpeakerAction(argsListPlayAlarm);
   }
 
+  /**
+   * Run action after an announcement
+   */
   private void runActionsAfterAnnouncement() {
     try {
       timer.schedule(new TimerTask() {
@@ -270,6 +286,8 @@ public class PlayRingtones {
         public void run() {
           if (isPlayingAlarm) {
             playAlarm();
+          } else if (isPlayingPlaylist) {
+            playPlaylistFromPlaylistState();
           } else {
             restart();
           }
@@ -319,6 +337,24 @@ public class PlayRingtones {
    */
   public void setPlayingFromQueue(boolean playingFromQueue) {
     isPlayingFromQueue = playingFromQueue;
+  }
+
+  /**
+   * Getter for the attribute isPlayingPlaylist
+   *
+   * @return isPlayingPlaylist
+   */
+  public boolean isPlayingPlaylist() {
+    return isPlayingPlaylist;
+  }
+
+  /**
+   * Setter for the attribute isPlayingPlaylist
+   *
+   * @param playingPlaylist
+   */
+  public void setPlayingPlaylist(boolean playingPlaylist) {
+    isPlayingPlaylist = playingPlaylist;
   }
 
   /**
@@ -394,8 +430,38 @@ public class PlayRingtones {
     String[] argsList = new String[]{SpeakerCommand.CLEAR_QUEUE.getCommand()};
     executeSpeakerAction(argsList);
     for (PlaylistSongDTO playlistSongDTO : playlistSongDTOList) {
+      System.out.println(playlistSongDTO.getName());
       argsList = new String[]{SpeakerCommand.ADD_URI_TO_QUEUE.getCommand(), PlayRingtoneTask.convertPath(playlistSongDTO.getFilePath())};
       executeSpeakerAction(argsList);
     }
   }
+
+  /**
+   * Get the actual playlist state
+   */
+  private void getPlaylistState() {
+    String[] argsPause = new String[]{SpeakerCommand.PAUSE.getCommand()};
+    SpeakerActionStatus speakerActionStatusPause = executeSpeakerAction(argsPause);
+    String[] argsPosition = new String[]{SpeakerCommand.GET_POSITION.getCommand()};
+    SpeakerActionStatus speakerActionStatusPosition = executeSpeakerAction(argsPosition);
+    if(speakerActionStatusPosition.getExitCode() == 0 && speakerActionStatusPosition.getException() == null) {
+      position = speakerActionStatusPosition.getInformation();
+    }
+    String[] argsPlaylistPosition = new String[]{SpeakerCommand.GET_PLAYLIST_POSITION.getCommand()};
+    SpeakerActionStatus speakerActionStatusPlaylistPosition = executeSpeakerAction(argsPlaylistPosition);
+    if(speakerActionStatusPlaylistPosition.getExitCode() == 0 && speakerActionStatusPlaylistPosition.getException() == null) {
+        playlistPosition = speakerActionStatusPlaylistPosition.getInformation();
+    }
+  }
+
+  /**
+   * Play playlist from saved playlist state
+   */
+  private void playPlaylistFromPlaylistState() {
+    String[] argsPlay = new String[]{SpeakerCommand.PLAY_FROM_QUEUE.getCommand(), playlistPosition};
+    executeSpeakerAction(argsPlay);
+    String[] argsSeek = new String[]{SpeakerCommand.SEEK.getCommand(), position};
+    executeSpeakerAction(argsSeek);
+  }
+
 }

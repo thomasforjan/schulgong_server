@@ -17,6 +17,7 @@ import at.schulgong.util.Config;
 import at.schulgong.util.DtoConverter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import jakarta.websocket.server.PathParam;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -232,6 +233,32 @@ public class LiveController {
       return ResponseEntity.ok().build();
     }
     return ResponseEntity.badRequest().build();
+  }
+
+  /**
+   * Set playlist on network speaker
+   *
+   * @param force Flag if set playlist is running
+   * @return response status
+   */
+  @PostMapping("music/songs/set/playlist/{force}")
+  ResponseEntity<?> setPlaylistOnNetworkSpeaker(
+    @PathParam("force") boolean force) {
+    try {
+      if(force || !playRingtones.isPlayingFromQueue()) {
+        List<PlaylistSong> playlistSongList = playlistRepository.findAll();
+        if(playlistSongList != null) {
+          List<PlaylistSongDTO> playlistSongDTOList = new ArrayList<>();
+          for (PlaylistSong playlistSong : playlistSongList) {
+            playlistSongDTOList.add(DtoConverter.convertPlaylistSongToDTO(playlistSong));
+          }
+          playRingtones.setPlaylist(playlistSongDTOList);
+        }
+      }
+    }catch (Exception e) {
+      return ResponseEntity.internalServerError().build();
+    }
+    return ResponseEntity.ok().build();
   }
 
   /**

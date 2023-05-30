@@ -34,6 +34,8 @@ public class PlayRingtoneTask extends TimerTask {
       convertPath(this.ringtoneDTO.getPath())
     };
     playRingtones.executeSpeakerAction(argsList);
+    playRingtones.setPlayingFromQueue(false);
+    playRingtones.setPlayingPlaylist(false);
   }
 
   /**
