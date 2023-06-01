@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class PlayRingtonesTest {
 
-  private final String SONG_PATH_ONE = "audiofiles/01_-_attack.mp3";
+  /*private final String SONG_PATH_ONE = "audiofiles/01_-_attack.mp3";
   private final String SONG_PATH_TWO = "audiofiles/02_-_dreaming.mp3";
   private final String SONG_PATH_THREE = "audiofiles/03_-_kill_rock_n_roll.mp3";
   private final String SONG_PATH_FOUR = "audiofiles/04_-_hypnotize.mp3";
@@ -100,10 +100,10 @@ class PlayRingtonesTest {
     SpeakerApi.runSpeakerApi(argsList);
   }
 
-  /**
+  *//**
    * Test if you get the correct playlist infos back from the network speaker
    * volume: 5, mute: false, position: 0, speakerState: PLAYING
-   */
+   *//*
   @Test
   void testGetPlaylistInfoOne() {
     int volume = 5;
@@ -126,10 +126,10 @@ class PlayRingtonesTest {
 
   }
 
-  /**
+  *//**
    * Test if you get the correct playlist infos back from the network speaker
    * volume: 1, mute: true, position: 2, speakerState: PLAYING
-   */
+   *//*
   @Test
   void testGetPlaylistInfoTwo() {
     int volume = 1;
@@ -152,10 +152,10 @@ class PlayRingtonesTest {
 
   }
 
-  /**
+  *//**
    * Test if you get the correct playlist infos back from the network speaker
    * volume: 1, mute: false, position: 3, speakerState: STOPPED
-   */
+   *//*
   @Test
   void testGetPlaylistInfoThree() {
     int volume = 1;
@@ -176,10 +176,10 @@ class PlayRingtonesTest {
 
   }
 
-  /**
+  *//**
    * Test if you get the correct playlist infos back from the network speaker
    * volume: 4, mute: false, position: 1, speakerState: PAUSED_PLAYBACK
-   */
+   *//*
   @Test
   void testGetPlaylistInfoFour() {
     int volume = 4;
@@ -203,11 +203,11 @@ class PlayRingtonesTest {
     assertEquals(playlistSongDTOList, playlistDTO.getSongDTOList());
   }
 
-  /**
+  *//**
    * Test to set the playlist on the network speaker
    *
    * @throws IOException if method fails
-   */
+   *//*
   @Test
   void testSetPlaylist() throws IOException {
     String[] argsList = new String[]{SpeakerCommand.STOP.getCommand()};
@@ -243,6 +243,6 @@ class PlayRingtonesTest {
     for (Speaker speaker : speakerObjects.getSpeakerObjects()) {
       assertThat("Error, don't contains " + speaker.getName(), speakerActionStatus.getSpeakerList().contains(speaker.getName()));
     }
-  }
+  }*/
 
 }

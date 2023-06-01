@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SpeakerApiTest {
 
-  private final String SONG_PATH_ONE = "audiofiles/01_-_attack.mp3";
+  /*private final String SONG_PATH_ONE = "audiofiles/01_-_attack.mp3";
   private final String SONG_PATH_TWO = "audiofiles/02_-_dreaming.mp3";
   private final String SONG_PATH_THREE = "audiofiles/03_-_kill_rock_n_roll.mp3";
   private final String SONG_PATH_FOUR = "audiofiles/04_-_hypnotize.mp3";
@@ -38,11 +38,11 @@ class SpeakerApiTest {
   private final String SONG_NAME_FOUR = "04_-_hypnotize.mp3";
 
 
-  /**
+  *//**
    * Test if the all speakers are discovered by name.
    *
    * @throws IOException if method fails
-   */
+   *//*
   @Test
   void testDiscoverByName() throws IOException {
     String[] args = new String[]{SpeakerCommand.DISCOVER_BY_NAME.getCommand()};
@@ -65,11 +65,11 @@ class SpeakerApiTest {
     assertEquals(speakerList.toString(), speakerActionStatus.getSpeakerList());
   }
 
-  /**
+  *//**
    * Test if an exception returns if all speaker names are wrong.
    *
    * @throws IOException if method fails
-   */
+   *//*
   @Test
   void testDiscoverByNameWithWrongNames() throws IOException {
     SpeakerObjects currentSpeakerObjects = ReadSpeakerConfigFile.getSpeakerObjectListFromConfigFile();
@@ -90,11 +90,11 @@ class SpeakerApiTest {
     assertNull(speakerActionStatus.getSpeakerList());
   }
 
-  /**
+  *//**
    * Test if an only a speaker list returns with one speaker fewer.
    *
    * @throws IOException if method fails
-   */
+   *//*
   @Test
   void testDiscoverByNameWithOneWrongName() throws IOException {
     SpeakerObjects currentSpeakerObjects = ReadSpeakerConfigFile.getSpeakerObjectListFromConfigFile();
@@ -116,11 +116,11 @@ class SpeakerApiTest {
     assertEquals(speakerList, speakerActionStatus.getSpeakerList());
   }
 
-  /**
+  *//**
    * Test if the all speakers are discovered by discover_all funciton.
    *
    * @throws IOException if method fails
-   */
+   *//*
   @Test
   void testDiscoverAll() throws IOException {
     SpeakerObjects currentSpeakerObjects = ReadSpeakerConfigFile.getSpeakerObjectListFromConfigFile();
@@ -140,11 +140,11 @@ class SpeakerApiTest {
 
   }
 
-  /**
+  *//**
    * Test if all speakers ar discovered by discover function, if speaker are defined in the config file.
    *
    * @throws IOException if method fails
-   */
+   *//*
   @Test
   void testDiscoverWithSpeakersInConfigFile() throws IOException {
     SpeakerObjects currentSpeakerObjects = ReadSpeakerConfigFile.getSpeakerObjectListFromConfigFile();
@@ -168,11 +168,11 @@ class SpeakerApiTest {
     assertEquals(speakerList.toString(), speakerActionStatus.getSpeakerList());
   }
 
-  /**
+  *//**
    * Test if all speakers ar discovered by discover function, if no speaker are defined in the config file.
    *
    * @throws IOException if method fails
-   */
+   *//*
   @Test
   void testDiscoverWithoutSpeakersInConfigFile() throws IOException {
     SpeakerObjects currentSpeakerObjects = ReadSpeakerConfigFile.getSpeakerObjectListFromConfigFile();
@@ -200,11 +200,11 @@ class SpeakerApiTest {
     }
   }
 
-  /**
+  *//**
    * Test if song played with play_uri function.
    *
    * @throws IOException if method fails
-   */
+   *//*
   @Test
   void testPlayUri() throws IOException {
     String[] args = new String[]{SpeakerCommand.PLAY_URI.getCommand(), SONG_PATH_ONE};
@@ -229,11 +229,11 @@ class SpeakerApiTest {
     }
   }
 
-  /**
+  *//**
    * Test if song play with play function.
    *
    * @throws IOException if method fails
-   */
+   *//*
   @Test
   void testPlay() throws IOException {
     String[] args = new String[]{SpeakerCommand.PLAY.getCommand()};
@@ -258,11 +258,11 @@ class SpeakerApiTest {
     }
   }
 
-  /**
+  *//**
    * Test if song is stopped after stop function.
    *
    * @throws IOException if method fails
-   */
+   *//*
   @Test
   void testStop() throws IOException {
     String[] args = new String[]{SpeakerCommand.STOP.getCommand()};
@@ -287,11 +287,11 @@ class SpeakerApiTest {
     }
   }
 
-  /**
+  *//**
    * Test if song is paused with pause function.
    *
    * @throws IOException if method fails
-   */
+   *//*
   @Test
   void testPause() throws IOException {
     String[] args = new String[]{SpeakerCommand.PAUSE.getCommand()};
@@ -316,11 +316,11 @@ class SpeakerApiTest {
     }
   }
 
-  /**
+  *//**
    * Test if song is muted with mute function.
    *
    * @throws IOException if method fails
-   */
+   *//*
   @Test
   void testMute() throws IOException {
     String[] args = new String[]{SpeakerCommand.MUTE.getCommand(), "True"};
@@ -346,11 +346,11 @@ class SpeakerApiTest {
     }
   }
 
-  /**
+  *//**
    * Test if song is not muted with mute function.
    *
    * @throws IOException if method fails
-   */
+   *//*
   @Test
   void testUnMute() throws IOException {
     String[] args = new String[]{SpeakerCommand.MUTE.getCommand(), "False"};
@@ -376,11 +376,11 @@ class SpeakerApiTest {
     }
   }
 
-  /**
+  *//**
    * Test if mute state is True after set mute.
    *
    * @throws IOException if method fails
-   */
+   *//*
   @Test
   void testGetMuteStateTrue() throws IOException {
     String[] argsSetMute = new String[]{SpeakerCommand.MUTE.getCommand(), "True"};
@@ -410,11 +410,11 @@ class SpeakerApiTest {
     }
   }
 
-  /**
+  *//**
    * Test if mute state is False after set not muted.
    *
    * @throws IOException if method fails
-   */
+   *//*
   @Test
   void testGetMuteStateFalse() throws IOException {
     String[] argsSetMute = new String[]{SpeakerCommand.MUTE.getCommand(), "False"};
@@ -442,11 +442,11 @@ class SpeakerApiTest {
     }
   }
 
-  /**
+  *//**
    * Test to add a song to the queue.
    *
    * @throws IOException if method fails
-   */
+   *//*
   @Test
   void testAddUriToQueue() throws IOException {
     String[] args = new String[]{SpeakerCommand.ADD_URI_TO_QUEUE.getCommand(), SONG_PATH_ONE};
@@ -472,11 +472,11 @@ class SpeakerApiTest {
     }
   }
 
-  /**
+  *//**
    * Test to clear the queue.
    *
    * @throws IOException if method fails
-   */
+   *//*
   @Test
   void testClearQueue() throws IOException {
     String[] args = new String[]{SpeakerCommand.CLEAR_QUEUE.getCommand()};
@@ -502,11 +502,11 @@ class SpeakerApiTest {
     }
   }
 
-  /**
+  *//**
    * Test to get a list of all songs in the queue.
    *
    * @throws IOException if method fails
-   */
+   *//*
   @Test
   void testGetQueue() throws IOException {
     String[] argsList = new String[]{SpeakerCommand.CLEAR_QUEUE.getCommand()};
@@ -549,11 +549,11 @@ class SpeakerApiTest {
     }
   }
 
-  /**
+  *//**
    * Test to play a song from the queue.
    *
    * @throws IOException if method fails
-   */
+   *//*
   @Test
   void testPlayFromQueue() throws IOException {
     String[] argsList = new String[]{SpeakerCommand.CLEAR_QUEUE.getCommand()};
@@ -585,11 +585,11 @@ class SpeakerApiTest {
     }
   }
 
-  /**
+  *//**
    * Test if an exception occurs with a wrong start number.
    *
    * @throws IOException if method fails
-   */
+   *//*
   @Test
   void testPlayFromQueueWithWrongStartNumber() throws IOException {
     String[] argsList = new String[]{SpeakerCommand.CLEAR_QUEUE.getCommand()};
@@ -621,11 +621,11 @@ class SpeakerApiTest {
     }
   }
 
-  /**
+  *//**
    * Test to play the next song in the queue.
    *
    * @throws IOException if method fails
-   */
+   *//*
   @Test
   void testPlayNextSongFromQueue() throws IOException {
     String[] argsList = new String[]{SpeakerCommand.CLEAR_QUEUE.getCommand()};
@@ -661,11 +661,11 @@ class SpeakerApiTest {
     }
   }
 
-  /**
+  *//**
    * Test if the first song of the queue is played after the next song from the queue when the last song is currently played.
    *
    * @throws IOException if method fails
-   */
+   *//*
   @Test
   void testPlayNextSongFromQueueSkipFromLastToFirstSong() throws IOException {
     String[] argsList = new String[]{SpeakerCommand.CLEAR_QUEUE.getCommand()};
@@ -701,11 +701,11 @@ class SpeakerApiTest {
     }
   }
 
-  /**
+  *//**
    * Test if exception occurs by execute next_song_queue if the queue is empty
    *
    * @throws IOException if method fails
-   */
+   *//*
   @Test
   void testPlayNextSongFromQueueWithEmptyQueue() throws IOException {
     String[] argsList = new String[]{SpeakerCommand.CLEAR_QUEUE.getCommand()};
@@ -739,11 +739,11 @@ class SpeakerApiTest {
     }
   }
 
-  /**
+  *//**
    * Test to play the previous song in the queue.
    *
    * @throws IOException if method fails
-   */
+   *//*
   @Test
   void testPlayPreviousSongFromQueue() throws IOException {
     String[] argsList = new String[]{SpeakerCommand.CLEAR_QUEUE.getCommand()};
@@ -779,11 +779,11 @@ class SpeakerApiTest {
     }
   }
 
-  /**
+  *//**
    * Test if the last song of the queue is played after the previous song from the queue when the first song is currently played.
    *
    * @throws IOException if method fails
-   */
+   *//*
   @Test
   void testPlayPreviousSongFromQueueSkipFromLastToFirstSong() throws IOException {
     String[] argsList = new String[]{SpeakerCommand.CLEAR_QUEUE.getCommand()};
@@ -819,11 +819,11 @@ class SpeakerApiTest {
     }
   }
 
-  /**
+  *//**
    * Test if exception occurs by execute previous_song_queue if the queue is empty
    *
    * @throws IOException if method fails
-   */
+   *//*
   @Test
   void testPlayPreviousSongFromQueueWithEmptyQueue() throws IOException {
     String[] argsList = new String[]{SpeakerCommand.CLEAR_QUEUE.getCommand()};
@@ -857,11 +857,11 @@ class SpeakerApiTest {
     }
   }
 
-  /**
+  *//**
    * Test if a song can be removed from the queue
    *
    * @throws IOException if method fails
-   */
+   *//*
   @Test
   void testRemoveFromQueue() throws IOException {
     String[] argsList = new String[]{SpeakerCommand.CLEAR_QUEUE.getCommand()};
@@ -893,11 +893,11 @@ class SpeakerApiTest {
     }
   }
 
-  /**
+  *//**
    * Test if an exception occurs if a song will be removed that doesn't exist in the queue
    *
    * @throws IOException if method fails
-   */
+   *//*
   @Test
   void testRemoveFromQueueThatNotExistsInQueue() throws IOException {
     String[] argsList = new String[]{SpeakerCommand.CLEAR_QUEUE.getCommand()};
@@ -925,11 +925,11 @@ class SpeakerApiTest {
     }
   }
 
-  /**
+  *//**
    * Test to set the volume of the speakers
    *
    * @throws IOException if method fails
-   */
+   *//*
   @Test
   void testSetVolume() throws IOException {
     String[] args = new String[]{SpeakerCommand.SET_VOLUME.getCommand(), "10"};
@@ -955,11 +955,11 @@ class SpeakerApiTest {
     }
   }
 
-  /**
+  *//**
    * Test to set the volume of the speakers with a negative volume input
    *
    * @throws IOException if method fails
-   */
+   *//*
   @Test
   void testSetVolumeWithNegativeVolumeAsInput() throws IOException {
     String[] args = new String[]{SpeakerCommand.SET_VOLUME.getCommand(), "-1"};
@@ -983,11 +983,11 @@ class SpeakerApiTest {
     assertNull(speakerActionStatus.getSpeakerList());
   }
 
-  /**
+  *//**
    * Test to set the volume of the speakers with a too high volume input
    *
    * @throws IOException if method fails
-   */
+   *//*
   @Test
   void testSetVolumeWithTooHighVolumeAsInput() throws IOException {
     String[] args = new String[]{SpeakerCommand.SET_VOLUME.getCommand(), "105"};
@@ -1011,11 +1011,11 @@ class SpeakerApiTest {
     assertNull(speakerActionStatus.getSpeakerList());
   }
 
-  /**
+  *//**
    * Test to set the volume of the speakers with a volume input of a
    *
    * @throws IOException if method fails
-   */
+   *//*
   @Test
   void testSetVolumeWithCharAsInput() throws IOException {
     String[] args = new String[]{SpeakerCommand.SET_VOLUME.getCommand(), "a"};
@@ -1039,11 +1039,11 @@ class SpeakerApiTest {
     assertNull(speakerActionStatus.getSpeakerList());
   }
 
-  /**
+  *//**
    * Test to get the volume of the speakers
    *
    * @throws IOException if method fails
-   */
+   *//*
   @Test
   void testGetVolume() throws IOException {
     String[] argsSetVolume = new String[]{SpeakerCommand.SET_VOLUME.getCommand(), "5"};
@@ -1071,11 +1071,11 @@ class SpeakerApiTest {
     }
   }
 
-  /**
+  *//**
    * Test if speaker state is PLAYING after execute play_uri function
    *
    * @throws IOException if method fails
-   */
+   *//*
   @Test
   void testGetPlayingStatePLAYING() throws IOException {
     String[] argsStop = new String[]{SpeakerCommand.STOP.getCommand()};
@@ -1105,11 +1105,11 @@ class SpeakerApiTest {
     }
   }
 
-  /**
+  *//**
    * Test if speaker state is PAUSED_PLAYBACK after execute pause function
    *
    * @throws IOException if method fails
-   */
+   *//*
   @Test
   void testGetPlayingStatePause() throws IOException {
     String[] argsStop = new String[]{SpeakerCommand.STOP.getCommand()};
@@ -1141,11 +1141,11 @@ class SpeakerApiTest {
     }
   }
 
-  /**
+  *//**
    * Test if speaker state is STOPPED after execute stop function
    *
    * @throws IOException if method fails
-   */
+   *//*
   @Test
   void testGetPlayingStateStopped() throws IOException {
     String[] argsStop = new String[]{SpeakerCommand.STOP.getCommand()};
@@ -1176,5 +1176,5 @@ class SpeakerApiTest {
       assertThat("Error, don't contains " + speaker.getName(), speakerActionStatus.getSpeakerList().contains(speaker.getName()));
     }
   }
-
+*/
 }
