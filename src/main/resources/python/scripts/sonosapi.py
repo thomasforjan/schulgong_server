@@ -29,6 +29,7 @@ def discover_by_name():
             if sonos_speaker is not None:
               soco_speaker_list.update({speaker['name']: sonos_speaker})
         if soco_speaker_list is not None and len(soco_speaker_list) > 0:
+          print("speakerList=", ", ".join(soco_speaker_list))
           coordinator_speaker_name = _get_coordinator_speaker_name(soco_speaker_list)
           if not _is_grouped(soco_speaker_list):
             soco_speaker_list[coordinator_speaker_name].partymode()
@@ -44,6 +45,7 @@ def discover_all():
     try:
         soco_speaker_list = {device.player_name: device for device in soco.discover()}
         if soco_speaker_list is not None:
+          print("speakerList=", ", ".join(soco_speaker_list))
           coordinator_speaker_name = _get_coordinator_speaker_name(soco_speaker_list)
           if not _is_grouped(soco_speaker_list):
             soco_speaker_list[coordinator_speaker_name].partymode()

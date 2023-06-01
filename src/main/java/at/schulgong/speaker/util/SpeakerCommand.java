@@ -7,6 +7,7 @@ package at.schulgong.speaker.util;
  * @since May 2023
  */
 public enum SpeakerCommand {
+  DISCOVER("discover"),
   DISCOVER_BY_NAME("discover_by_name"),
   DISCOVER_ALL("discover_all"),
   GET_PLAYING_STATE("get_playing_state"),

@@ -155,8 +155,6 @@ public class LiveController {
   @GetMapping("music/state")
   public ResponseEntity<PlaylistDTO> getPlaylistState() {
     PlaylistDTO playlistDTO = null;
-    SpeakerState speakerState = null;
-    PlaylistSongDTO actualPlaylistSongDTO = null;
     List<PlaylistSongDTO> playlistSongDTOList = new ArrayList<>();
     List<PlaylistSong> playlistList = playlistRepository.findAll();
     if (!playRingtones.isPlayingAlarm() && !playlistList.isEmpty()) {
@@ -164,30 +162,7 @@ public class LiveController {
         playlistSongDTOList.add(DtoConverter.convertPlaylistSongToDTO(p));
       }
       playlistSongDTOList.sort(Comparator.comparingLong(PlaylistSongDTO::getIndex));
-      String[] argsListCurrentMediaInfo = {SpeakerCommand.GET_PLAYLIST_INFO.getCommand()};
-      SpeakerActionStatus speakerActionStatus = playRingtones.executeSpeakerAction(argsListCurrentMediaInfo);
-      if(speakerActionStatus.getInformation() != null) {
-        try {
-          ObjectMapper objectMapper = new ObjectMapper();
-          objectMapper.registerModule(new JavaTimeModule());
-          PlaylistInfo playlistInfo = objectMapper.readValue(speakerActionStatus.getInformation(), PlaylistInfo.class);
-          actualPlaylistSongDTO = playlistSongDTOList.get(playlistInfo.getPosition() == 0 ? 0 : playlistInfo.getPosition() - 1);
-          if (!playlistInfo.isPlayingFromQueue()) {
-            speakerState = SpeakerState.STOPPED;
-          } else {
-            speakerState = SpeakerState.fromState(playlistInfo.getSpeakerState());
-          }
-          playlistDTO = PlaylistDTO.builder()
-            .speakerState(speakerState)
-            .volume(playlistInfo.getVolume())
-            .mute(playlistInfo.isMute())
-            .actualSong(actualPlaylistSongDTO)
-            .songDTOList(playlistSongDTOList).build();
-
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
-      }
+      playlistDTO = playRingtones.getPlaylistInfo(playlistSongDTOList);
     }
     return ResponseEntity.ok(playlistDTO);
   }
