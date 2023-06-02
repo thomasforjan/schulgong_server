@@ -18,6 +18,7 @@ public enum Config {
   FILEPATH("", "Audiofiles", ""),
   ANNOUNCEMENT_PATH("", "C:/Users/phili/OneDrive/Desktop/sonos_music/Durchsage.mp3", ""),
   ANNOUNCEMENT_PATH_WEBA_FORMAT("", "C:/Users/phili/OneDrive/Desktop/sonos_music/Durchsage.weba", ""),
+  SPEAKER_CONFIG_PATH("", "src/main/resources/python/config/speaker_config.json", ""),
   PLAYLIST_PATH("", "C:/Users/phili/OneDrive/Desktop/sonos_music/playlist/", "");
 
   private final String url;

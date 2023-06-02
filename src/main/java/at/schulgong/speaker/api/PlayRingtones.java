@@ -5,6 +5,7 @@ import at.schulgong.model.PlaylistSong;
 import at.schulgong.speaker.util.*;
 import at.schulgong.util.Config;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.annotation.PostConstruct;
@@ -465,6 +466,39 @@ public class PlayRingtones {
     executeSpeakerAction(argsSeek);
     isPlayingPlaylist = true;
     isPlayingFromQueue = true;
+  }
+
+  public PlaylistDTO getPlaylistInfo(List<PlaylistSongDTO> playlistSongDTOList) {
+    PlaylistDTO playlistDTO = null;
+    SpeakerState speakerState = null;
+    PlaylistSongDTO actualPlaylistSongDTO = null;
+    String[] argsListCurrentMediaInfo = {SpeakerCommand.GET_PLAYLIST_INFO.getCommand()};
+    SpeakerActionStatus speakerActionStatus = executeSpeakerAction(argsListCurrentMediaInfo);
+    try {
+      ObjectMapper objectMapper = new ObjectMapper();
+      objectMapper.registerModule(new JavaTimeModule());
+      PlaylistInfo playlistInfo = objectMapper.readValue(speakerActionStatus.getInformation(), PlaylistInfo.class);
+      actualPlaylistSongDTO = playlistSongDTOList.get(playlistInfo.getPosition() == 0 ? 0 : playlistInfo.getPosition() - 1);
+      if (!playlistInfo.isPlayingFromQueue()) {
+        speakerState = SpeakerState.STOPPED;
+      } else {
+        speakerState = SpeakerState.fromState(playlistInfo.getSpeakerState());
+      }
+      playlistDTO = PlaylistDTO.builder()
+        .speakerState(speakerState)
+        .volume(playlistInfo.getVolume())
+        .mute(playlistInfo.isMute())
+        .actualSong(actualPlaylistSongDTO)
+        .songDTOList(playlistSongDTOList).build();
+
+    } catch (
+      JsonMappingException e) {
+      throw new RuntimeException(e);
+    } catch (
+      JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
+    return playlistDTO;
   }
 
 }
