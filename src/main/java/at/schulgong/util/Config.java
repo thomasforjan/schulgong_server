@@ -10,26 +10,31 @@ import lombok.Getter;
  */
 @Getter
 public enum Config {
-    RINGTONE("ringtones", "", "ringtone"),
-    RINGTIME("ringtimes", "", "ringtime"),
-    HOLIDAY("holidays", "", "holiday"),
-    SPEAKER_API_SETTINGS_PATH("", "src/main/resources/python/config/speaker_api_settings.json", ""),
-    FILEPATH("", "Audiofiles", "");
+  RINGTONE("ringtones", "", "ringtone"),
+  RINGTIME("ringtimes", "", "ringtime"),
+  HOLIDAY("holidays", "", "holiday"),
+  SONG("live/music/songs", "", "song"),
+  SPEAKER_API_SETTINGS_PATH("", "src/main/resources/python/config/speaker_api_settings.json", ""),
+  FILEPATH("", "Audiofiles", ""),
+  ANNOUNCEMENT_PATH("", "C:/Users/phili/OneDrive/Desktop/sonos_music/Durchsage.mp3", ""),
+  ANNOUNCEMENT_PATH_WEBA_FORMAT("", "C:/Users/phili/OneDrive/Desktop/sonos_music/Durchsage.weba", ""),
+  SPEAKER_CONFIG_PATH("", "src/main/resources/python/config/speaker_config.json", ""),
+  PLAYLIST_PATH("", "C:/Users/phili/OneDrive/Desktop/sonos_music/playlist/", "");
 
-    private final String url;
-    private final String path;
-    private final String exception;
+  private final String url;
+  private final String path;
+  private final String exception;
 
-    /**
-     * Constructor of enum
-     *
-     * @param url url for CRUD
-     * @param path path for file saving
-     * @param exception name of entity for exception
-     */
-    Config(String url, String path, String exception) {
-        this.url = url;
-        this.path = path;
-        this.exception = exception;
-    }
+  /**
+   * Constructor of enum
+   *
+   * @param url       url for CRUD
+   * @param path      path for file saving
+   * @param exception name of entity for exception
+   */
+  Config(String url, String path, String exception) {
+    this.url = url;
+    this.path = path;
+    this.exception = exception;
+  }
 }

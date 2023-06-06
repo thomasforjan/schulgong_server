@@ -1,14 +1,21 @@
 package at.schulgong.controller;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-
 import at.schulgong.assembler.RingtoneModelAssembler;
 import at.schulgong.dto.RingtoneDTO;
 import at.schulgong.exception.EntityNotFoundException;
 import at.schulgong.model.Ringtone;
 import at.schulgong.repository.RingtoneRepository;
 import at.schulgong.util.Config;
+import at.schulgong.util.DtoConverter;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.IanaLinkRelations;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -16,12 +23,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.List;
-import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.IanaLinkRelations;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 /**
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
@@ -71,23 +75,53 @@ public class RingtoneController {
      */
     @GetMapping(value = "/{id}")
     public RingtoneDTO one(@PathVariable long id) {
-        Ringtone ringtone =
-                ringtoneRepository
-                        .findById(id)
-                        .orElseThrow(
-                                () -> new EntityNotFoundException(id, Config.RINGTONE.getUrl()));
-        return assembler.toModel(ringtone);
+      Ringtone ringtone =
+        ringtoneRepository
+          .findById(id)
+          .orElseThrow(
+            () -> new EntityNotFoundException(id, Config.RINGTONE.getUrl()));
+      return assembler.toModel(ringtone);
     }
 
-    /**
-     * Add new ringtone.
-     *
-     * @param song Multipartfile (audiofile)
-     * @param name name of new entry
-     * @return new ringtone
-     */
-    @PostMapping
-    ResponseEntity<?> newRingtone(
+  /**
+   * Get particular file for the ringtone by a specific id
+   *
+   * @param id of entry
+   * @return new ResponseEntity
+   */
+  @GetMapping(value = "/file/{id}")
+  public ResponseEntity<byte[]> getFile(@PathVariable long id) {
+    Ringtone ringtone = DtoConverter.convertDtoToRingtone(this.one(id));
+    File audioFile = new File(ringtone.getPath());
+    byte[] audioBytes = null;
+    try {
+      audioBytes = Files.readAllBytes(audioFile.toPath());
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+
+    if (audioBytes != null) {
+      headers.setContentLength(audioBytes.length);
+    } else {
+      throw new EntityNotFoundException(id, "File not found");
+    }
+
+    headers.setContentDispositionFormData("attachment", ringtone.getFilename());
+    return new ResponseEntity<>(audioBytes, headers, HttpStatus.OK);
+  }
+
+  /**
+   * Add new ringtone.
+   *
+   * @param song Multipartfile (audiofile)
+   * @param name name of new entry
+   * @return new ringtone
+   */
+  @PostMapping
+  ResponseEntity<?> newRingtone(
             @RequestParam("song") MultipartFile song, @RequestParam("name") String name) {
         // check if ContentType of the Post Request (MultipartFile) is audio
         if (checkIfRightContentType(song.getContentType())) {

@@ -1,16 +1,22 @@
 package at.schulgong.speaker.api;
 
-import at.schulgong.dto.HolidayDTO;
-import at.schulgong.dto.RingtimeDTO;
-import at.schulgong.speaker.util.ReadSettingFile;
-import at.schulgong.speaker.util.Setting;
-import at.schulgong.speaker.util.SpeakerActionStatus;
+import at.schulgong.dto.*;
+import at.schulgong.model.PlaylistSong;
+import at.schulgong.speaker.util.*;
+import at.schulgong.util.Config;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.context.annotation.ApplicationScope;
+import ws.schild.jave.EncoderException;
+import ws.schild.jave.MultimediaObject;
 
+import java.io.File;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -30,8 +36,17 @@ public class PlayRingtones {
   private PlayRingtonesService playRingtonesService;
   private Timer timer;
   private List<RingtimeDTO> ringtimeDTOList;
-  private List<RingtimeTask> ringtimeTaskList;
+  private List<PlayRingtoneTask> playRingtoneTaskList;
+  private PlayRingtoneTask playAlarmTask;
   private Setting setting;
+  private boolean isPlayingAlarm;
+  private boolean isPlayingAnnouncement;
+  private boolean isPlayingFromQueue;
+  private boolean isPlayingPlaylist;
+  private String position;
+  private String playlistPosition;
+
+
 
   @Bean
   @ApplicationScope
@@ -58,13 +73,13 @@ public class PlayRingtones {
     setting = ReadSettingFile.getSettingFromConfigFile();
     timer = new Timer();
     runEveryDayTask();
-    ringtimeTaskList = new ArrayList<>();
+    playRingtoneTaskList = new ArrayList<>();
     System.out.println("POST CONSTRACT");
     playRingtonesFromRingtimes();
   }
 
   /**
-   * Start the tasks for play rintones from ring times
+   * Start the tasks for play ringtones from ring times
    */
   public void playRingtonesFromRingtimes() {
     if (ringtimeDTOList != null && !ringtimeDTOList.isEmpty()) {
@@ -83,21 +98,23 @@ public class PlayRingtones {
    * Restarts the tasks for playing ringtones
    */
   public void restart() {
-    System.out.println("RESTART");
-    stopTasks();
-    loadRingtimes();
-    playRingtonesFromRingtimes();
+    if (!isPlayingAlarm && !isPlayingAnnouncement && !isPlayingPlaylist) {
+      System.out.println("RESTART");
+      stopTasks();
+      loadRingtimes();
+      playRingtonesFromRingtimes();
+    }
   }
 
   /**
    * Stop all tasks
    */
   private void stopTasks() {
-    if (ringtimeTaskList != null && !ringtimeTaskList.isEmpty()) {
-      for (RingtimeTask task : ringtimeTaskList) {
+    if (playRingtoneTaskList != null && !playRingtoneTaskList.isEmpty()) {
+      for (PlayRingtoneTask task : playRingtoneTaskList) {
         task.cancel();
       }
-      ringtimeTaskList = new ArrayList<>();
+      playRingtoneTaskList = new ArrayList<>();
     }
   }
 
@@ -120,8 +137,8 @@ public class PlayRingtones {
   private void startRingtimeTask(LocalDateTime ldtPlayTime, RingtimeDTO ringtimeDTO) {
     Date date = Date.from(ldtPlayTime.atZone(ZoneId.systemDefault()).toInstant());
     try {
-      RingtimeTask ringtimeTask = new RingtimeTask(ringtimeDTO, this);
-      ringtimeTaskList.add(ringtimeTask);
+      PlayRingtoneTask ringtimeTask = new PlayRingtoneTask(ringtimeDTO.getRingtoneDTO(), this);
+      playRingtoneTaskList.add(ringtimeTask);
       timer.schedule(ringtimeTask, date);
     } catch (Exception e) {
       e.printStackTrace();
@@ -182,14 +199,306 @@ public class PlayRingtones {
    * Task which run one time every day to load the ring time for the actual day
    */
   private void runEveryDayTask() {
-    LocalDateTime ldt = LocalDateTime.of(LocalDate.now(), setting.getLoadRingtimeTime());
-    Date date = Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
-    long period = 1000L * 60L * 60L * 24L;
-    timer.scheduleAtFixedRate(new TimerTask() {
-      @Override
-      public void run() {
-        restart();
-      }
-    }, date, period);
+    if (!isPlayingAlarm && !isPlayingAnnouncement && !isPlayingPlaylist) {
+      LocalDateTime ldt = LocalDateTime.of(LocalDate.now(), setting.getLoadRingtimeTime());
+      Date date = Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
+      long period = 1000L * 60L * 60L * 24L;
+      timer.scheduleAtFixedRate(new TimerTask() {
+        @Override
+        public void run() {
+          restart();
+        }
+      }, date, period);
+    }
   }
+
+  /**
+   * Start playing the alarm
+   */
+  public void playAlarm() {
+    isPlayingFromQueue = false;
+    isPlayingPlaylist = false;
+    isPlayingAlarm = true;
+    stopTasks();
+    RingtoneDTO ringtoneDTO = playRingtonesService.getRingtoneAlarm();
+    System.out.println(ringtoneDTO.getPath());
+    if (ringtoneDTO != null) {
+      runAlarmTask(ringtoneDTO);
+    }
+  }
+
+  /**
+   * Stop the alarm
+   */
+  public void stopAlarm() {
+    isPlayingAlarm = false;
+    playAlarmTask.cancel();
+    String[] argsListStop = {SpeakerCommand.STOP.getCommand(),};
+    executeSpeakerAction(argsListStop);
+    restart();
+  }
+
+  /**
+   * Task which run the task for playing the alarm
+   */
+  private void runAlarmTask(RingtoneDTO ringtoneDTO) {
+    try {
+      playAlarmTask = new PlayRingtoneTask(ringtoneDTO, this);
+      LocalDateTime ldt = LocalDateTime.now();
+      Date date = Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
+      long duration = getDurationOfMusicFile(ringtoneDTO.getPath());
+      timer.scheduleAtFixedRate(playAlarmTask, date, duration);
+    } catch (EncoderException e) {
+      e.printStackTrace();
+    }
+  }
+
+  /**
+   * Play the announcement
+   */
+  public void playAnnouncement() {
+    isPlayingFromQueue = false;
+    isPlayingAnnouncement = true;
+    stopTasks();
+    if (isPlayingAlarm) {
+      playAlarmTask.cancel();
+    }
+    if(isPlayingPlaylist) {
+      getPlaylistState();
+    }
+    executePlayAnnouncement();
+    runActionsAfterAnnouncement();
+  }
+
+  /**
+   * Execute the command for playing the announcement on the network speaker
+   */
+  private void executePlayAnnouncement() {
+    String[] argsListPlayAlarm = {SpeakerCommand.PLAY_URI.getCommand(), PlayRingtoneTask.convertPath(Config.ANNOUNCEMENT_PATH.getPath())};
+    executeSpeakerAction(argsListPlayAlarm);
+  }
+
+  /**
+   * Run action after an announcement
+   */
+  private void runActionsAfterAnnouncement() {
+    try {
+      timer.schedule(new TimerTask() {
+        @Override
+        public void run() {
+          if (isPlayingAlarm) {
+            playAlarm();
+          } else if (isPlayingPlaylist) {
+            playPlaylistFromPlaylistState();
+          } else {
+            restart();
+          }
+          isPlayingAnnouncement = false;
+        }
+      }, getDurationOfMusicFile(Config.ANNOUNCEMENT_PATH.getPath()));
+    } catch (EncoderException e) {
+      e.printStackTrace();
+    }
+  }
+
+  /**
+   * Get the duration of the music file
+   *
+   * @param filePath of the music file
+   * @return duration of the music file
+   * @throws EncoderException
+   */
+  private long getDurationOfMusicFile(String filePath) throws EncoderException {
+    File alarmFile = new File(filePath);
+    MultimediaObject mmo = new MultimediaObject(alarmFile);
+    return mmo.getInfo().getDuration();
+  }
+
+  /**
+   * Getter for the attribute isPlayingAlarm
+   *
+   * @return isPlayingAlarm
+   */
+  public boolean isPlayingAlarm() {
+    return isPlayingAlarm;
+  }
+
+  /**
+   * Getter for the attribute isPlayingFromQueue
+   *
+   * @return isPlayingFromQueue
+   */
+  public boolean isPlayingFromQueue() {
+    return isPlayingFromQueue;
+  }
+
+  /**
+   * Setter for the attribute isPlayingFromQueue
+   *
+   * @param playingFromQueue
+   */
+  public void setPlayingFromQueue(boolean playingFromQueue) {
+    isPlayingFromQueue = playingFromQueue;
+  }
+
+  /**
+   * Getter for the attribute isPlayingPlaylist
+   *
+   * @return isPlayingPlaylist
+   */
+  public boolean isPlayingPlaylist() {
+    return isPlayingPlaylist;
+  }
+
+  /**
+   * Setter for the attribute isPlayingPlaylist
+   *
+   * @param playingPlaylist
+   */
+  public void setPlayingPlaylist(boolean playingPlaylist) {
+    isPlayingPlaylist = playingPlaylist;
+  }
+
+  /**
+   * Execute commands for the network speaker to control the playlist
+   *
+   * @param speakerCommandDTO Command for executing on the network speaker
+   * @param playlistList List of all songs in the playlist
+   * @return speakerActionStatus - Return value from the network speaker
+   */
+  public SpeakerActionStatus controlPlaylist(SpeakerCommandDTO speakerCommandDTO, List<PlaylistSong> playlistList) {
+    if (!isPlayingAlarm && !isPlayingAnnouncement) {
+      String command = speakerCommandDTO.getCommand();
+      SpeakerCommand speakerCommand;
+      String[] argsListPlaylist = new String[0];
+      if (command.equals("PLAY") || command.equals("NEXT") || command.equals("PREVIOUS")) {
+        if (isPlayingFromQueue) {
+          switch (command) {
+            case "PLAY":
+              isPlayingPlaylist = true;
+              argsListPlaylist = new String[]{SpeakerCommand.PLAY.getCommand()};
+              break;
+            case "NEXT":
+              argsListPlaylist = new String[]{SpeakerCommand.NEXT_SONG_QUEUE.getCommand()};
+              break;
+            case "PREVIOUS":
+              argsListPlaylist = new String[]{SpeakerCommand.PREVIOUS_SONG_QUEUE.getCommand()};
+              break;
+            default:
+              break;
+          }
+        } else {
+          switch (command) {
+            case "PLAY":
+              isPlayingPlaylist = true;
+              argsListPlaylist = new String[]{SpeakerCommand.PLAY_FROM_QUEUE.getCommand(), "0"};
+              break;
+            case "NEXT":
+              String position = "0";
+              if (playlistList.size() > 1) {
+                position = "1";
+              }
+              argsListPlaylist = new String[]{SpeakerCommand.PLAY_FROM_QUEUE.getCommand(), position};
+              break;
+            case "PREVIOUS":
+              argsListPlaylist = new String[]{SpeakerCommand.PLAY_FROM_QUEUE.getCommand(), "" + (playlistList.size() - 1)};
+              break;
+            default:
+              break;
+          }
+          isPlayingFromQueue = true;
+        }
+      } else if (command.equals("STOP")) {
+        isPlayingPlaylist = false;
+        argsListPlaylist = new String[]{SpeakerCommand.PAUSE.getCommand()};
+      } else if (command.equals("VOLUME")) {
+        argsListPlaylist = new String[]{SpeakerCommand.SET_VOLUME.getCommand(), speakerCommandDTO.getParameter()};
+      } else if (command.equals("MUTE")) {
+        argsListPlaylist = new String[]{SpeakerCommand.MUTE.getCommand(), speakerCommandDTO.getParameter()};
+      }
+      return executeSpeakerAction(argsListPlaylist);
+    }
+    return new SpeakerActionStatus();
+  }
+
+
+  /**
+   * Set the playlist on the network speakers
+   *
+   * @param playlistSongDTOList - List of all songs for the playlist
+   */
+  public void setPlaylist(List<PlaylistSongDTO> playlistSongDTOList) {
+    playlistSongDTOList.sort(Comparator.comparingLong(PlaylistSongDTO::getIndex));
+    String[] argsList = new String[]{SpeakerCommand.CLEAR_QUEUE.getCommand()};
+    executeSpeakerAction(argsList);
+    for (PlaylistSongDTO playlistSongDTO : playlistSongDTOList) {
+      System.out.println(playlistSongDTO.getName());
+      argsList = new String[]{SpeakerCommand.ADD_URI_TO_QUEUE.getCommand(), PlayRingtoneTask.convertPath(playlistSongDTO.getFilePath())};
+      executeSpeakerAction(argsList);
+    }
+  }
+
+  /**
+   * Get the actual playlist state
+   */
+  private void getPlaylistState() {
+    String[] argsPause = new String[]{SpeakerCommand.PAUSE.getCommand()};
+    SpeakerActionStatus speakerActionStatusPause = executeSpeakerAction(argsPause);
+    String[] argsPosition = new String[]{SpeakerCommand.GET_POSITION.getCommand()};
+    SpeakerActionStatus speakerActionStatusPosition = executeSpeakerAction(argsPosition);
+    if(speakerActionStatusPosition.getExitCode() == 0 && speakerActionStatusPosition.getException() == null) {
+      position = speakerActionStatusPosition.getInformation();
+    }
+    String[] argsPlaylistPosition = new String[]{SpeakerCommand.GET_PLAYLIST_POSITION.getCommand()};
+    SpeakerActionStatus speakerActionStatusPlaylistPosition = executeSpeakerAction(argsPlaylistPosition);
+    if(speakerActionStatusPlaylistPosition.getExitCode() == 0 && speakerActionStatusPlaylistPosition.getException() == null) {
+        playlistPosition = speakerActionStatusPlaylistPosition.getInformation();
+    }
+  }
+
+  /**
+   * Play playlist from saved playlist state
+   */
+  private void playPlaylistFromPlaylistState() {
+    String[] argsPlay = new String[]{SpeakerCommand.PLAY_FROM_QUEUE.getCommand(), playlistPosition};
+    executeSpeakerAction(argsPlay);
+    String[] argsSeek = new String[]{SpeakerCommand.SEEK.getCommand(), position};
+    executeSpeakerAction(argsSeek);
+    isPlayingPlaylist = true;
+    isPlayingFromQueue = true;
+  }
+
+  public PlaylistDTO getPlaylistInfo(List<PlaylistSongDTO> playlistSongDTOList) {
+    PlaylistDTO playlistDTO = null;
+    SpeakerState speakerState = null;
+    PlaylistSongDTO actualPlaylistSongDTO = null;
+    String[] argsListCurrentMediaInfo = {SpeakerCommand.GET_PLAYLIST_INFO.getCommand()};
+    SpeakerActionStatus speakerActionStatus = executeSpeakerAction(argsListCurrentMediaInfo);
+    try {
+      ObjectMapper objectMapper = new ObjectMapper();
+      objectMapper.registerModule(new JavaTimeModule());
+      PlaylistInfo playlistInfo = objectMapper.readValue(speakerActionStatus.getInformation(), PlaylistInfo.class);
+      actualPlaylistSongDTO = playlistSongDTOList.get(playlistInfo.getPosition() == 0 ? 0 : playlistInfo.getPosition() - 1);
+      if (!playlistInfo.isPlayingFromQueue()) {
+        speakerState = SpeakerState.STOPPED;
+      } else {
+        speakerState = SpeakerState.fromState(playlistInfo.getSpeakerState());
+      }
+      playlistDTO = PlaylistDTO.builder()
+        .speakerState(speakerState)
+        .volume(playlistInfo.getVolume())
+        .mute(playlistInfo.isMute())
+        .actualSong(actualPlaylistSongDTO)
+        .songDTOList(playlistSongDTOList).build();
+
+    } catch (
+      JsonMappingException e) {
+      throw new RuntimeException(e);
+    } catch (
+      JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
+    return playlistDTO;
+  }
+
 }

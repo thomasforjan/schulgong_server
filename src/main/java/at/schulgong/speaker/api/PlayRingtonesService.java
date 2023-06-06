@@ -1,8 +1,10 @@
 package at.schulgong.speaker.api;
 
 import at.schulgong.dto.RingtimeDTO;
+import at.schulgong.dto.RingtoneDTO;
 import at.schulgong.model.Holiday;
 import at.schulgong.model.Ringtime;
+import at.schulgong.model.Ringtone;
 import at.schulgong.repository.HolidayRepository;
 import at.schulgong.util.DtoConverter;
 import jakarta.persistence.EntityManager;
@@ -78,4 +80,22 @@ public class PlayRingtonesService {
     List<Holiday> holidayList = holidayRepository.findHolidaysAtCurrentDate();
     return holidayList != null && !holidayList.isEmpty();
   }
+
+  /**
+   * Get ringtone alarm from database
+   *
+   * @return ringtoneDTO
+   */
+  public RingtoneDTO getRingtoneAlarm() {
+    RingtoneDTO ringtoneDTO = null;
+    TypedQuery<Ringtone> typedQuery =
+      entityManager.createQuery(
+        "SELECT r FROM Ringtone r WHERE r.name = 'Alarm'", Ringtone.class);
+    Ringtone ringtone = typedQuery.getSingleResult();
+    if (ringtone != null) {
+      ringtoneDTO = DtoConverter.convertRingtoneToDTO(ringtone);
+    }
+    return ringtoneDTO;
+  }
+
 }

@@ -1,8 +1,6 @@
 package at.schulgong.util;
 
-import at.schulgong.dto.HolidayDTO;
-import at.schulgong.dto.RingtimeDTO;
-import at.schulgong.dto.RingtoneDTO;
+import at.schulgong.dto.*;
 import at.schulgong.model.*;
 
 import java.time.LocalTime;
@@ -26,8 +24,8 @@ public class DtoConverter {
   public static RingtimeDTO convertRingtimeToDTO(Ringtime ringtime, boolean inclusiveRingtone) {
     RingtimeDTO ringTimeDTO = RingtimeDTO.builder().id(ringtime.getId()).name(ringtime.getName()).startDate(ringtime.getStartDate()).endDate(ringtime.getEndDate()).monday(ringtime.isMonday()).tuesday(ringtime.isTuesday()).wednesday(ringtime.isWednesday()).thursday(ringtime.isThursday()).friday(ringtime.isFriday()).saturday(ringtime.isSaturday()).sunday(ringtime.isSunday()).playTime(LocalTime.of(ringtime.getHour().getHour(), ringtime.getMinute().getMinute())).build();
     if (inclusiveRingtone && (ringtime.getRingtone() != null)) {
-        RingtoneDTO ringToneDTO = convertRingtoneToDTO(ringtime.getRingtone());
-        ringTimeDTO.setRingtoneDTO(ringToneDTO);
+      RingtoneDTO ringToneDTO = convertRingtoneToDTO(ringtime.getRingtone());
+      ringTimeDTO.setRingtoneDTO(ringToneDTO);
     }
     return ringTimeDTO;
   }
@@ -112,5 +110,58 @@ public class DtoConverter {
     holiday.setEndDate(holidayDTO.getEndDate());
     holiday.setName(holidayDTO.getName());
     return holiday;
+  }
+
+  /**
+   * Method to convert playlistSong object into a playlistSongDTO object
+   *
+   * @param playlistSong object of playlistSong
+   * @return object of playlistSongDTO
+   */
+  public static PlaylistSongDTO convertPlaylistSongToDTO(PlaylistSong playlistSong) {
+    PlaylistSongDTO playlistSongDTO = new PlaylistSongDTO();
+    playlistSongDTO.setIndex(playlistSong.getId());
+    playlistSongDTO.setId(playlistSong.getSong().getId());
+    playlistSongDTO.setName(playlistSong.getSong().getName());
+    playlistSongDTO.setFilePath(playlistSong.getSong().getFilePath());
+    return playlistSongDTO;
+  }
+
+  /**
+   * Method to convert playlistSongDTO object into a playlistSong object
+   *
+   * @param playlistSongDTO object of playlistSongDTO
+   * @return object of playlistSong
+   */
+  public static PlaylistSong convertDtoToPlaylistSong(PlaylistSongDTO playlistSongDTO, Song song) {
+    PlaylistSong playlistSong = new PlaylistSong();
+    playlistSong.setId(playlistSongDTO.getIndex());
+    playlistSong.setSong(song);
+
+    return playlistSong;
+  }
+
+  /**
+   * Method to convert song object into a songDTO object
+   *
+   * @param song song object
+   * @return songDTO object
+   */
+  public static SongDTO convertSongToDTO(Song song) {
+    return SongDTO.builder().id(song.getId()).name(song.getName()).filePath(song.getFilePath()).build();
+  }
+
+  /**
+   * Method to convert songDTO object into a song object
+   *
+   * @param songDTO songDTO object
+   * @return song object
+   */
+  public static Song convertSongDTOToSong(SongDTO songDTO) {
+    Song song = new Song();
+    song.setId(songDTO.getId());
+    song.setName(songDTO.getName());
+    song.setFilePath(songDTO.getFilePath());
+    return song;
   }
 }
