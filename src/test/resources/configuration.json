@@ -1,5 +1,5 @@
 {
-  "password": "1234",
+  "password": "$argon2id$v=19$m=60000,t=10,p=1$VpM7WJo3vSg5J31VLs74GA$e/t1NrAAYKPuDTT9TIgHzMT8zXu6x5mbNLkspVzQjUk",
   "ringtimeVolume": 1,
   "alarmVolume": 5,
   "announcementVolume": 5,
