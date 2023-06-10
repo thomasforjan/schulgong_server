@@ -56,11 +56,29 @@ public class SecurityConfig {
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
                 .permitAll()
                 .requestMatchers(
-                        new AntPathRequestMatcher("/api/auth/login", HttpMethod.POST.toString()))
+                        new AntPathRequestMatcher(
+                                "/api/speaker/play/**", HttpMethod.GET.toString()))
                 .permitAll()
                 .requestMatchers(
                         new AntPathRequestMatcher(
-                                "/api/speaker/play/**", HttpMethod.GET.toString()))
+                                "/",
+                                HttpMethod.GET
+                                        .toString())) // Add this line to allow all GET requests to
+                // "/"
+                .permitAll()
+                .requestMatchers(
+                        new AntPathRequestMatcher("/index.html", HttpMethod.GET.toString()))
+                .permitAll()
+                .requestMatchers(new AntPathRequestMatcher("/**/*.js", HttpMethod.GET.toString()))
+                .permitAll()
+                .requestMatchers(new AntPathRequestMatcher("/**/*.css", HttpMethod.GET.toString()))
+                .permitAll()
+                .requestMatchers(new AntPathRequestMatcher("/**/*.ttf", HttpMethod.GET.toString()))
+                .permitAll()
+                .requestMatchers(new AntPathRequestMatcher("/**/*.svg", HttpMethod.GET.toString()))
+                .permitAll()
+                .requestMatchers(
+                        new AntPathRequestMatcher("/api/auth/login", HttpMethod.POST.toString()))
                 .permitAll()
                 .anyRequest()
                 .authenticated();
