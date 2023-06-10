@@ -1,25 +1,25 @@
 buildscript {
-repositories {
-	maven {
-	url 'https://plugins.gradle.org/m2/'
-	}
-}
-dependencies {
-	classpath 'com.diffplug.spotless:spotless-plugin-gradle:6.11.0'
-	classpath 'com.github.spotbugs.snom:spotbugs-gradle-plugin:5.0.13'
-}
+  repositories {
+    maven {
+      url 'https://plugins.gradle.org/m2/'
+    }
+  }
+  dependencies {
+    classpath 'com.diffplug.spotless:spotless-plugin-gradle:6.11.0'
+    classpath 'com.github.spotbugs.snom:spotbugs-gradle-plugin:5.0.13'
+  }
 }
 
 plugins {
-id 'java'
-id 'io.spring.dependency-management' version '1.1.0'
-id 'org.springframework.boot' version '3.0.6'
-id 'com.github.spotbugs' version '5.0.13'
-id 'com.diffplug.spotless' version '6.11.0'
+  id 'java'
+  id 'io.spring.dependency-management' version '1.1.0'
+  id 'org.springframework.boot' version '3.0.6'
+  id 'com.github.spotbugs' version '5.0.13'
+  id 'com.diffplug.spotless' version '6.11.0'
 }
 
 compileJava {
-options.compilerArgs << "-parameters"
+  options.compilerArgs << "-parameters"
 }
 
 group = 'at.schulgong'
@@ -27,9 +27,9 @@ version = '0.0.3'
 sourceCompatibility = '17'
 
 configurations {
-compileOnly {
-	extendsFrom annotationProcessor
-}
+  compileOnly {
+    extendsFrom annotationProcessor
+  }
 }
 
 
@@ -38,126 +38,136 @@ apply plugin: 'com.github.spotbugs'
 apply plugin: 'com.diffplug.spotless'
 
 repositories {
-mavenCentral()
+  mavenCentral()
 }
 
 dependencies {
-implementation 'org.springframework.boot:spring-boot-starter-data-jpa:3.0.6'
-testImplementation 'org.springframework.boot:spring-boot-starter-test:3.0.6'
-implementation 'org.springframework.boot:spring-boot-starter-hateoas:3.0.6'
-implementation 'org.projectlombok:lombok:1.18.22'
-compileOnly 'org.projectlombok:lombok:1.18.22'
-annotationProcessor 'org.projectlombok:lombok:1.18.22'
-testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
-implementation 'org.mariadb.jdbc:mariadb-java-client:3.1.3'
-implementation 'org.hibernate.validator:hibernate-validator:8.0.0.Final'
-implementation 'jakarta.persistence:jakarta.persistence-api:3.1.0'
-implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.15'
-implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.15.0'
-implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.15.0'
-implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.33'
+  implementation 'org.springframework.boot:spring-boot-starter-data-jpa:3.0.6'
+  testImplementation 'org.springframework.boot:spring-boot-starter-test:3.0.6'
+  implementation 'org.springframework.boot:spring-boot-starter-hateoas:3.0.6'
+  implementation 'org.projectlombok:lombok:1.18.22'
+  compileOnly 'org.projectlombok:lombok:1.18.22'
+  annotationProcessor 'org.projectlombok:lombok:1.18.22'
+  testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+  testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+  implementation 'org.mariadb.jdbc:mariadb-java-client:3.1.3'
+  implementation 'org.hibernate.validator:hibernate-validator:8.0.0.Final'
+  implementation 'jakarta.persistence:jakarta.persistence-api:3.1.0'
+  implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.15'
+  implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.15.0'
+  implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.15.0'
+  implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.33'
   implementation 'ws.schild:jave-all-deps:3.3.1'
+  // JWT
+  implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
+  runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
+  runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
+  // Spring Security Crypto
+  implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.1.0'
+  // Bouncy Castle Provider
+  implementation group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.70'
+  // Spring Security
+  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '3.1.0'
 }
 
 spotbugs {
-ignoreFailures = false
-showStackTraces = true
-showProgress = true
-effort = 'default'
-reportLevel = 'default'
-visitors = ['FindSqlInjection', 'SwitchFallthrough']
-omitVisitors = ['FindNonShortCircuit']
-reportsDir = file("$buildDir/spotbugs")
-excludeFilter = file("build.gradle")
+  ignoreFailures = false
+  showStackTraces = true
+  showProgress = true
+  effort = 'default'
+  reportLevel = 'default'
+  visitors = ['FindSqlInjection', 'SwitchFallthrough']
+  omitVisitors = ['FindNonShortCircuit']
+  reportsDir = file("$buildDir/spotbugs")
+  excludeFilter = file("build.gradle")
 }
 
 spotless {
 // optional: limit format enforcement to just the files changed by this feature branch
-ratchetFrom getCurrentGitBranch()
+  ratchetFrom getCurrentGitBranch()
 
-format 'misc', {
-	// define the files to apply `misc` to
-	target '*.gradle', '*.md', '.gitignore'
-	// define the steps to apply to those files
-	trimTrailingWhitespace()
-	indentWithTabs() // or spaces. Takes an integer argument if you don't like 4
-	endWithNewline()
-}
-java {
-	target 'src/*/java/**/*.java'
-	googleJavaFormat('1.15.0').aosp().reflowLongStrings().groupArtifact('com.google.googlejavaformat:google-java-format')
-	formatAnnotations()
-}
+  format 'misc', {
+    // define the files to apply `misc` to
+    target '*.gradle', '*.md', '.gitignore'
+    // define the steps to apply to those files
+    trimTrailingWhitespace()
+    indentWithTabs() // or spaces. Takes an integer argument if you don't like 4
+    endWithNewline()
+  }
+  java {
+    target 'src/*/java/**/*.java'
+    googleJavaFormat('1.15.0').aosp().reflowLongStrings().groupArtifact('com.google.googlejavaformat:google-java-format')
+    formatAnnotations()
+  }
 }
 
 tasks.named('test') {
-useJUnitPlatform()
+  useJUnitPlatform()
 }
 
 def getCurrentGitBranch() {
-def gitBranch = "Unknown branch"
-try {
-	def workingDir = new File("${project.projectDir}")
-	def result = 'git rev-parse --abbrev-ref HEAD'.execute(null, workingDir)
-	result.waitFor()
-	if (result.exitValue() == 0) {
-	gitBranch = result.text.trim()
-	}
-} catch (e) {
-}
-return gitBranch
+  def gitBranch = "Unknown branch"
+  try {
+    def workingDir = new File("${project.projectDir}")
+    def result = 'git rev-parse --abbrev-ref HEAD'.execute(null, workingDir)
+    result.waitFor()
+    if (result.exitValue() == 0) {
+      gitBranch = result.text.trim()
+    }
+  } catch (e) {
+  }
+  return gitBranch
 }
 
 task incrementVersionNumber {
-group 'special'
-doLast {
-	def oldVersionNumber = buildFile.getText().find(version)
-	println 'Version number old: ' + oldVersionNumber
-	def number = oldVersionNumber.toString().replace("'", "")
-	def versionNumbers = oldVersionNumber.split("\\.")
-	def major = 0
-	def minor = 0
-	def revision = 0
-	if (versionNumbers[0].isInteger() && versionNumbers[1].isInteger() && versionNumbers[2].isInteger()) {
-	major = versionNumbers[0]
-	minor = versionNumbers[1]
-	revision = versionNumbers[2]
-	} else {
-	raise Exception("Version number is not correct")
-	}
+  group 'special'
+  doLast {
+    def oldVersionNumber = buildFile.getText().find(version)
+    println 'Version number old: ' + oldVersionNumber
+    def number = oldVersionNumber.toString().replace("'", "")
+    def versionNumbers = oldVersionNumber.split("\\.")
+    def major = 0
+    def minor = 0
+    def revision = 0
+    if (versionNumbers[0].isInteger() && versionNumbers[1].isInteger() && versionNumbers[2].isInteger()) {
+      major = versionNumbers[0]
+      minor = versionNumbers[1]
+      revision = versionNumbers[2]
+    } else {
+      raise Exception("Version number is not correct")
+    }
 
-	if (revision == "9") {
-	revision = 0
-	if (minor == "9") {
-		minor = 0
-		major++
-	} else {
-		minor++
-	}
-	} else {
-	revision++
-	}
+    if (revision == "9") {
+      revision = 0
+      if (minor == "9") {
+        minor = 0
+        major++
+      } else {
+        minor++
+      }
+    } else {
+      revision++
+    }
 
-	def versionNumber = "version = '" + major + "." + minor + "." + revision + "'"
-	def currentVersionNumber = "version = '" + oldVersionNumber + "'"
-	def test = buildFile.getText().find("version = '" + oldVersionNumber + "'")
-	if (buildFile.getText().find("version = '" + oldVersionNumber + "'") != null) {
-	currentVersionNumber = "version = '" + oldVersionNumber + "'"
-	} else if (buildFile.getText().find("version= '" + oldVersionNumber + "'") != null) {
-	currentVersionNumber = "version= '" + oldVersionNumber + "'"
-	} else if (buildFile.getText().find("version ='" + oldVersionNumber + "'") != null) {
-	currentVersionNumber = "version ='" + oldVersionNumber + "'"
-	} else if (buildFile.getText().find("version='" + oldVersionNumber + "'") != null) {
-	currentVersionNumber = "version='" + oldVersionNumber + "'"
-	}
-	def text = buildFile.getText().replace(currentVersionNumber, versionNumber)
-	buildFile.setText(text)
-	println 'Version number new: ' + versionNumber
+    def versionNumber = "version = '" + major + "." + minor + "." + revision + "'"
+    def currentVersionNumber = "version = '" + oldVersionNumber + "'"
+    def test = buildFile.getText().find("version = '" + oldVersionNumber + "'")
+    if (buildFile.getText().find("version = '" + oldVersionNumber + "'") != null) {
+      currentVersionNumber = "version = '" + oldVersionNumber + "'"
+    } else if (buildFile.getText().find("version= '" + oldVersionNumber + "'") != null) {
+      currentVersionNumber = "version= '" + oldVersionNumber + "'"
+    } else if (buildFile.getText().find("version ='" + oldVersionNumber + "'") != null) {
+      currentVersionNumber = "version ='" + oldVersionNumber + "'"
+    } else if (buildFile.getText().find("version='" + oldVersionNumber + "'") != null) {
+      currentVersionNumber = "version='" + oldVersionNumber + "'"
+    }
+    def text = buildFile.getText().replace(currentVersionNumber, versionNumber)
+    buildFile.setText(text)
+    println 'Version number new: ' + versionNumber
 
-	def newVersion = major + "." + minor + "." + revision
-	ant.replaceregexp(match: oldVersionNumber, replace: newVersion, flags: 'g', byline: true) {
-	fileset(dir: '', includes: 'Procfile')
-	}
-}
+    def newVersion = major + "." + minor + "." + revision
+    ant.replaceregexp(match: oldVersionNumber, replace: newVersion, flags: 'g', byline: true) {
+      fileset(dir: '', includes: 'Procfile')
+    }
+  }
 }
