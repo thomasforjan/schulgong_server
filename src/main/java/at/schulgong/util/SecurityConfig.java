@@ -47,16 +47,20 @@ public class SecurityConfig {
    */
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http
-      .csrf().disable()
-      .cors().configurationSource(corsConfigurationSource())
+    http.csrf()
+      .disable()
+      .cors()
+      .configurationSource(corsConfigurationSource())
       .and()
       .authorizeRequests()
-      .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-      .requestMatchers(new AntPathRequestMatcher("/login", HttpMethod.POST.toString())).permitAll()
+      .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
+      .permitAll()
+      .requestMatchers(new AntPathRequestMatcher("/api/auth/login", HttpMethod.POST.toString()))
+      .permitAll()
       .anyRequest().authenticated();
 
-    http.addFilterAfter(new JwtTokenFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
+    http.addFilterAfter(
+      new JwtTokenFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
   }

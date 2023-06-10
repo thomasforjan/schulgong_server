@@ -41,7 +41,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
  * @since May 2023
  */
 @RestController
-@RequestMapping("live")
+@RequestMapping("api/live")
 @CrossOrigin
 public class LiveController {
   private final PlayRingtones playRingtones;

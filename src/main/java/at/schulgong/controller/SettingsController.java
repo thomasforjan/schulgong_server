@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
  * @since May 2023
  */
 @RestController
-@RequestMapping("settings")
+@RequestMapping("api/settings")
 @CrossOrigin
 public class SettingsController {
 
