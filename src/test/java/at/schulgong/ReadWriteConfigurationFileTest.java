@@ -2,6 +2,7 @@ package at.schulgong;
 
 import at.schulgong.dto.ConfigurationDTO;
 import at.schulgong.util.ReadWriteConfigurationFile;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -21,6 +22,7 @@ class ReadWriteConfigurationFileTest {
 
   private final String CONFIGURATION_FILE_PATH = Paths.get("src/test/resources/configuration.json").toAbsolutePath().toString();
   private ConfigurationDTO dummyReadConfigurationDTO;
+  private ConfigurationDTO dummyWriteConfigurationDTO;
 
   @BeforeAll
   public void initialize() {
@@ -31,6 +33,19 @@ class ReadWriteConfigurationFileTest {
       .announcementVolume(5)
       .ringtimeDirectory("C:/Users/phili/OneDrive/Desktop/sonos_music")
       .playlistDirectory("C:/Users/phili/OneDrive/Desktop/sonos_music/playlist").build();
+
+    dummyWriteConfigurationDTO = ConfigurationDTO.builder()
+      .password("5678")
+      .ringtimeVolume(6)
+      .alarmVolume(15)
+      .announcementVolume(25)
+      .ringtimeDirectory("C:/Users/phili/OneDrive/Desktop/ringtimes")
+      .playlistDirectory("C:/Users/phili/OneDrive/Desktop/playlist").build();
+  }
+
+  @AfterEach
+  public void writeInitialValuesToFile() {
+    ReadWriteConfigurationFile.writeConfigurationDTOFromConfigFile(CONFIGURATION_FILE_PATH, dummyReadConfigurationDTO);
   }
 
 
@@ -43,6 +58,19 @@ class ReadWriteConfigurationFileTest {
     assertEquals(dummyReadConfigurationDTO.getAnnouncementVolume(), configurationDTO.getAnnouncementVolume());
     assertEquals(dummyReadConfigurationDTO.getRingtimeDirectory(), configurationDTO.getRingtimeDirectory());
     assertEquals(dummyReadConfigurationDTO.getPlaylistDirectory(), configurationDTO.getPlaylistDirectory());
+  }
+
+  @Test
+  public void testWriteConfigurationDTOFromConfigFile() {
+    ReadWriteConfigurationFile.writeConfigurationDTOFromConfigFile(CONFIGURATION_FILE_PATH, dummyWriteConfigurationDTO);
+    ConfigurationDTO configurationDTO = ReadWriteConfigurationFile.readConfigurationDTOFromConfigFile(CONFIGURATION_FILE_PATH);
+
+    assertEquals(dummyWriteConfigurationDTO.getPassword(), configurationDTO.getPassword());
+    assertEquals(dummyWriteConfigurationDTO.getRingtimeVolume(), configurationDTO.getRingtimeVolume());
+    assertEquals(dummyWriteConfigurationDTO.getAlarmVolume(), configurationDTO.getAlarmVolume());
+    assertEquals(dummyWriteConfigurationDTO.getAnnouncementVolume(), configurationDTO.getAnnouncementVolume());
+    assertEquals(dummyWriteConfigurationDTO.getRingtimeDirectory(), configurationDTO.getRingtimeDirectory());
+    assertEquals(dummyWriteConfigurationDTO.getPlaylistDirectory(), configurationDTO.getPlaylistDirectory());
   }
 
 }
