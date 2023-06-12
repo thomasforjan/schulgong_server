@@ -150,4 +150,15 @@ public class HolidayController {
       throw new EntityNotFoundException(id, Config.HOLIDAY.getException());
     }
   }
+
+  /**
+   * Delete all holidays.
+   *
+   * @return response
+   */
+  @DeleteMapping
+  ResponseEntity<HolidayDTO> deleteAllHolidays() {
+    holidayRepository.deleteAll();
+    return ResponseEntity.ok().build();
+  }
 }
