@@ -4,6 +4,7 @@ import at.schulgong.dto.*;
 import at.schulgong.model.PlaylistSong;
 import at.schulgong.speaker.util.*;
 import at.schulgong.util.Config;
+import at.schulgong.util.ReadWriteConfigurationFile;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -45,6 +46,7 @@ public class PlayRingtones {
   private boolean isPlayingPlaylist;
   private String position;
   private String playlistPosition;
+  private ConfigurationDTO configurationDTO;
 
 
 
@@ -70,6 +72,7 @@ public class PlayRingtones {
    */
   @PostConstruct
   public void init() {
+    configurationDTO = ReadWriteConfigurationFile.readConfigurationDTOFromConfigFile(Config.CONFIGURATION_PATH.getPath());
     setting = ReadSettingFile.getSettingFromConfigFile();
     timer = new Timer();
     runEveryDayTask();
@@ -274,7 +277,7 @@ public class PlayRingtones {
    * Execute the command for playing the announcement on the network speaker
    */
   private void executePlayAnnouncement() {
-    String[] argsListPlayAlarm = {SpeakerCommand.PLAY_URI.getCommand(), PlayRingtoneTask.convertPath(Config.ANNOUNCEMENT_PATH.getPath())};
+    String[] argsListPlayAlarm = {SpeakerCommand.PLAY_URI_VOLUME_MUTE.getCommand(), PlayRingtoneTask.convertPath(Config.ANNOUNCEMENT_PATH.getPath()), String.valueOf(configurationDTO.getAnnouncementVolume()), "False"};
     executeSpeakerAction(argsListPlayAlarm);
   }
 
@@ -348,6 +351,25 @@ public class PlayRingtones {
    */
   public boolean isPlayingPlaylist() {
     return isPlayingPlaylist;
+  }
+
+
+  /**
+   * Getter for the attribute configurationDTO
+   *
+   * @return configurationDTO
+   */
+  public ConfigurationDTO getConfigurationDTO() {
+    return configurationDTO;
+  }
+
+  /**
+   * Setter for the attribute configurationDTO
+   *
+   * @param configurationDTO
+   */
+  public void setConfigurationDTO(ConfigurationDTO configurationDTO) {
+    this.configurationDTO = configurationDTO;
   }
 
   /**
@@ -468,6 +490,12 @@ public class PlayRingtones {
     isPlayingFromQueue = true;
   }
 
+  /**
+   * Get playlist info
+   *
+   * @param playlistSongDTOList
+   * @return playlistDTO
+   */
   public PlaylistDTO getPlaylistInfo(List<PlaylistSongDTO> playlistSongDTOList) {
     PlaylistDTO playlistDTO = null;
     SpeakerState speakerState = null;

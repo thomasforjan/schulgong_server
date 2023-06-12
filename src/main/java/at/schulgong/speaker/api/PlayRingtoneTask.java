@@ -30,8 +30,10 @@ public class PlayRingtoneTask extends TimerTask {
   @Override
   public void run() {
     String[] argsList = {
-      SpeakerCommand.PLAY_URI.getCommand(),
-      convertPath(this.ringtoneDTO.getPath())
+      SpeakerCommand.PLAY_URI_VOLUME_MUTE.getCommand(),
+      convertPath(this.ringtoneDTO.getPath()),
+      playRingtones.isPlayingAlarm() ? String.valueOf(playRingtones.getConfigurationDTO().getAlarmVolume()) : String.valueOf(playRingtones.getConfigurationDTO().getRingtimeVolume()),
+      "False"
     };
     playRingtones.executeSpeakerAction(argsList);
     playRingtones.setPlayingFromQueue(false);

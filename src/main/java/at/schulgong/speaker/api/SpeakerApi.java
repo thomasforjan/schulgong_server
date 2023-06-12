@@ -45,7 +45,11 @@ public class SpeakerApi {
       String filePath = ReadSettingFile.getSettingFromConfigFile().getExecutedFilePath();
       ProcessBuilder processBuilder = null;
       if (args != null) {
-        if (args.length > 1) {
+        if (args.length > 3) {
+          processBuilder = new ProcessBuilder(PYTHON_STRING, filePath, args[0], args[1], args[2], args[3]);
+        } else if (args.length > 2) {
+          processBuilder = new ProcessBuilder(PYTHON_STRING, filePath, args[0], args[1], args[2]);
+        } else if (args.length > 1) {
           processBuilder = new ProcessBuilder(PYTHON_STRING, filePath, args[0], args[1]);
         } else if (args.length > 0) {
           processBuilder = new ProcessBuilder(PYTHON_STRING, filePath, args[0]);

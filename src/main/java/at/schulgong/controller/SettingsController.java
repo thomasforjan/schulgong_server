@@ -1,6 +1,7 @@
 package at.schulgong.controller;
 
 import at.schulgong.dto.ConfigurationDTO;
+import at.schulgong.speaker.api.PlayRingtones;
 import at.schulgong.util.Config;
 import at.schulgong.util.ReadWriteConfigurationFile;
 import org.springframework.http.ResponseEntity;
@@ -18,11 +19,13 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin
 public class SettingsController {
 
+  private final PlayRingtones playRingtones;
+
   /**
    * Controller of Settings
    */
-  public SettingsController() {
-
+  public SettingsController(PlayRingtones playRingtones) {
+    this.playRingtones = playRingtones;
   }
 
   /**
@@ -47,6 +50,7 @@ public class SettingsController {
       configurationDTO.setRingtimeVolume(volume);
       try {
         ReadWriteConfigurationFile.writeConfigurationDTOFromConfigFile(Config.CONFIGURATION_PATH.getPath(), configurationDTO);
+        playRingtones.setConfigurationDTO(configurationDTO);
       } catch (RuntimeException e) {
         ResponseEntity.internalServerError().build();
       }
@@ -68,6 +72,7 @@ public class SettingsController {
       configurationDTO.setAlarmVolume(volume);
       try {
         ReadWriteConfigurationFile.writeConfigurationDTOFromConfigFile(Config.CONFIGURATION_PATH.getPath(), configurationDTO);
+        playRingtones.setConfigurationDTO(configurationDTO);
       } catch (RuntimeException e) {
         ResponseEntity.internalServerError().build();
       }
@@ -89,6 +94,7 @@ public class SettingsController {
       configurationDTO.setAnnouncementVolume(volume);
       try {
         ReadWriteConfigurationFile.writeConfigurationDTOFromConfigFile(Config.CONFIGURATION_PATH.getPath(), configurationDTO);
+        playRingtones.setConfigurationDTO(configurationDTO);
       } catch (RuntimeException e) {
         ResponseEntity.internalServerError().build();
       }

@@ -98,10 +98,7 @@ def mute(mute):
     try:
         soco_speaker = discover()
         if soco_speaker is not None:
-            if str(mute).lower() == 'true':
-                soco_speaker.group.mute = True
-            else:
-                soco_speaker.group.mute = False
+            _set_mute(soco_speaker, mute)
     except:
         print("exception= An exception occurred in the method mute(mute)")
 
@@ -315,6 +312,22 @@ def get_playlist_info():
     except:
         print("exception= An exception occurred in the method get_playlist_info")
 
+def play_uri_volume_mute(uri, volume, mute):
+    print("command= play_uri")
+    url = START_PATH_URI + uri
+    print(url)
+    try:
+        soco_speaker = discover()
+        if soco_speaker is not None:
+          if volume >= 0 and volume <= 100:
+            soco_speaker.group.volume = volume
+          else:
+            print("exception= Please enter a number between 0 and 100 as argument")
+          _set_mute(soco_speaker, mute)
+          soco_speaker.play_uri(url)
+    except:
+        print("exception= An exception occurred in the method play_uri")
+
 def _set_group(soco_speaker_list):
     print("for for-loop")
     for i in range(1, len(soco_speaker_list)):
@@ -337,4 +350,10 @@ def _get_coordinator_speaker_name(soco_speaker_list):
       return speaker
 
   return list(soco_speaker_list.keys())[0]
+
+def _set_mute(soco_speaker, mute):
+  if str(mute).lower() == 'true':
+      soco_speaker.group.mute = True
+  else:
+      soco_speaker.group.mute = False
 
