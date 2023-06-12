@@ -18,7 +18,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 /**
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
- * @version 0.1
+ * @version 0.2
  * @implNote Spring Security Configuration
  * @since June 2023
  */
@@ -27,6 +27,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
 
     private final JwtTokenProvider jwtTokenProvider;
+
+    private static final String API_REQUEST = "/api/**";
 
     /**
      * Constructor
@@ -47,6 +49,7 @@ public class SecurityConfig {
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
         http.csrf()
                 .disable()
                 .cors()
@@ -80,7 +83,14 @@ public class SecurityConfig {
                 .requestMatchers(
                         new AntPathRequestMatcher("/api/auth/login", HttpMethod.POST.toString()))
                 .permitAll()
-                .anyRequest()
+                .requestMatchers(new AntPathRequestMatcher(API_REQUEST, HttpMethod.GET.toString()))
+                .authenticated()
+                .requestMatchers(new AntPathRequestMatcher(API_REQUEST, HttpMethod.POST.toString()))
+                .authenticated()
+                .requestMatchers(new AntPathRequestMatcher(API_REQUEST, HttpMethod.PUT.toString()))
+                .authenticated()
+                .requestMatchers(
+                        new AntPathRequestMatcher(API_REQUEST, HttpMethod.DELETE.toString()))
                 .authenticated();
 
         http.addFilterAfter(
