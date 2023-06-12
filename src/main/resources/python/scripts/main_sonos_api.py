@@ -98,6 +98,13 @@ def main():
     # Get playlist info
     subparsers.add_parser('get_playlist_info')
 
+    # Play from uri with setting volume and mute command
+    parser_play_uri_volume_mute = subparsers.add_parser('play_uri_volume_mute')
+    parser_play_uri_volume_mute.add_argument('path_song', help='Pfad zum Song.')
+    parser_play_uri_volume_mute.add_argument(
+        'volume', type=int, help='Lautstärke zwischen 0 und 100.')
+    parser_play_uri_volume_mute.add_argument('mute', help='Mute(True) or Unmute(False) Song.')
+
     args = parser.parse_args()
 
     if args.command == 'discover':
@@ -154,6 +161,8 @@ def main():
         sonosapi.get_current_media_info()
     elif args.command == 'get_playlist_info':
         sonosapi.get_playlist_info()
+    elif args.command == 'play_uri_volume_mute':
+        sonosapi.play_uri_volume_mute(args.path_song, args.volume, args.mute)
     else:
         parser.print_help()
 
