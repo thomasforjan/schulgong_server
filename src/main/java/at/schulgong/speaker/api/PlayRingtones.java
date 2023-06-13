@@ -562,6 +562,10 @@ public class PlayRingtones {
       }
       if (!playlistSongDTOList.isEmpty()) {
         actualPlaylistSongDTO = playlistSongDTOList.get(playlistInfo.getPosition() == 0 ? 0 : playlistInfo.getPosition() - 1);
+      }else {
+        isPlayingPlaylist = false;
+        isPlayingFromQueue = false;
+        restart();
       }
       if (!playlistInfo.isPlayingFromQueue()) {
         speakerState = SpeakerState.STOPPED;
