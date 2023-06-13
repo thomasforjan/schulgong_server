@@ -47,7 +47,11 @@ public class PlayRingtones {
   private String position;
   private String playlistPosition;
   private ConfigurationDTO configurationDTO;
+  private PlaylistDTO playlistDTO;
+  private boolean runPlaylistAfterAnouncement;
 
+  private boolean repeatPlaylist;
+  private boolean isPlaylistThreadRunning;
 
 
   @Bean
@@ -62,7 +66,6 @@ public class PlayRingtones {
   public void loadRingtimes() {
     ringtimeDTOList = new ArrayList<>();
     if (!playRingtonesService.isHolidayAtCurrentDate()) {
-      System.out.println("NO HOLIDAYS");
       ringtimeDTOList = playRingtonesService.findRingtimeForCurrentDateAndWeekday();
     }
   }
@@ -72,12 +75,12 @@ public class PlayRingtones {
    */
   @PostConstruct
   public void init() {
+    getPlaylistInfo();
     configurationDTO = ReadWriteConfigurationFile.readConfigurationDTOFromConfigFile(Config.CONFIGURATION_PATH.getPath());
     setting = ReadSettingFile.getSettingFromConfigFile();
     timer = new Timer();
     runEveryDayTask();
     playRingtoneTaskList = new ArrayList<>();
-    System.out.println("POST CONSTRACT");
     playRingtonesFromRingtimes();
   }
 
@@ -102,7 +105,6 @@ public class PlayRingtones {
    */
   public void restart() {
     if (!isPlayingAlarm && !isPlayingAnnouncement && !isPlayingPlaylist) {
-      System.out.println("RESTART");
       stopTasks();
       loadRingtimes();
       playRingtonesFromRingtimes();
@@ -224,7 +226,6 @@ public class PlayRingtones {
     isPlayingAlarm = true;
     stopTasks();
     RingtoneDTO ringtoneDTO = playRingtonesService.getRingtoneAlarm();
-    System.out.println(ringtoneDTO.getPath());
     if (ringtoneDTO != null) {
       runAlarmTask(ringtoneDTO);
     }
@@ -266,7 +267,9 @@ public class PlayRingtones {
     if (isPlayingAlarm) {
       playAlarmTask.cancel();
     }
-    if(isPlayingPlaylist) {
+    if (isPlayingPlaylist) {
+      isPlayingPlaylist = false;
+      runPlaylistAfterAnouncement = true;
       getPlaylistState();
     }
     executePlayAnnouncement();
@@ -291,7 +294,7 @@ public class PlayRingtones {
         public void run() {
           if (isPlayingAlarm) {
             playAlarm();
-          } else if (isPlayingPlaylist) {
+          } else if (runPlaylistAfterAnouncement) {
             playPlaylistFromPlaylistState();
           } else {
             restart();
@@ -353,6 +356,14 @@ public class PlayRingtones {
     return isPlayingPlaylist;
   }
 
+  /**
+   * Setter for the attribute isPlayingPlaylist
+   *
+   * @param playingPlaylist
+   */
+  public void setPlayingPlaylist(boolean playingPlaylist) {
+    isPlayingPlaylist = playingPlaylist;
+  }
 
   /**
    * Getter for the attribute configurationDTO
@@ -373,15 +384,6 @@ public class PlayRingtones {
   }
 
   /**
-   * Setter for the attribute isPlayingPlaylist
-   *
-   * @param playingPlaylist
-   */
-  public void setPlayingPlaylist(boolean playingPlaylist) {
-    isPlayingPlaylist = playingPlaylist;
-  }
-
-  /**
    * Execute commands for the network speaker to control the playlist
    *
    * @param speakerCommandDTO Command for executing on the network speaker
@@ -390,15 +392,17 @@ public class PlayRingtones {
    */
   public SpeakerActionStatus controlPlaylist(SpeakerCommandDTO speakerCommandDTO, List<PlaylistSong> playlistList) {
     if (!isPlayingAlarm && !isPlayingAnnouncement) {
+      stopTasks();
       String command = speakerCommandDTO.getCommand();
-      SpeakerCommand speakerCommand;
       String[] argsListPlaylist = new String[0];
+      boolean callPlaylistInfoThread = false;
       if (command.equals("PLAY") || command.equals("NEXT") || command.equals("PREVIOUS")) {
         if (isPlayingFromQueue) {
           switch (command) {
             case "PLAY":
               isPlayingPlaylist = true;
               argsListPlaylist = new String[]{SpeakerCommand.PLAY.getCommand()};
+              callPlaylistInfoThread = true;
               break;
             case "NEXT":
               argsListPlaylist = new String[]{SpeakerCommand.NEXT_SONG_QUEUE.getCommand()};
@@ -414,16 +418,21 @@ public class PlayRingtones {
             case "PLAY":
               isPlayingPlaylist = true;
               argsListPlaylist = new String[]{SpeakerCommand.PLAY_FROM_QUEUE.getCommand(), "0"};
+              callPlaylistInfoThread = true;
               break;
             case "NEXT":
               String position = "0";
               if (playlistList.size() > 1) {
                 position = "1";
               }
+              isPlayingPlaylist = true;
               argsListPlaylist = new String[]{SpeakerCommand.PLAY_FROM_QUEUE.getCommand(), position};
+              callPlaylistInfoThread = true;
               break;
             case "PREVIOUS":
+              isPlayingPlaylist = true;
               argsListPlaylist = new String[]{SpeakerCommand.PLAY_FROM_QUEUE.getCommand(), "" + (playlistList.size() - 1)};
+              callPlaylistInfoThread = true;
               break;
             default:
               break;
@@ -433,12 +442,19 @@ public class PlayRingtones {
       } else if (command.equals("STOP")) {
         isPlayingPlaylist = false;
         argsListPlaylist = new String[]{SpeakerCommand.PAUSE.getCommand()};
+        restart();
       } else if (command.equals("VOLUME")) {
         argsListPlaylist = new String[]{SpeakerCommand.SET_VOLUME.getCommand(), speakerCommandDTO.getParameter()};
       } else if (command.equals("MUTE")) {
         argsListPlaylist = new String[]{SpeakerCommand.MUTE.getCommand(), speakerCommandDTO.getParameter()};
       }
-      return executeSpeakerAction(argsListPlaylist);
+
+      SpeakerActionStatus speakerActionStatus = executeSpeakerAction(argsListPlaylist);
+      if(callPlaylistInfoThread && !isPlaylistThreadRunning) {
+        getPlaylistInfoThread();
+      }
+
+      return speakerActionStatus;
     }
     return new SpeakerActionStatus();
   }
@@ -454,7 +470,6 @@ public class PlayRingtones {
     String[] argsList = new String[]{SpeakerCommand.CLEAR_QUEUE.getCommand()};
     executeSpeakerAction(argsList);
     for (PlaylistSongDTO playlistSongDTO : playlistSongDTOList) {
-      System.out.println(playlistSongDTO.getName());
       argsList = new String[]{SpeakerCommand.ADD_URI_TO_QUEUE.getCommand(), PlayRingtoneTask.convertPath(playlistSongDTO.getFilePath())};
       executeSpeakerAction(argsList);
     }
@@ -468,13 +483,14 @@ public class PlayRingtones {
     SpeakerActionStatus speakerActionStatusPause = executeSpeakerAction(argsPause);
     String[] argsPosition = new String[]{SpeakerCommand.GET_POSITION.getCommand()};
     SpeakerActionStatus speakerActionStatusPosition = executeSpeakerAction(argsPosition);
-    if(speakerActionStatusPosition.getExitCode() == 0 && speakerActionStatusPosition.getException() == null) {
+    if (speakerActionStatusPosition.getExitCode() == 0 && speakerActionStatusPosition.getException() == null) {
       position = speakerActionStatusPosition.getInformation();
     }
     String[] argsPlaylistPosition = new String[]{SpeakerCommand.GET_PLAYLIST_POSITION.getCommand()};
     SpeakerActionStatus speakerActionStatusPlaylistPosition = executeSpeakerAction(argsPlaylistPosition);
-    if(speakerActionStatusPlaylistPosition.getExitCode() == 0 && speakerActionStatusPlaylistPosition.getException() == null) {
-        playlistPosition = speakerActionStatusPlaylistPosition.getInformation();
+    if (speakerActionStatusPlaylistPosition.getExitCode() == 0 && speakerActionStatusPlaylistPosition.getException() == null) {
+      int playlistPositionNumber = Integer.parseInt(speakerActionStatusPlaylistPosition.getInformation()) - 1;
+      playlistPosition = String.valueOf(playlistPositionNumber);
     }
   }
 
@@ -488,16 +504,40 @@ public class PlayRingtones {
     executeSpeakerAction(argsSeek);
     isPlayingPlaylist = true;
     isPlayingFromQueue = true;
+    runPlaylistAfterAnouncement = false;
+    if(!isPlaylistThreadRunning) {
+      getPlaylistInfoThread();
+    }
   }
 
   /**
-   * Get playlist info
-   *
-   * @param playlistSongDTOList
-   * @return playlistDTO
+   * Thread to call the getPlaylistInfo method every second
    */
-  public PlaylistDTO getPlaylistInfo(List<PlaylistSongDTO> playlistSongDTOList) {
-    PlaylistDTO playlistDTO = null;
+  public void getPlaylistInfoThread() {
+    Thread thread = new Thread(new Runnable() {
+      @Override
+      public void run() {
+        while (isPlayingPlaylist) {
+          isPlaylistThreadRunning = true;
+          getPlaylistInfo();
+          try {
+            Thread.sleep(2000);
+          } catch (InterruptedException e) {
+            e.printStackTrace();
+          }
+        }
+        isPlaylistThreadRunning = false;
+      }
+    });
+
+    thread.start();
+
+  }
+
+  /**
+   * Get playlist info and set global playlistInfo variable
+   */
+  public void getPlaylistInfo() {
     SpeakerState speakerState = null;
     PlaylistSongDTO actualPlaylistSongDTO = null;
     String[] argsListCurrentMediaInfo = {SpeakerCommand.GET_PLAYLIST_INFO.getCommand()};
@@ -506,7 +546,23 @@ public class PlayRingtones {
       ObjectMapper objectMapper = new ObjectMapper();
       objectMapper.registerModule(new JavaTimeModule());
       PlaylistInfo playlistInfo = objectMapper.readValue(speakerActionStatus.getInformation(), PlaylistInfo.class);
-      actualPlaylistSongDTO = playlistSongDTOList.get(playlistInfo.getPosition() == 0 ? 0 : playlistInfo.getPosition() - 1);
+      List<PlaylistSongDTO> playlistSongDTOList = playRingtonesService.getPlaylistSongList();
+      if (playlistInfo.isPlayingFromQueue() && playlistInfo.getPosition() == 1 && playlistInfo.getSpeakerState().equals(SpeakerState.STOPPED.getState())) {
+        if (repeatPlaylist) {
+          String[] args = {SpeakerCommand.PLAY.getCommand()};
+          SpeakerActionStatus speakerActionStatusRepeat = executeSpeakerAction(args);
+          if (speakerActionStatusRepeat.getExitCode() == 0 && speakerActionStatusRepeat.getException() == null) {
+            playlistInfo.setSpeakerState(SpeakerState.PLAYING.getState());
+          }
+        } else {
+          isPlayingPlaylist = false;
+          isPlayingFromQueue = false;
+          restart();
+        }
+      }
+      if (!playlistSongDTOList.isEmpty()) {
+        actualPlaylistSongDTO = playlistSongDTOList.get(playlistInfo.getPosition() == 0 ? 0 : playlistInfo.getPosition() - 1);
+      }
       if (!playlistInfo.isPlayingFromQueue()) {
         speakerState = SpeakerState.STOPPED;
       } else {
@@ -516,17 +572,44 @@ public class PlayRingtones {
         .speakerState(speakerState)
         .volume(playlistInfo.getVolume())
         .mute(playlistInfo.isMute())
+        .looping(repeatPlaylist)
         .actualSong(actualPlaylistSongDTO)
         .songDTOList(playlistSongDTOList).build();
 
     } catch (
       JsonMappingException e) {
-      throw new RuntimeException(e);
+      e.printStackTrace();
     } catch (
       JsonProcessingException e) {
-      throw new RuntimeException(e);
+      e.printStackTrace();
     }
+  }
+
+  /**
+   * Getter for the attribute playlistDTO
+   *
+   * @return playlistDTO
+   */
+  public PlaylistDTO getPlaylistDTO() {
     return playlistDTO;
+  }
+
+  /**
+   * Getter for the attribute repeatPlaylist
+   *
+   * @return repeatPlaylist
+   */
+  public boolean isRepeatPlaylist() {
+    return repeatPlaylist;
+  }
+
+  /**
+   * Setter for the attribute repeatPlaylist
+   *
+   * @param repeatPlaylist
+   */
+  public void setRepeatPlaylist(boolean repeatPlaylist) {
+    this.repeatPlaylist = repeatPlaylist;
   }
 
 }

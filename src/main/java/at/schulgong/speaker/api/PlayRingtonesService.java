@@ -1,11 +1,14 @@
 package at.schulgong.speaker.api;
 
+import at.schulgong.dto.PlaylistSongDTO;
 import at.schulgong.dto.RingtimeDTO;
 import at.schulgong.dto.RingtoneDTO;
 import at.schulgong.model.Holiday;
+import at.schulgong.model.PlaylistSong;
 import at.schulgong.model.Ringtime;
 import at.schulgong.model.Ringtone;
 import at.schulgong.repository.HolidayRepository;
+import at.schulgong.repository.PlaylistSongRepository;
 import at.schulgong.util.DtoConverter;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -15,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -29,9 +33,12 @@ public class PlayRingtonesService {
   private final HolidayRepository holidayRepository;
   @PersistenceContext
   private EntityManager entityManager;
+  private final PlaylistSongRepository playlistSongRepository;
 
-  public PlayRingtonesService(HolidayRepository holidayRepository) {
+
+  public PlayRingtonesService(HolidayRepository holidayRepository, PlaylistSongRepository playlistSongRepository) {
     this.holidayRepository = holidayRepository;
+    this.playlistSongRepository = playlistSongRepository;
   }
 
   /**
@@ -96,6 +103,23 @@ public class PlayRingtonesService {
       ringtoneDTO = DtoConverter.convertRingtoneToDTO(ringtone);
     }
     return ringtoneDTO;
+  }
+
+  /**
+   * Get sorted playlist list from the database
+   *
+   * @return List of all songs in the playlist
+   */
+  public List<PlaylistSongDTO> getPlaylistSongList() {
+    List<PlaylistSongDTO> playlistSongDTOList = new ArrayList<>();
+    List<PlaylistSong> playlistList = playlistSongRepository.findAll();
+    if(playlistList != null) {
+      for (PlaylistSong p : playlistList) {
+        playlistSongDTOList.add(DtoConverter.convertPlaylistSongToDTO(p));
+      }
+      playlistSongDTOList.sort(Comparator.comparingLong(PlaylistSongDTO::getIndex));
+    }
+    return playlistSongDTOList;
   }
 
 }

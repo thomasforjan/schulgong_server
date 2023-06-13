@@ -20,6 +20,8 @@ public class PlaylistDTO {
   private SpeakerState speakerState;
   private int volume;
   private boolean mute;
+  private boolean looping;
+  private boolean playingPlaylist;
   private PlaylistSongDTO actualSong;
   private List<PlaylistSongDTO> songDTOList;
 

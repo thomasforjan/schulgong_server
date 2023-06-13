@@ -155,14 +155,8 @@ public class LiveController {
   @GetMapping("music/state")
   public ResponseEntity<PlaylistDTO> getPlaylistState() {
     PlaylistDTO playlistDTO = null;
-    List<PlaylistSongDTO> playlistSongDTOList = new ArrayList<>();
-    List<PlaylistSong> playlistList = playlistRepository.findAll();
-    if (!playRingtones.isPlayingAlarm() && !playlistList.isEmpty()) {
-      for (PlaylistSong p : playlistList) {
-        playlistSongDTOList.add(DtoConverter.convertPlaylistSongToDTO(p));
-      }
-      playlistSongDTOList.sort(Comparator.comparingLong(PlaylistSongDTO::getIndex));
-      playlistDTO = playRingtones.getPlaylistInfo(playlistSongDTOList);
+    if (!playRingtones.isPlayingAlarm()) {
+      playlistDTO = playRingtones.getPlaylistDTO();
     }
     return ResponseEntity.ok(playlistDTO);
   }
@@ -205,9 +199,25 @@ public class LiveController {
     SpeakerActionStatus speakerActionStatus = playRingtones.controlPlaylist(speakerCommandDTO, playRingtones.isPlayingFromQueue() ? null : playlistRepository.findAll());
     if (speakerActionStatus.getExitCode() == 0
       && (speakerActionStatus.getException() == null || speakerActionStatus.getException().isEmpty())) {
+      if(speakerActionStatus.getSpeakerCommand() != SpeakerCommand.PLAY) {
+        playRingtones.getPlaylistInfo();
+      }
       return ResponseEntity.ok().build();
     }
     return ResponseEntity.badRequest().build();
+  }
+
+  /**
+   * Repeat playlist.
+   *
+   * @param repeat takes SpeakerCommandDTO
+   * @return status ok
+   */
+  @PostMapping("music/repeat/{repeat}")
+  ResponseEntity setRepeatFunction(@PathVariable("repeat") boolean repeat) {
+    playRingtones.setRepeatPlaylist(repeat);
+    playRingtones.getPlaylistInfo();
+    return ResponseEntity.ok().build();
   }
 
   /**
