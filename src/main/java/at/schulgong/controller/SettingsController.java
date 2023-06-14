@@ -4,8 +4,6 @@ import at.schulgong.dto.ConfigurationDTO;
 import at.schulgong.speaker.api.PlayRingtones;
 import at.schulgong.util.Config;
 import at.schulgong.util.ReadWriteConfigurationFile;
-import at.schulgong.util.SecretKeyService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
