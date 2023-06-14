@@ -540,37 +540,44 @@ public class PlayRingtones {
   public void getPlaylistInfo() {
     SpeakerState speakerState = null;
     PlaylistSongDTO actualPlaylistSongDTO = null;
+    PlaylistInfo playlistInfo = new PlaylistInfo();
     String[] argsListCurrentMediaInfo = {SpeakerCommand.GET_PLAYLIST_INFO.getCommand()};
     SpeakerActionStatus speakerActionStatus = executeSpeakerAction(argsListCurrentMediaInfo);
     try {
-      ObjectMapper objectMapper = new ObjectMapper();
-      objectMapper.registerModule(new JavaTimeModule());
-      PlaylistInfo playlistInfo = objectMapper.readValue(speakerActionStatus.getInformation(), PlaylistInfo.class);
       List<PlaylistSongDTO> playlistSongDTOList = playRingtonesService.getPlaylistSongList();
-      if (playlistInfo.isPlayingFromQueue() && playlistInfo.getPosition() == 1 && playlistInfo.getSpeakerState().equals(SpeakerState.STOPPED.getState())) {
-        if (repeatPlaylist) {
-          String[] args = {SpeakerCommand.PLAY.getCommand()};
-          SpeakerActionStatus speakerActionStatusRepeat = executeSpeakerAction(args);
-          if (speakerActionStatusRepeat.getExitCode() == 0 && speakerActionStatusRepeat.getException() == null) {
-            playlistInfo.setSpeakerState(SpeakerState.PLAYING.getState());
+      if (speakerActionStatus.getInformation() != null) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        playlistInfo = objectMapper.readValue(speakerActionStatus.getInformation(), PlaylistInfo.class);
+        if (playlistInfo.isPlayingFromQueue() && playlistInfo.getPosition() == 1 && playlistInfo.getSpeakerState().equals(SpeakerState.STOPPED.getState())) {
+          if (repeatPlaylist) {
+            String[] args = {SpeakerCommand.PLAY.getCommand()};
+            SpeakerActionStatus speakerActionStatusRepeat = executeSpeakerAction(args);
+            if (speakerActionStatusRepeat.getExitCode() == 0 && speakerActionStatusRepeat.getException() == null) {
+              playlistInfo.setSpeakerState(SpeakerState.PLAYING.getState());
+            }
+          } else {
+            isPlayingPlaylist = false;
+            isPlayingFromQueue = false;
+            restart();
           }
+        }
+        if (!playlistSongDTOList.isEmpty()) {
+          actualPlaylistSongDTO = playlistSongDTOList.get(playlistInfo.getPosition() == 0 ? 0 : playlistInfo.getPosition() - 1);
         } else {
           isPlayingPlaylist = false;
           isPlayingFromQueue = false;
           restart();
         }
-      }
-      if (!playlistSongDTOList.isEmpty()) {
-        actualPlaylistSongDTO = playlistSongDTOList.get(playlistInfo.getPosition() == 0 ? 0 : playlistInfo.getPosition() - 1);
+        if (!playlistInfo.isPlayingFromQueue()) {
+          speakerState = SpeakerState.STOPPED;
+        } else {
+          speakerState = SpeakerState.fromState(playlistInfo.getSpeakerState());
+        }
       }else {
         isPlayingPlaylist = false;
         isPlayingFromQueue = false;
         restart();
-      }
-      if (!playlistInfo.isPlayingFromQueue()) {
-        speakerState = SpeakerState.STOPPED;
-      } else {
-        speakerState = SpeakerState.fromState(playlistInfo.getSpeakerState());
       }
       playlistDTO = PlaylistDTO.builder()
         .speakerState(speakerState)
