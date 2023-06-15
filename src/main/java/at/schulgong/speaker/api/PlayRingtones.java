@@ -498,7 +498,8 @@ public class PlayRingtones {
    * Play playlist from saved playlist state
    */
   private void playPlaylistFromPlaylistState() {
-    String[] argsPlay = new String[]{SpeakerCommand.PLAY_FROM_QUEUE.getCommand(), playlistPosition};
+    String[] argsPlay = new String[]{SpeakerCommand.PLAY_FROM_QUEUE_AFTER_ANNOUNCEMENT.getCommand(),
+      playlistPosition, "" + playlistDTO.getVolume(), "" + playlistDTO.isMute(), "0" + position};
     executeSpeakerAction(argsPlay);
     String[] argsSeek = new String[]{SpeakerCommand.SEEK.getCommand(), position};
     executeSpeakerAction(argsSeek);

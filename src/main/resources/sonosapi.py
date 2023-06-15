@@ -2,7 +2,7 @@ import soco
 import json
 import os
 
-SPEAKER_CONFIG_FILE_URL = "/home/schulgong/speaker_config.json"
+SPEAKER_CONFIG_FILE_URL = "D:/01-Studium/Software Engineering und vernetzte Systeme/4. Semester/Praxisprojekt/schulgong_server/src/main/resources/python/config/speaker_config.json"
 
 def discover():
   try:
@@ -323,6 +323,24 @@ def play_uri_volume_mute(uri, volume, mute):
           soco_speaker.play_uri(uri)
     except:
         print("exception= An exception occurred in the method play_uri")
+
+def play_from_queue_after_announcement(index, volume, mute, position):
+    print("command= play_from_queue_after_announcement")
+    try:
+        soco_speaker = discover()
+        if soco_speaker is not None:
+          if volume >= 0 and volume <= 100:
+            soco_speaker.group.volume = volume
+          else:
+            print("exception= Please enter a number between 0 and 100 as argument")
+          _set_mute(soco_speaker, mute)
+          print("index")
+          soco_speaker.play_from_queue(int(index))
+          print(position)
+          soco_speaker.seek(position)
+          print("nach seek")
+    except:
+        print("exception= An exception occurred in the method play_from_queue_after_announcement")
 
 def _set_group(soco_speaker_list):
     print("for for-loop")
