@@ -7,9 +7,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 /**
+ * Repository of playlist
+ *
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
  * @version 0.2
- * @implNote Repository of playlist
  * @since May 2023
  */
 public interface SongRepository extends JpaRepository<Song, Long> {

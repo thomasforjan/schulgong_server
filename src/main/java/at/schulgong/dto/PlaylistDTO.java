@@ -1,14 +1,14 @@
 package at.schulgong.dto;
 
 import at.schulgong.speaker.util.SpeakerState;
+import java.util.List;
 import lombok.*;
 
-import java.util.List;
-
 /**
+ * DTO of Playlist Object
+ *
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
  * @version 0.2
- * @implNote DTO of Playlist Object
  * @since May 2023
  */
 @Getter
@@ -17,12 +17,11 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class PlaylistDTO {
-  private SpeakerState speakerState;
-  private int volume;
-  private boolean mute;
-  private boolean looping;
-  private boolean playingPlaylist;
-  private PlaylistSongDTO actualSong;
-  private List<PlaylistSongDTO> songDTOList;
-
+    private SpeakerState speakerState;
+    private int volume;
+    private boolean mute;
+    private boolean looping;
+    private boolean playingPlaylist;
+    private PlaylistSongDTO actualSong;
+    private List<PlaylistSongDTO> songDTOList;
 }

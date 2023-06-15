@@ -2,14 +2,14 @@ package at.schulgong.speaker.api;
 
 import at.schulgong.dto.RingtoneDTO;
 import at.schulgong.speaker.util.SpeakerCommand;
-import at.schulgong.util.Config;
 import java.util.TimerTask;
 import lombok.NoArgsConstructor;
 
 /**
+ * Task to execute speaker control at a specific time
+ *
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
  * @version 0.1
- * @implNote Task to execute speaker control at a specific time
  * @since May 2023
  */
 @NoArgsConstructor
@@ -24,21 +24,21 @@ public class PlayRingtoneTask extends TimerTask {
         this.playRingtones = playRingtones;
     }
 
-  /**
-   * Run method to execute speaker control at specific time
-   */
-  @Override
-  public void run() {
-    String[] argsList = {
-      SpeakerCommand.PLAY_URI_VOLUME_MUTE.getCommand(),
-      convertPath(this.ringtoneDTO.getPath()),
-      playRingtones.isPlayingAlarm() ? String.valueOf(playRingtones.getConfigurationDTO().getAlarmVolume()) : String.valueOf(playRingtones.getConfigurationDTO().getRingtimeVolume()),
-      "False"
-    };
-    playRingtones.executeSpeakerAction(argsList);
-    playRingtones.setPlayingFromQueue(false);
-    playRingtones.setPlayingPlaylist(false);
-  }
+    /** Run method to execute speaker control at specific time */
+    @Override
+    public void run() {
+        String[] argsList = {
+            SpeakerCommand.PLAY_URI_VOLUME_MUTE.getCommand(),
+            convertPath(this.ringtoneDTO.getPath()),
+            playRingtones.isPlayingAlarm()
+                    ? String.valueOf(playRingtones.getConfigurationDTO().getAlarmVolume())
+                    : String.valueOf(playRingtones.getConfigurationDTO().getRingtimeVolume()),
+            "False"
+        };
+        playRingtones.executeSpeakerAction(argsList);
+        playRingtones.setPlayingFromQueue(false);
+        playRingtones.setPlayingPlaylist(false);
+    }
 
     /**
      * Convert a path in the correct form
