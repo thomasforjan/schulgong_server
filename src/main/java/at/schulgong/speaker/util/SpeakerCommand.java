@@ -31,7 +31,8 @@ public enum SpeakerCommand {
   GET_SPEAKER_INFO("get_speaker_info"),
   GET_CURRENT_MEDIA_INFO("get_current_media_info"),
   GET_PLAYLIST_INFO("get_playlist_info"),
-  PLAY_URI_VOLUME_MUTE("play_uri_volume_mute");
+  PLAY_URI_VOLUME_MUTE("play_uri_volume_mute"),
+  PLAY_FROM_QUEUE_AFTER_ANNOUNCEMENT("play_from_queue_after_announcement");;
   private final String command;
 
   SpeakerCommand(String command) {
