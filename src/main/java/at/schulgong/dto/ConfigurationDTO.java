@@ -16,7 +16,7 @@ import java.util.Objects;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ConfigurationDTO extends RepresentationModel<ConfigurationDTO> {
+public class ConfigurationDTO {
   private String password;
   private int ringtimeVolume;
   private int alarmVolume;

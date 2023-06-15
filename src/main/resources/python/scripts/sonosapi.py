@@ -352,5 +352,3 @@ def _set_mute(soco_speaker, mute):
       soco_speaker.group.mute = True
   else:
       soco_speaker.group.mute = False
-
-

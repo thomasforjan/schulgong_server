@@ -87,6 +87,21 @@ public class RingtimeController {
   }
 
   /**
+   * Retrieves the current server time. This method is responsible for handling GET requests to
+   * the "/server-time" endpoint. It fetches the current server time, formats it using the
+   * ISO_DATE_TIME pattern, and then returns it as a ServertimeDTO wrapped in a ResponseEntity.
+   *
+   * @return a ResponseEntity containing the ServertimeDTO with the current server time
+   */
+  @GetMapping("/server-time")
+  public ResponseEntity<ServertimeDTO> getServerTime() {
+    LocalDateTime servertime = LocalDateTime.now();
+    String formattedServertime = DateTimeFormatter.ISO_DATE_TIME.format(servertime);
+    ServertimeDTO servertimeDTO = new ServertimeDTO(formattedServertime);
+    return ResponseEntity.ok(servertimeDTO);
+  }
+
+  /**
    * Add new sensor.
    *
    * @param newRingtime takes given ringtime body values
@@ -176,17 +191,13 @@ public class RingtimeController {
   }
 
   /**
-   * Retrieves the current server time. This method is responsible for handling GET requests to
-   * the "/server-time" endpoint. It fetches the current server time, formats it using the
-   * ISO_DATE_TIME pattern, and then returns it as a ServertimeDTO wrapped in a ResponseEntity.
+   * Delete all ringtimes.
    *
-   * @return a ResponseEntity containing the ServertimeDTO with the current server time
+   * @return response
    */
-  @GetMapping("/server-time")
-  public ResponseEntity<ServertimeDTO> getServerTime() {
-    LocalDateTime servertime = LocalDateTime.now();
-    String formattedServertime = DateTimeFormatter.ISO_DATE_TIME.format(servertime);
-    ServertimeDTO servertimeDTO = new ServertimeDTO(formattedServertime);
-    return ResponseEntity.ok(servertimeDTO);
+  @DeleteMapping
+  ResponseEntity<RingtimeDTO> deleteAllRingtimes() {
+    ringtimeRepository.deleteAll();
+    return ResponseEntity.ok().build();
   }
 }

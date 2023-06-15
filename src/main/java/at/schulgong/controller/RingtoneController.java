@@ -210,35 +210,51 @@ public class RingtoneController {
      */
     @DeleteMapping("/{id}")
     ResponseEntity<RingtoneDTO> deleteRingtone(@PathVariable long id) {
-        if (ringtoneRepository.existsById(id)) {
-            RingtoneDTO ringtoneDTO = one(id);
-            ringtoneRepository.deleteById(id);
-            deleteAudioFile(ringtoneDTO.getPath());
-            return ResponseEntity.noContent().build();
-        } else {
-            throw new EntityNotFoundException(id, Config.RINGTONE.getException());
-        }
+      if (ringtoneRepository.existsById(id)) {
+        RingtoneDTO ringtoneDTO = one(id);
+        ringtoneRepository.deleteById(id);
+        deleteAudioFile(ringtoneDTO.getPath());
+        return ResponseEntity.noContent().build();
+      } else {
+        throw new EntityNotFoundException(id, Config.RINGTONE.getException());
+      }
     }
 
-    /**
-     * Delete the audiofile in the directory
-     *
-     * @param path path of audio file
-     */
-    private void deleteAudioFile(String path) {
-        File file = new File(path);
-        try {
-            if (file.exists() && file.canWrite()) {
-                Files.delete(Paths.get(path));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+  /**
+   * Delete a all ringtones.
+   *
+   * @return response
+   */
+  @DeleteMapping
+  ResponseEntity<RingtoneDTO> deleteAllRingtones() {
+    List<Ringtone> ringtoneList = ringtoneRepository.findAllDeletableRingtones();
+    if (ringtoneList != null && !ringtoneList.isEmpty()) {
+      for (Ringtone ringtone : ringtoneList) {
+        deleteRingtone(ringtone.getId());
+      }
     }
+    return ResponseEntity.ok().build();
+  }
 
-    /**
-     * Method to save the audiofile in the directory
-     *
+  /**
+   * Delete the audiofile in the directory
+   *
+   * @param path path of audio file
+   */
+  private void deleteAudioFile(String path) {
+    File file = new File(path);
+    try {
+      if (file.exists() && file.canWrite()) {
+        Files.delete(Paths.get(path));
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  /**
+   * Method to save the audiofile in the directory
+   *
      * @param ringtone ringtone object
      * @param newSong multipart file
      * @throws IOException if entity not found
