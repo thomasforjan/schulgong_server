@@ -24,6 +24,7 @@ import java.util.Date;
  * @since June 2023
  */
 @RestController
+@RequestMapping("api/auth")
 @CrossOrigin
 public class AuthenticationController {
 

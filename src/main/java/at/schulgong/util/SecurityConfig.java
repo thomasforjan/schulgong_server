@@ -18,7 +18,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 /**
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
- * @version 0.1
+ * @version 0.2
  * @implNote Spring Security Configuration
  * @since June 2023
  */
@@ -26,64 +26,102 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableWebSecurity
 public class SecurityConfig {
 
-  private final JwtTokenProvider jwtTokenProvider;
+    private final JwtTokenProvider jwtTokenProvider;
 
-  /**
-   * Constructor
-   *
-   * @param jwtTokenProvider JwtTokenProvider
-   */
-  @Autowired
-  public SecurityConfig(JwtTokenProvider jwtTokenProvider) {
-    this.jwtTokenProvider = jwtTokenProvider;
-  }
+    private static final String API_REQUEST = "/api/**";
 
-  /**
-   * SecurityFilterChain Bean for Spring Security
-   *
-   * @param http HttpSecurity
-   * @return SecurityFilterChain
-   * @throws Exception Exception
-   */
-  @Bean
-  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http
-      .csrf().disable()
-      .cors().configurationSource(corsConfigurationSource())
-      .and()
-      .authorizeRequests()
-      .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-      .requestMatchers(new AntPathRequestMatcher("/login", HttpMethod.POST.toString())).permitAll()
-      .anyRequest().authenticated();
+    /**
+     * Constructor
+     *
+     * @param jwtTokenProvider JwtTokenProvider
+     */
+    @Autowired
+    public SecurityConfig(JwtTokenProvider jwtTokenProvider) {
+        this.jwtTokenProvider = jwtTokenProvider;
+    }
 
-    http.addFilterAfter(new JwtTokenFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
+    /**
+     * SecurityFilterChain Bean for Spring Security
+     *
+     * @param http HttpSecurity
+     * @return SecurityFilterChain
+     * @throws Exception Exception
+     */
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-    return http.build();
-  }
+        http.csrf()
+                .disable()
+                .cors()
+                .configurationSource(corsConfigurationSource())
+                .and()
+                .authorizeRequests()
+                .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
+                .permitAll()
+                .requestMatchers(
+                        new AntPathRequestMatcher(
+                                "/api/speaker/play/**", HttpMethod.GET.toString()))
+                .permitAll()
+                .requestMatchers(
+                        new AntPathRequestMatcher(
+                                "/",
+                                HttpMethod.GET
+                                        .toString())) // Add this line to allow all GET requests to
+                // "/"
+                .permitAll()
+                .requestMatchers(
+                        new AntPathRequestMatcher("/index.html", HttpMethod.GET.toString()))
+                .permitAll()
+                .requestMatchers(new AntPathRequestMatcher("/**/*.js", HttpMethod.GET.toString()))
+                .permitAll()
+                .requestMatchers(new AntPathRequestMatcher("/**/*.css", HttpMethod.GET.toString()))
+                .permitAll()
+                .requestMatchers(new AntPathRequestMatcher("/**/*.ttf", HttpMethod.GET.toString()))
+                .permitAll()
+                .requestMatchers(new AntPathRequestMatcher("/**/*.svg", HttpMethod.GET.toString()))
+                .permitAll()
+                .requestMatchers(
+                        new AntPathRequestMatcher("/api/auth/login", HttpMethod.POST.toString()))
+                .permitAll()
+                .requestMatchers(new AntPathRequestMatcher(API_REQUEST, HttpMethod.GET.toString()))
+                .authenticated()
+                .requestMatchers(new AntPathRequestMatcher(API_REQUEST, HttpMethod.POST.toString()))
+                .authenticated()
+                .requestMatchers(new AntPathRequestMatcher(API_REQUEST, HttpMethod.PUT.toString()))
+                .authenticated()
+                .requestMatchers(
+                        new AntPathRequestMatcher(API_REQUEST, HttpMethod.DELETE.toString()))
+                .authenticated();
 
-  /**
-   * UserDetailsService Bean for Spring Security
-   *
-   * @return UserDetailsService
-   */
-  @Bean
-  public UserDetailsService userDetailsService() {
-    return new InMemoryUserDetailsManager();
-  }
+        http.addFilterAfter(
+                new JwtTokenFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
 
-  /**
-   * CorsConfigurationSource Bean for Spring Security
-   *
-   * @return CorsConfigurationSource
-   */
-  @Bean
-  public CorsConfigurationSource corsConfigurationSource() {
-    final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-    final CorsConfiguration config = new CorsConfiguration();
-    config.addAllowedOrigin("*");
-    config.addAllowedHeader("*");
-    config.addAllowedMethod("*");
-    source.registerCorsConfiguration("/**", config);
-    return source;
-  }
+        return http.build();
+    }
+
+    /**
+     * UserDetailsService Bean for Spring Security
+     *
+     * @return UserDetailsService
+     */
+    @Bean
+    public UserDetailsService userDetailsService() {
+        return new InMemoryUserDetailsManager();
+    }
+
+    /**
+     * CorsConfigurationSource Bean for Spring Security
+     *
+     * @return CorsConfigurationSource
+     */
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        final CorsConfiguration config = new CorsConfiguration();
+        config.addAllowedOrigin("*");
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("*");
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
 }

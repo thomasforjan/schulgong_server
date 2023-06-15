@@ -26,7 +26,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
  * @since April 2023
  */
 @RestController
-@RequestMapping("holidays")
+@RequestMapping("api/holidays")
 @CrossOrigin
 public class HolidayController {
   private final PlayRingtones playRingtones;

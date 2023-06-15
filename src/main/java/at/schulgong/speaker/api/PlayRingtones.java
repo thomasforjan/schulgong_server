@@ -280,7 +280,7 @@ public class PlayRingtones {
    * Execute the command for playing the announcement on the network speaker
    */
   private void executePlayAnnouncement() {
-    String[] argsListPlayAlarm = {SpeakerCommand.PLAY_URI_VOLUME_MUTE.getCommand(), PlayRingtoneTask.convertPath(Config.ANNOUNCEMENT_PATH.getPath()), String.valueOf(configurationDTO.getAnnouncementVolume()), "False"};
+    String[] argsListPlayAlarm = {SpeakerCommand.PLAY_URI_VOLUME_MUTE.getCommand(), Config.SPEAKER_ANNOUNCEMENT.getUrl(), String.valueOf(configurationDTO.getAnnouncementVolume()), "False"};
     executeSpeakerAction(argsListPlayAlarm);
   }
 
@@ -301,7 +301,7 @@ public class PlayRingtones {
           }
           isPlayingAnnouncement = false;
         }
-      }, getDurationOfMusicFile(Config.ANNOUNCEMENT_PATH.getPath()));
+      }, getDurationOfMusicFile(Config.ANNOUNCEMENT_PATH.getPath() + "/Durchsage.mp3"));
     } catch (EncoderException e) {
       e.printStackTrace();
     }
@@ -470,7 +470,7 @@ public class PlayRingtones {
     String[] argsList = new String[]{SpeakerCommand.CLEAR_QUEUE.getCommand()};
     executeSpeakerAction(argsList);
     for (PlaylistSongDTO playlistSongDTO : playlistSongDTOList) {
-      argsList = new String[]{SpeakerCommand.ADD_URI_TO_QUEUE.getCommand(), PlayRingtoneTask.convertPath(playlistSongDTO.getFilePath())};
+      argsList = new String[]{SpeakerCommand.ADD_URI_TO_QUEUE.getCommand(), Config.SPEAKER_PLAYLIST.getUrl() + playlistSongDTO.getName()};
       executeSpeakerAction(argsList);
     }
   }
