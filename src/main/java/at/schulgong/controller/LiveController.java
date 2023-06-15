@@ -76,6 +76,16 @@ public class LiveController {
   }
 
   /**
+   * Get isPlayingPlaylist flag.
+   *
+   * @return isPlayingPlaylist flag
+   */
+  @GetMapping("playlist/isplaying")
+  public ResponseEntity<Boolean> playlistIsPlaying() {
+    return ResponseEntity.ok(playRingtones.isPlayingPlaylist());
+  }
+
+  /**
    * Start or stop playing the alarm.
    *
    * @param isPlayingAlarm flag if alarm has to start or stop
