@@ -31,7 +31,7 @@ public class PlayRingtoneTask extends TimerTask {
   public void run() {
     String[] argsList = {
       SpeakerCommand.PLAY_URI_VOLUME_MUTE.getCommand(),
-      convertPath(this.ringtoneDTO.getPath()),
+      Config.SPEAKER_RINGTONE.getUrl() + ringtoneDTO.getFilename(),
       playRingtones.isPlayingAlarm() ? String.valueOf(playRingtones.getConfigurationDTO().getAlarmVolume()) : String.valueOf(playRingtones.getConfigurationDTO().getRingtimeVolume()),
       "False"
     };
