@@ -87,6 +87,16 @@ public class LiveController {
         return ResponseEntity.noContent().build();
     }
 
+  /**
+   * Get isPlayingPlaylist flag.
+   *
+   * @return isPlayingPlaylist flag
+   */
+  @GetMapping("playlist/isplaying")
+  public ResponseEntity<Boolean> playlistIsPlaying() {
+    return ResponseEntity.ok(playRingtones.isPlayingPlaylist());
+  }
+
     /**
      * Play announcement.
      *
@@ -145,7 +155,6 @@ public class LiveController {
                         linkTo(methodOn(LiveController.class).allSongs())
                                 .withRel(Config.SONG.getUrl()));
     }
-
 
   /**
    * Get all available songs.
