@@ -18,9 +18,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 /**
+ * Controller to provide CRUD-functionality
+ *
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
  * @version 0.2
- * @implNote Controller to provide CRUD-functionality
  * @since April 2023
  */
 @RestController

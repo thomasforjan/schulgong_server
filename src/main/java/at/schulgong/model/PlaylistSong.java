@@ -6,9 +6,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
+ * Model of playlistSong
+ *
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
  * @version 0.2
- * @implNote Model of playlistSong
  * @since May 2023
  */
 @Getter
@@ -17,10 +18,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 public class PlaylistSong {
-  @Id
-  private long id;
+    @Id private long id;
 
-  @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "song_ID")
-  private Song song;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "song_ID")
+    private Song song;
 }

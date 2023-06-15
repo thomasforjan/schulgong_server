@@ -9,9 +9,10 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.resource.PathResourceResolver;
 
 /**
+ * Single Page Application Configuration
+ *
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
  * @version 0.1
- * @implNote Single Page Application Configuration
  * @since June 2023
  */
 @Configuration

@@ -1,13 +1,13 @@
 package at.schulgong.speaker.util.speakerconfig;
 
+import java.util.List;
 import lombok.*;
 
-import java.util.List;
-
 /**
+ * Setting for controlling network speakers
+ *
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
  * @version 0.1
- * @implNote Setting for controlling network speakers
  * @since May 2023
  */
 @Setter
@@ -17,5 +17,5 @@ import java.util.List;
 @Builder
 public class SpeakerObjects {
 
-  private List<Speaker> speakerObjects;
+    private List<Speaker> speakerObjects;
 }

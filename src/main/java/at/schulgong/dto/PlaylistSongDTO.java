@@ -6,9 +6,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
+ * DTO of PlaylistSong Object
+ *
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
  * @version 0.2
- * @implNote DTO of PlaylistSong Object
  * @since May 2023
  */
 @Getter
@@ -16,6 +17,5 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PlaylistSongDTO extends SongDTO {
-  private long index;
-
+    private long index;
 }

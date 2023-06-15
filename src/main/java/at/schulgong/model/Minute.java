@@ -5,9 +5,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
+ * Model of minutes
+ *
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
  * @version 0.2
- * @implNote Model of minutes
  * @since April 2023
  */
 @Getter
@@ -16,17 +17,16 @@ import lombok.Setter;
 @Table(name = "Minute")
 public class Minute {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
-  @Column(name = "minute")
-  private int minute;
+    @Column(name = "minute")
+    private int minute;
 
-  public Minute() {
-  }
+    public Minute() {}
 
-  public Minute(int minute) {
-    this.minute = minute;
-  }
+    public Minute(int minute) {
+        this.minute = minute;
+    }
 }
