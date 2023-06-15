@@ -34,7 +34,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
  * @since April 2023
  */
 @RestController
-@RequestMapping("ringtones")
+@RequestMapping("api/ringtones")
 @CrossOrigin
 public class RingtoneController {
     private final RingtoneRepository ringtoneRepository;

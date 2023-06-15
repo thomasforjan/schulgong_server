@@ -3,7 +3,6 @@ import json
 import os
 
 SPEAKER_CONFIG_FILE_URL = "D:/01-Studium\Software Engineering und vernetzte Systeme/4. Semester/Praxisprojekt/schulgong_server/src/main/resources/python/config/speaker_config.json"
-START_PATH_URI = "x-file-cifs://DESKTOP-Q0STA8D"
 
 def discover():
   try:
@@ -113,22 +112,20 @@ def get_mute_state():
 
 def play_uri(uri):
     print("command= play_uri")
-    url = START_PATH_URI + uri
-    print(url)
+    print(uri)
     try:
         soco_speaker = discover()
         if soco_speaker is not None:
-          soco_speaker.play_uri(url)
+          soco_speaker.play_uri(uri)
     except:
         print("exception= An exception occurred in the method play_uri")
 
 def add_uri_to_queue(path_song):
     print("command= add_uri_to_queue")
-    uri = START_PATH_URI + path_song
     try:
         soco_speaker = discover()
         if soco_speaker is not None:
-            soco_speaker.add_uri_to_queue(uri)
+            soco_speaker.add_uri_to_queue(path_song)
     except:
         print("exception= An exception occurred in the method add_uri_to_queue(path_song)")
 
@@ -313,9 +310,8 @@ def get_playlist_info():
         print("exception= An exception occurred in the method get_playlist_info")
 
 def play_uri_volume_mute(uri, volume, mute):
-    print("command= play_uri")
-    url = START_PATH_URI + uri
-    print(url)
+    print("command= play_uri_volume_mute")
+    print(uri)
     try:
         soco_speaker = discover()
         if soco_speaker is not None:
@@ -324,7 +320,7 @@ def play_uri_volume_mute(uri, volume, mute):
           else:
             print("exception= Please enter a number between 0 and 100 as argument")
           _set_mute(soco_speaker, mute)
-          soco_speaker.play_uri(url)
+          soco_speaker.play_uri(uri)
     except:
         print("exception= An exception occurred in the method play_uri")
 
@@ -356,4 +352,3 @@ def _set_mute(soco_speaker, mute):
       soco_speaker.group.mute = True
   else:
       soco_speaker.group.mute = False
-

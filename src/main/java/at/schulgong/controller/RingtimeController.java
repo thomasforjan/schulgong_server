@@ -35,7 +35,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
  * @since April 2023
  */
 @RestController
-@RequestMapping("ringtimes")
+@RequestMapping("api/ringtimes")
 @CrossOrigin
 public class RingtimeController {
   private final PlayRingtones playRingtones;

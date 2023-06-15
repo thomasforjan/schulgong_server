@@ -19,7 +19,7 @@ import java.util.Map;
  * @since May 2023
  */
 @RestController
-@RequestMapping("settings")
+@RequestMapping("api/settings")
 @CrossOrigin
 public class SettingsController {
   Argon2PasswordEncoder argon2PasswordEncoder = new Argon2PasswordEncoder(16, 32, 1, 60000, 10);
