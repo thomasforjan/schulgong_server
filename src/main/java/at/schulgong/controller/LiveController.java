@@ -12,6 +12,7 @@ import at.schulgong.repository.PlaylistSongRepository;
 import at.schulgong.repository.SongRepository;
 import at.schulgong.speaker.api.PlayRingtones;
 import at.schulgong.speaker.util.SpeakerActionStatus;
+import at.schulgong.speaker.util.SpeakerCommand;
 import at.schulgong.util.AudioConverter;
 import at.schulgong.util.Config;
 import at.schulgong.util.DtoConverter;
