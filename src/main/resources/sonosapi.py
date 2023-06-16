@@ -2,7 +2,7 @@ import soco
 import json
 import os
 
-SPEAKER_CONFIG_FILE_URL = "D:/01-Studium/Software Engineering und vernetzte Systeme/4. Semester/Praxisprojekt/schulgong_server/src/main/resources/python/config/speaker_config.json"
+SPEAKER_CONFIG_FILE_URL = "/home/schulgong/speaker_config.json"
 
 def discover():
   try:
