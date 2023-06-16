@@ -1,13 +1,19 @@
 package at.schulgong;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
+
 import at.schulgong.controller.AuthenticationController;
 import org.junit.jupiter.api.TestInstance;
 
+
 /**
+ * Tests for {@link AuthenticationController} class and Test for Argon2 password encoder raw
+ * password to hashed password
+ *
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
  * @version 0.1
- * @implNote Tests for {@link AuthenticationController} class and Test for Argon2 password encoder
- *     raw password to hashed password
  * @since June 2023
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)

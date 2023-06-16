@@ -1,8 +1,8 @@
 {
-  "password" : "$argon2id$v=19$m=60000,t=10,p=1$VpM7WJo3vSg5J31VLs74GA$e/t1NrAAYKPuDTT9TIgHzMT8zXu6x5mbNLkspVzQjUk",
-  "ringtimeVolume" : 1,
-  "alarmVolume" : 5,
-  "announcementVolume" : 5,
-  "ringtimeDirectory" : "C:/Users/phili/OneDrive/Desktop/sonos_music",
-  "playlistDirectory" : "C:/Users/phili/OneDrive/Desktop/sonos_music/playlist"
+  "password": "$argon2id$v=19$m=60000,t=10,p=1$E4W+ArwtCGSfnrX3DTSJ6g$V2fBKFzAjHy+zhr3t7fHMnVGY1XnFYPFAuTbP3g/Lcs",
+  "ringtimeVolume": 1,
+  "alarmVolume": 5,
+  "announcementVolume": 5,
+  "ringtimeDirectory": "/home/shared/Ringtones",
+  "playlistDirectory": "/home/shared/Playlist"
 }

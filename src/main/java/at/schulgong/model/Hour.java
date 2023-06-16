@@ -5,9 +5,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
+ * Model of hours
+ *
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
  * @version 0.2
- * @implNote Model of hours
  * @since April 2023
  */
 @Getter
@@ -16,17 +17,16 @@ import lombok.Setter;
 @Table(name = "Hour")
 public class Hour {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
-  @Column(name = "hour")
-  private int hour;
+    @Column(name = "hour")
+    private int hour;
 
-  public Hour() {
-  }
+    public Hour() {}
 
-  public Hour(int hour) {
-    this.hour = hour;
-  }
+    public Hour(int hour) {
+        this.hour = hour;
+    }
 }

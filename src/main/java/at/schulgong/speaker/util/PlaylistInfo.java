@@ -6,9 +6,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
+ * Infos about the playlist (model)
+ *
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
  * @version 0.2
- * @implNote Infos about the playlist (model)
  * @since May 2023
  */
 @Getter
@@ -16,9 +17,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PlaylistInfo {
-  private int volume;
-  private boolean mute;
-  private boolean playingFromQueue;
-  private int position;
-  private String speakerState;
+    private int volume;
+    private boolean mute;
+    private boolean playingFromQueue;
+    private int position;
+    private String speakerState;
 }

@@ -8,12 +8,12 @@ import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.stream.Collectors;
-import net.minidev.json.JSONObject;
 
 /**
+ * Read application configuration from configuration file
+ *
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
  * @version 0.1
- * @implNote Read application configuration from configuration file
  * @since May 2023
  */
 public class ReadWriteConfigurationFile {
@@ -36,20 +36,22 @@ public class ReadWriteConfigurationFile {
       }
     }
 
-  /**
-   * Method to write configurations into the file
-   *
-   * @param configurationFilePath Path from the configuration file
-   * @param writeConfigurationDTO ConfigurationDTO to write into the file
-   * @throws RuntimeException
-   */
-  public static void writeConfigurationDTOFromConfigFile(String configurationFilePath, ConfigurationDTO writeConfigurationDTO) throws RuntimeException {
-    ObjectMapper objectMapper = new ObjectMapper();
-    objectMapper.enable(SerializationFeature.INDENT_OUTPUT); // This will format the output
-    try {
-      objectMapper.writeValue(new File(configurationFilePath), writeConfigurationDTO);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+    /**
+     * Method to write configurations into the file
+     *
+     * @param configurationFilePath Path from the configuration file
+     * @param writeConfigurationDTO ConfigurationDTO to write into the file
+     * @throws RuntimeException
+     */
+    public static void writeConfigurationDTOFromConfigFile(
+            String configurationFilePath, ConfigurationDTO writeConfigurationDTO)
+            throws RuntimeException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT); // This will format the output
+        try {
+            objectMapper.writeValue(new File(configurationFilePath), writeConfigurationDTO);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
-  }
 }

@@ -29,9 +29,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 /**
+ * Controller to provide CRUD-functionality
+ *
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
  * @version 0.2
- * @implNote Controller to provide CRUD-functionality
  * @since May 2023
  */
 @RestController
@@ -86,6 +87,16 @@ public class LiveController {
             playRingtones.stopAlarm();
         }
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Get isPlayingPlaylist flag.
+     *
+     * @return isPlayingPlaylist flag
+     */
+    @GetMapping("playlist/isplaying")
+    public ResponseEntity<Boolean> playlistIsPlaying() {
+        return ResponseEntity.ok(playRingtones.isPlayingPlaylist());
     }
 
     /**
@@ -147,31 +158,34 @@ public class LiveController {
                                 .withRel(Config.SONG.getUrl()));
     }
 
-
-  /**
-   * Get all available songs.
-   *
-   * @return all songs
-   */
-  @GetMapping("music/songs/available")
-  public CollectionModel<SongDTO> allSongsWithoutPlaylist() {
-    List<Song> songs = songRepository.findAvailableSongs();
-    return songModelAssembler.toCollectionModel(songs).add(linkTo(methodOn(LiveController.class).allSongs()).withRel(Config.SONG.getUrl()));
-  }
-
-  /**
-   * Get state if songs are playing
-   *
-   * @return playlistDTO
-   */
-  @GetMapping("music/state")
-  public ResponseEntity<PlaylistDTO> getPlaylistState() {
-    PlaylistDTO playlistDTO = null;
-    if (!playRingtones.isPlayingAlarm()) {
-      playlistDTO = playRingtones.getPlaylistDTO();
+    /**
+     * Get all available songs.
+     *
+     * @return all songs
+     */
+    @GetMapping("music/songs/available")
+    public CollectionModel<SongDTO> allSongsWithoutPlaylist() {
+        List<Song> songs = songRepository.findAvailableSongs();
+        return songModelAssembler
+                .toCollectionModel(songs)
+                .add(
+                        linkTo(methodOn(LiveController.class).allSongs())
+                                .withRel(Config.SONG.getUrl()));
     }
-    return ResponseEntity.ok(playlistDTO);
-  }
+
+    /**
+     * Get state if songs are playing
+     *
+     * @return playlistDTO
+     */
+    @GetMapping("music/state")
+    public ResponseEntity<PlaylistDTO> getPlaylistState() {
+        PlaylistDTO playlistDTO = null;
+        if (!playRingtones.isPlayingAlarm()) {
+            playlistDTO = playRingtones.getPlaylistDTO();
+        }
+        return ResponseEntity.ok(playlistDTO);
+    }
 
     /**
      * Update songs and playlist.
@@ -197,63 +211,68 @@ public class LiveController {
         }
         return ResponseEntity.ok().build();
     }
-      
-  /**
-   * Control playlist.
-   *
-   * @param speakerCommandDTO takes SpeakerCommandDTO
-   * @return status ok or badRequest
-   */
-  @PostMapping("music/control")
-  ResponseEntity controlPlaylist(@RequestBody SpeakerCommandDTO speakerCommandDTO) {
-    SpeakerActionStatus speakerActionStatus = playRingtones.controlPlaylist(speakerCommandDTO, playRingtones.isPlayingFromQueue() ? null : playlistRepository.findAll());
-    if (speakerActionStatus.getExitCode() == 0
-      && (speakerActionStatus.getException() == null || speakerActionStatus.getException().isEmpty())) {
-      if(speakerActionStatus.getSpeakerCommand() != SpeakerCommand.PLAY) {
-        playRingtones.getPlaylistInfo();
-      }
-      return ResponseEntity.ok().build();
-    }
-    return ResponseEntity.badRequest().build();
-  }
-      
-  /**
-   * Repeat playlist.
-   *
-   * @param repeat takes SpeakerCommandDTO
-   * @return status ok
-   */
-  @PostMapping("music/repeat/{repeat}")
-  ResponseEntity setRepeatFunction(@PathVariable("repeat") boolean repeat) {
-    playRingtones.setRepeatPlaylist(repeat);
-    playRingtones.getPlaylistInfo();
-    return ResponseEntity.ok().build();
-  }
 
-  /**
-   * Set playlist on network speaker
-   *
-   * @param force Flag if set playlist is running
-   * @return response status
-   */
-  @PostMapping("music/songs/set/playlist/{force}")
-  ResponseEntity<?> setPlaylistOnNetworkSpeaker(@PathParam("force") boolean force) {
-    try {
-      if(force || !playRingtones.isPlayingFromQueue()) {
-        List<PlaylistSong> playlistSongList = playlistRepository.findAll();
-        if(playlistSongList != null) {
-          List<PlaylistSongDTO> playlistSongDTOList = new ArrayList<>();
-          for (PlaylistSong playlistSong : playlistSongList) {
-            playlistSongDTOList.add(DtoConverter.convertPlaylistSongToDTO(playlistSong));
-          }
-          playRingtones.setPlaylist(playlistSongDTOList);
+    /**
+     * Control playlist.
+     *
+     * @param speakerCommandDTO takes SpeakerCommandDTO
+     * @return status ok or badRequest
+     */
+    @PostMapping("music/control")
+    ResponseEntity controlPlaylist(@RequestBody SpeakerCommandDTO speakerCommandDTO) {
+        SpeakerActionStatus speakerActionStatus =
+                playRingtones.controlPlaylist(
+                        speakerCommandDTO,
+                        playRingtones.isPlayingFromQueue() ? null : playlistRepository.findAll());
+        if (speakerActionStatus.getExitCode() == 0
+                && (speakerActionStatus.getException() == null
+                        || speakerActionStatus.getException().isEmpty())) {
+            if (speakerActionStatus.getSpeakerCommand() != SpeakerCommand.PLAY) {
+                playRingtones.getPlaylistInfo();
+            }
+            return ResponseEntity.ok().build();
         }
-      }
-    }catch (Exception e) {
-      return ResponseEntity.internalServerError().build();
+        return ResponseEntity.badRequest().build();
     }
-    return ResponseEntity.ok().build();
-  }
+
+    /**
+     * Repeat playlist.
+     *
+     * @param repeat takes SpeakerCommandDTO
+     * @return status ok
+     */
+    @PostMapping("music/repeat/{repeat}")
+    ResponseEntity setRepeatFunction(@PathVariable("repeat") boolean repeat) {
+        playRingtones.setRepeatPlaylist(repeat);
+        playRingtones.getPlaylistInfo();
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Set playlist on network speaker
+     *
+     * @param force Flag if set playlist is running
+     * @return response status
+     */
+    @PostMapping("music/songs/set/playlist/{force}")
+    ResponseEntity<?> setPlaylistOnNetworkSpeaker(@PathParam("force") boolean force) {
+        try {
+            if (force || !playRingtones.isPlayingFromQueue()) {
+                List<PlaylistSong> playlistSongList = playlistRepository.findAll();
+                if (playlistSongList != null) {
+                    List<PlaylistSongDTO> playlistSongDTOList = new ArrayList<>();
+                    for (PlaylistSong playlistSong : playlistSongList) {
+                        playlistSongDTOList.add(
+                                DtoConverter.convertPlaylistSongToDTO(playlistSong));
+                    }
+                    playRingtones.setPlaylist(playlistSongDTOList);
+                }
+            }
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+        return ResponseEntity.ok().build();
+    }
 
     /**
      * Save audiofile from the anouncement and encode it

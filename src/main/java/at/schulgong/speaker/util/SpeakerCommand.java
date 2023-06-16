@@ -1,9 +1,10 @@
 package at.schulgong.speaker.util;
 
 /**
+ * Commands for controlling network speaker
+ *
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
  * @version 0.1
- * @implNote Commands for controlling network speaker
  * @since May 2023
  */
 public enum SpeakerCommand {
@@ -35,22 +36,22 @@ public enum SpeakerCommand {
   PLAY_FROM_QUEUE_AFTER_ANNOUNCEMENT("play_from_queue_after_announcement");;
   private final String command;
 
-  SpeakerCommand(String command) {
-    this.command = command;
-  }
-
-  public static SpeakerCommand fromCommand(String command) throws IllegalArgumentException {
-    if (command != null) {
-      for (SpeakerCommand speakerCommand : SpeakerCommand.values()) {
-        if (command.equals(speakerCommand.command)) {
-          return speakerCommand;
-        }
-      }
+    SpeakerCommand(String command) {
+        this.command = command;
     }
-    throw new IllegalArgumentException("Name [" + command + "] not supported.");
-  }
 
-  public String getCommand() {
-    return this.command;
-  }
+    public static SpeakerCommand fromCommand(String command) throws IllegalArgumentException {
+        if (command != null) {
+            for (SpeakerCommand speakerCommand : SpeakerCommand.values()) {
+                if (command.equals(speakerCommand.command)) {
+                    return speakerCommand;
+                }
+            }
+        }
+        throw new IllegalArgumentException("Name [" + command + "] not supported.");
+    }
+
+    public String getCommand() {
+        return this.command;
+    }
 }

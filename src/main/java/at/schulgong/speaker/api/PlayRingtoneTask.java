@@ -6,9 +6,10 @@ import java.util.TimerTask;
 import lombok.NoArgsConstructor;
 
 /**
+ * Task to execute speaker control at a specific time
+ *
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
  * @version 0.1
- * @implNote Task to execute speaker control at a specific time
  * @since May 2023
  */
 @NoArgsConstructor

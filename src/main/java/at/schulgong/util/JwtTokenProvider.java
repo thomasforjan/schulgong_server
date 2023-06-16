@@ -16,9 +16,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 /**
+ * JwtTokenProvider is a provider, which provides the token and validates it
+ *
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
  * @version 0.1
- * @implNote JwtTokenProvider is a provider, which provides the token and validates it
  * @since June 2023
  */
 @Service

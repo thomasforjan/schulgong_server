@@ -1,16 +1,16 @@
 package at.schulgong.model;
 
 import jakarta.persistence.*;
+import java.time.LocalDate;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
-
 /**
+ * Model of holiday
+ *
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
  * @version 0.2
- * @implNote Model of holiday
  * @since April 2023
  */
 @Getter
@@ -19,16 +19,16 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Entity
 public class Holiday {
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
-  @Column(name = "startdate")
-  private LocalDate startDate;
+    @Column(name = "startdate")
+    private LocalDate startDate;
 
-  @Column(name = "enddate")
-  private LocalDate endDate;
+    @Column(name = "enddate")
+    private LocalDate endDate;
 
-  @Column(name = "name")
-  private String name;
+    @Column(name = "name")
+    private String name;
 }

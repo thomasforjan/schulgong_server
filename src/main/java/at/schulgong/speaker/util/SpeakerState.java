@@ -1,38 +1,39 @@
 package at.schulgong.speaker.util;
 
 /**
+ * Enum for state of speakers
+ *
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
  * @version 0.2
- * @implNote Enum for state of speakers
  * @since May 2023
  */
 public enum SpeakerState {
-  PLAYING("PLAYING"),
+    PLAYING("PLAYING"),
 
-  TRANSITIONING("TRANSITIONING"),
+    TRANSITIONING("TRANSITIONING"),
 
-  PAUSED_PLAYBACK("PAUSED_PLAYBACK"),
+    PAUSED_PLAYBACK("PAUSED_PLAYBACK"),
 
-  STOPPED("STOPPED");
+    STOPPED("STOPPED");
 
-  private final String state;
+    private final String state;
 
-  SpeakerState(String state) {
-    this.state = state;
-  }
-
-  public static SpeakerState fromState(String state) throws IllegalArgumentException {
-    if (state != null) {
-      for (SpeakerState speakerState : SpeakerState.values()) {
-        if (state.equals(speakerState.state)) {
-          return speakerState;
-        }
-      }
+    SpeakerState(String state) {
+        this.state = state;
     }
-    throw new IllegalArgumentException("Name [" + state + "] not supported.");
-  }
 
-  public String getState() {
-    return this.state;
-  }
+    public static SpeakerState fromState(String state) throws IllegalArgumentException {
+        if (state != null) {
+            for (SpeakerState speakerState : SpeakerState.values()) {
+                if (state.equals(speakerState.state)) {
+                    return speakerState;
+                }
+            }
+        }
+        throw new IllegalArgumentException("Name [" + state + "] not supported.");
+    }
+
+    public String getState() {
+        return this.state;
+    }
 }

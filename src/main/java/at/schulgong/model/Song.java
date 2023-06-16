@@ -6,9 +6,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
+ * Model of song
+ *
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
  * @version 0.2
- * @implNote Model of song
  * @since May 2023
  */
 @Getter
@@ -17,13 +18,13 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 public class Song {
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
-  @Column(name = "name")
-  private String name;
+    @Column(name = "name")
+    private String name;
 
-  @Column(name = "filePath")
-  private String filePath;
+    @Column(name = "filePath")
+    private String filePath;
 }

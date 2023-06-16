@@ -8,9 +8,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 /**
+ * Api for running scripts to control network speaker
+ *
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
  * @version 0.1
- * @implNote Api for running scripts to control network speaker
  * @since May 2023
  */
 public class SpeakerApi {

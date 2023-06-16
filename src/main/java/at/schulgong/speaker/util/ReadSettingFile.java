@@ -10,9 +10,10 @@ import java.time.LocalTime;
 import java.util.stream.Collectors;
 
 /**
+ * Read speaker settings from config file
+ *
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
  * @version 0.1
- * @implNote Read speaker settings from config file
  * @since May 2023
  */
 public class ReadSettingFile {

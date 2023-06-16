@@ -3,9 +3,10 @@ package at.schulgong.util;
 import lombok.Getter;
 
 /**
+ * Config-Enum to configure global values
+ *
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
  * @version 0.2
- * @implNote Config-Enum to configure global values
  * @since April 2023
  */
 @Getter

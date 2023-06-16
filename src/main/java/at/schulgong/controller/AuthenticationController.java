@@ -18,9 +18,10 @@ import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 /**
+ * AuthenticationController for handling authentication requests
+ *
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
  * @version 0.1
- * @implNote AuthenticationController for handling authentication requests
  * @since June 2023
  */
 @RestController

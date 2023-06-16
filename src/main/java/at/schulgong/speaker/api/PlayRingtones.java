@@ -24,9 +24,10 @@ import ws.schild.jave.EncoderException;
 import ws.schild.jave.MultimediaObject;
 
 /**
+ * Class to playing ringtones
+ *
  * @author Thomas Forjan, Philipp Wildzeiss, Martin Kral
  * @version 0.2
- * @implNote Class to playing ringtones
  * @since May 2023
  */
 @Configuration
