@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.stream.Collectors;
 
 /**
@@ -23,23 +25,15 @@ public class ReadWriteConfigurationFile {
      * @return congigurationDTO
      */
     public static ConfigurationDTO readConfigurationDTOFromConfigFile(String filePath) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        String contents;
-        try {
-            try (InputStream inputStream =
-                            ReadWriteConfigurationFile.class
-                                    .getClassLoader()
-                                    .getResourceAsStream("configuration.json");
-                    BufferedReader reader =
-                            new BufferedReader(new InputStreamReader(inputStream))) {
-                contents = reader.lines().collect(Collectors.joining(System.lineSeparator()));
-            }
-            return objectMapper.readValue(contents, ConfigurationDTO.class);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
+      ObjectMapper objectMapper = new ObjectMapper();
+      objectMapper.registerModule(new JavaTimeModule());
+      try {
+        Path path = Paths.get(filePath);
+        return objectMapper.readValue(new File(path.toAbsolutePath().toUri()), ConfigurationDTO.class);
+      } catch (IOException e) {
+        e.printStackTrace();
+        return null;
+      }
     }
 
     /**

@@ -54,6 +54,8 @@ public class PlayRingtoneTask extends TimerTask {
             if (pathArray.length > 1) {
                 path = pathArray[1];
             }
+        } else {
+            path = "x-file-cifs://schulgong/" + path;
         }
         return path;
     }

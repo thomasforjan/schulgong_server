@@ -3,6 +3,7 @@ package at.schulgong.controller;
 import at.schulgong.dto.AuthResponseDTO;
 import at.schulgong.dto.ConfigurationDTO;
 import at.schulgong.dto.LoginDTO;
+import at.schulgong.util.Config;
 import at.schulgong.util.ReadWriteConfigurationFile;
 import at.schulgong.util.SecretKeyService;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -37,7 +38,7 @@ public class AuthenticationController {
     public AuthenticationController(SecretKeyService secretKeyService) {
         this.secretKey = secretKeyService.getSecretKey();
         CONFIGURATION_FILE_PATH =
-                Paths.get("src/main/resources/configuration.json").toAbsolutePath().toString();
+                Paths.get(Config.CONFIGURATION_PATH.getPath()).toAbsolutePath().toString();
     }
 
     /**

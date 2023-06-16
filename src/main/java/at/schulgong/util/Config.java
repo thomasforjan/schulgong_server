@@ -15,18 +15,18 @@ public enum Config {
     RINGTIME("api/ringtimes", "", "ringtime"),
     HOLIDAY("api/holidays", "", "holiday"),
     SONG("api/live/music/songs", "", "song"),
-    SPEAKER_API_SETTINGS_PATH("", "src/main/resources/python/config/speaker_api_settings.json", ""),
-    FILEPATH("", "Audiofiles/Ringtones", ""),
-    ANNOUNCEMENT_PATH("", "Audiofiles/Announcements", ""),
-    SPEAKER_CONFIG_PATH("", "src/main/resources/python/config/speaker_config.json", ""),
-    PLAYLIST_PATH("", "Audiofiles/Playlist/", ""),
-    CONFIGURATION_PATH("", "src/main/resources/configuration.json", ""),
+    SPEAKER_API_SETTINGS_PATH("", "/home/schulgong/speaker_api_settings.json", ""),
+    FILEPATH("", "shared/Ringtones", ""),
+    ANNOUNCEMENT_PATH("", "shared/Announcements", ""),
+    SPEAKER_CONFIG_PATH("", "/home/schulgong/speaker_config.json", ""),
+    PLAYLIST_PATH("", "shared/Playlist/", ""),
+    CONFIGURATION_PATH("", "/home/schulgong/configuration.json", ""),
     SPEAKER_RINGTONE(
-            "http://" + ReadHostIp.readHostIp() + ":8080" + "/api/speaker/play/ringtone/", "", ""),
+            "https://" + ReadHostIp.readHostIp() + ":8080" + "/api/speaker/play/ringtone/", "", ""),
     SPEAKER_PLAYLIST(
-            "http://" + ReadHostIp.readHostIp() + ":8080" + "/api/speaker/play/playlist/", "", ""),
+            "https://" + ReadHostIp.readHostIp() + ":8080" + "/api/speaker/play/playlist/", "", ""),
     SPEAKER_ANNOUNCEMENT(
-            "http://"
+            "https://"
                     + ReadHostIp.readHostIp()
                     + ":8080"
                     + "/api/speaker/play/announcement/Durchsage.mp3",

@@ -277,7 +277,7 @@ public class PlayRingtones {
     private void executePlayAnnouncement() {
         String[] argsListPlayAlarm = {
             SpeakerCommand.PLAY_URI_VOLUME_MUTE.getCommand(),
-            Config.SPEAKER_ANNOUNCEMENT.getUrl(),
+            PlayRingtoneTask.convertPath(Config.ANNOUNCEMENT_PATH.getPath() + "/Durchsage.mp3"),
             String.valueOf(configurationDTO.getAnnouncementVolume()),
             "False"
         };
@@ -489,7 +489,7 @@ public class PlayRingtones {
             argsList =
                     new String[] {
                         SpeakerCommand.ADD_URI_TO_QUEUE.getCommand(),
-                        Config.SPEAKER_PLAYLIST.getUrl() + playlistSongDTO.getName()
+                        PlayRingtoneTask.convertPath(playlistSongDTO.getFilePath())
                     };
             executeSpeakerAction(argsList);
         }
@@ -520,7 +520,13 @@ public class PlayRingtones {
     /** Play playlist from saved playlist state */
     private void playPlaylistFromPlaylistState() {
         String[] argsPlay =
-                new String[] {SpeakerCommand.PLAY_FROM_QUEUE.getCommand(), playlistPosition};
+                new String[] {
+                    SpeakerCommand.PLAY_FROM_QUEUE_AFTER_ANNOUNCEMENT.getCommand(),
+                    playlistPosition,
+                    "" + playlistDTO.getVolume(),
+                    "" + playlistDTO.isMute(),
+                    "0" + position
+                };
         executeSpeakerAction(argsPlay);
         String[] argsSeek = new String[] {SpeakerCommand.SEEK.getCommand(), position};
         executeSpeakerAction(argsSeek);

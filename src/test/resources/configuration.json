@@ -3,6 +3,6 @@
   "ringtimeVolume": 1,
   "alarmVolume": 5,
   "announcementVolume": 5,
-  "ringtimeDirectory": "C:/Users/phili/OneDrive/Desktop/sonos_music",
-  "playlistDirectory": "C:/Users/phili/OneDrive/Desktop/sonos_music/playlist"
+  "ringtimeDirectory": "/home/shared/Ringtones",
+  "playlistDirectory": "/home/shared/Playlist"
 }

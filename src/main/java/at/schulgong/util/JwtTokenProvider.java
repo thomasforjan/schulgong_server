@@ -36,7 +36,7 @@ public class JwtTokenProvider {
     public JwtTokenProvider(SecretKeyService secretKeyService) {
         this.secretKey = secretKeyService.getSecretKey();
         CONFIGURATION_FILE_PATH =
-                Paths.get("src/main/resources/configuration.json").toAbsolutePath().toString();
+                Paths.get(Config.CONFIGURATION_PATH.getPath()).toAbsolutePath().toString();
         this.configurationDTO =
                 ReadWriteConfigurationFile.readConfigurationDTOFromConfigFile(
                         CONFIGURATION_FILE_PATH);
