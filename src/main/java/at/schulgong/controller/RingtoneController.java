@@ -4,12 +4,14 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import at.schulgong.assembler.RingtoneModelAssembler;
+import at.schulgong.dto.ConfigurationDTO;
 import at.schulgong.dto.RingtoneDTO;
 import at.schulgong.exception.EntityNotFoundException;
 import at.schulgong.model.Ringtone;
 import at.schulgong.repository.RingtoneRepository;
 import at.schulgong.util.Config;
 import at.schulgong.util.DtoConverter;
+import at.schulgong.util.ReadWriteConfigurationFile;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -260,15 +262,20 @@ public class RingtoneController {
      * @throws IOException if entity not found
      */
     private void saveAudiofile(Ringtone ringtone, MultipartFile newSong) throws IOException {
-        File dir = new File(Config.FILEPATH.getPath());
-        if (!dir.exists()) {
-            dir.mkdirs();
+        ConfigurationDTO configurationDTO =
+                ReadWriteConfigurationFile.readConfigurationDTOFromConfigFile(
+                        Config.CONFIGURATION_PATH.getPath());
+        if (configurationDTO != null) {
+            File dir = new File(configurationDTO.getRingtimeDirectory());
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+            if (dir.exists()) {
+                ringtone = changeFileName(ringtone, 2);
+            }
+            Path filePath = Paths.get(ringtone.getPath());
+            newSong.transferTo(filePath.toAbsolutePath().toFile());
         }
-        if (dir.exists()) {
-            ringtone = changeFileName(ringtone, 2);
-        }
-        Path filePath = Paths.get(ringtone.getPath());
-        newSong.transferTo(filePath.toAbsolutePath().toFile());
     }
 
     /**
@@ -280,16 +287,21 @@ public class RingtoneController {
      */
     private Ringtone getChangedRingtone(MultipartFile multipartFile, String name) {
         Ringtone ringtone = new Ringtone();
-        Path filePath =
-                Paths.get(
-                        Config.FILEPATH.getPath()
-                                + File.separator
-                                + multipartFile.getOriginalFilename());
-        ringtone.setPath(filePath.toString());
-        ringtone.setName(name);
-        ringtone.setFilename(multipartFile.getOriginalFilename());
-        ringtone.setSize(Math.round((double) multipartFile.getSize() / 1000000));
-        ringtone.setDate(LocalDate.now());
+        ConfigurationDTO configurationDTO =
+                ReadWriteConfigurationFile.readConfigurationDTOFromConfigFile(
+                        Config.CONFIGURATION_PATH.getPath());
+        if (configurationDTO != null) {
+            Path filePath =
+                    Paths.get(
+                            configurationDTO.getRingtimeDirectory()
+                                    + File.separator
+                                    + multipartFile.getOriginalFilename());
+            ringtone.setPath(filePath.toString());
+            ringtone.setName(name);
+            ringtone.setFilename(multipartFile.getOriginalFilename());
+            ringtone.setSize(Math.round((double) multipartFile.getSize() / 1000000));
+            ringtone.setDate(LocalDate.now());
+        }
         return ringtone;
     }
 

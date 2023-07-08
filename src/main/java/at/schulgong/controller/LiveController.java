@@ -16,6 +16,7 @@ import at.schulgong.speaker.util.SpeakerCommand;
 import at.schulgong.util.AudioConverter;
 import at.schulgong.util.Config;
 import at.schulgong.util.DtoConverter;
+import at.schulgong.util.ReadWriteConfigurationFile;
 import jakarta.websocket.server.PathParam;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -349,15 +350,20 @@ public class LiveController {
     private void saveSongIntoSongEntityAndFileSystem(SavePlaylistDTO savePlaylistDTO) {
         for (SongDTO songDTO : savePlaylistDTO.getActualSongList()) {
             if (songDTO.getId() < 0) {
-                String filePath = Config.PLAYLIST_PATH.getPath();
-                if (saveAudioFile(songDTO.getSong(), filePath, songDTO.getName())) {
-                    songDTO.setFilePath(filePath + songDTO.getName());
-                    Song song = songRepository.save(DtoConverter.convertSongDTOToSong(songDTO));
-                    for (PlaylistSongDTO playlistSongDTO :
-                            savePlaylistDTO.getPlaylistSongDTOList()) {
-                        if (songDTO.getId() == playlistSongDTO.getId()) {
-                            playlistSongDTO.setId(song.getId());
-                            break;
+                ConfigurationDTO configurationDTO =
+                        ReadWriteConfigurationFile.readConfigurationDTOFromConfigFile(
+                                Config.CONFIGURATION_PATH.getPath());
+                if (configurationDTO != null) {
+                    String filePath = configurationDTO.getPlaylistDirectory();
+                    if (saveAudioFile(songDTO.getSong(), filePath, songDTO.getName())) {
+                        songDTO.setFilePath(filePath + songDTO.getName());
+                        Song song = songRepository.save(DtoConverter.convertSongDTOToSong(songDTO));
+                        for (PlaylistSongDTO playlistSongDTO :
+                                savePlaylistDTO.getPlaylistSongDTOList()) {
+                            if (songDTO.getId() == playlistSongDTO.getId()) {
+                                playlistSongDTO.setId(song.getId());
+                                break;
+                            }
                         }
                     }
                 }
