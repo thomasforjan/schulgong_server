@@ -52,7 +52,7 @@ public class PlayRingtoneTask extends TimerTask {
             path = path.replace("\\", "/");
             String[] pathArray = path.split(":");
             if (pathArray.length > 1) {
-                path = pathArray[1];
+                path = "x-file-cifs://DESKTOP-Q0STA8D" + pathArray[1];
             }
         } else {
             path = "x-file-cifs://schulgong/" + path;
