@@ -214,9 +214,13 @@ public class RingtoneController {
     ResponseEntity<RingtoneDTO> deleteRingtone(@PathVariable long id) {
         if (ringtoneRepository.existsById(id)) {
             RingtoneDTO ringtoneDTO = one(id);
-            ringtoneRepository.deleteById(id);
-            deleteAudioFile(ringtoneDTO.getPath());
-            return ResponseEntity.noContent().build();
+            if(!ringtoneDTO.getName().toLowerCase().equals("alarm")){
+              ringtoneRepository.deleteById(id);
+              deleteAudioFile(ringtoneDTO.getPath());
+              return ResponseEntity.noContent().build();
+            }else {
+              return ResponseEntity.badRequest().build();
+            }
         } else {
             throw new EntityNotFoundException(id, Config.RINGTONE.getException());
         }
