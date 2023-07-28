@@ -335,7 +335,7 @@ public class LiveController {
                     break;
                 }
             }
-            if (!songExist && (deleteAudioFile(song.getFilePath()))) {
+            if (!songExist && (Files.notExists(Paths.get(song.getFilePath())) || deleteAudioFile(song.getFilePath()))) {
                 songRepository.delete(song);
             }
         }
