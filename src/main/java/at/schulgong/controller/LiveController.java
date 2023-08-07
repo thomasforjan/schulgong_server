@@ -106,7 +106,7 @@ public class LiveController {
      * @param announcement takes announcement as byte array
      * @return no Content
      */
-    @PostMapping(consumes = "audio/webm")
+    @PostMapping(consumes = {"audio/webm", "audio/ogg", "audio/wav"})
     ResponseEntity<?> liveAnnouncement(@RequestBody byte[] announcement) {
         try {
             Path filePath = Paths.get(Config.ANNOUNCEMENT_PATH.getPath());
@@ -356,7 +356,9 @@ public class LiveController {
                 if (configurationDTO != null) {
                     String filePath = configurationDTO.getPlaylistDirectory();
                     if (saveAudioFile(songDTO.getSong(), filePath, songDTO.getName())) {
+
                         songDTO.setFilePath(filePath + File.separator + songDTO.getName());
+
                         Song song = songRepository.save(DtoConverter.convertSongDTOToSong(songDTO));
                         for (PlaylistSongDTO playlistSongDTO :
                                 savePlaylistDTO.getPlaylistSongDTOList()) {
