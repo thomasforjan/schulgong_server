@@ -211,7 +211,7 @@ public class RingtoneController {
      * @return deleted ringtone
      */
     @DeleteMapping("/{id}")
-    ResponseEntity<RingtoneDTO> deleteRingtone(@PathVariable long id) {
+    ResponseEntity<?> deleteRingtone(@PathVariable long id) {
         if (ringtoneRepository.existsById(id)) {
             RingtoneDTO ringtoneDTO = one(id);
             if(!ringtoneDTO.getName().toLowerCase().equals("alarm")){
@@ -219,7 +219,8 @@ public class RingtoneController {
               deleteAudioFile(ringtoneDTO.getPath());
               return ResponseEntity.noContent().build();
             }else {
-              return ResponseEntity.badRequest().build();
+              return ResponseEntity.status(400)
+                .body("Der Alarm kann nicht gelöscht werden!");
             }
         } else {
             throw new EntityNotFoundException(id, Config.RINGTONE.getException());
