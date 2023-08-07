@@ -289,7 +289,7 @@ public class LiveController {
         if (!dir.exists()) {
             dir.mkdirs();
         }
-        try (FileOutputStream fos = new FileOutputStream(filePath + fileName)) {
+        try (FileOutputStream fos = new FileOutputStream(dir.getAbsolutePath() + File.separator + fileName)) {
             Base64.Decoder decoder = Base64.getDecoder();
             byte[] decodedByte = decoder.decode(base64Audio.split(",")[1]);
             fos.write(decodedByte);
@@ -356,7 +356,9 @@ public class LiveController {
                 if (configurationDTO != null) {
                     String filePath = configurationDTO.getPlaylistDirectory();
                     if (saveAudioFile(songDTO.getSong(), filePath, songDTO.getName())) {
-                        songDTO.setFilePath(filePath + songDTO.getName());
+
+                        songDTO.setFilePath(filePath + File.separator + songDTO.getName());
+
                         Song song = songRepository.save(DtoConverter.convertSongDTOToSong(songDTO));
                         for (PlaylistSongDTO playlistSongDTO :
                                 savePlaylistDTO.getPlaylistSongDTOList()) {
