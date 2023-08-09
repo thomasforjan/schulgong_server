@@ -15,22 +15,10 @@ public enum Config {
     RINGTIME("api/ringtimes", "", "ringtime"),
     HOLIDAY("api/holidays", "", "holiday"),
     SONG("api/live/music/songs", "", "song"),
-    SPEAKER_API_SETTINGS_PATH(
-            "",
-            "D:/01-Studium/Software Engineering und vernetzte Systeme/4."
-                + " Semester/Praxisprojekt/schulgong_server/src/main/resources/speaker_api_settings.json",
-            ""),
-    ANNOUNCEMENT_PATH("", "C:/Users/phili/OneDrive/Desktop/sonos_music/Durchsage", ""),
-    SPEAKER_CONFIG_PATH(
-            "",
-            "D:/01-Studium/Software Engineering und vernetzte Systeme/4."
-                + " Semester/Praxisprojekt/schulgong_server/src/main/resources/speaker_config.json",
-            ""),
-    CONFIGURATION_PATH(
-            "",
-            "D:/01-Studium/Software Engineering und vernetzte Systeme/4."
-                + " Semester/Praxisprojekt/schulgong_server/src/main/resources/configuration.json",
-            ""),
+    SPEAKER_API_SETTINGS_PATH("", "/home/schulgong/speaker_api_settings.json", ""),
+    ANNOUNCEMENT_PATH("", "shared/Announcements", ""),
+    SPEAKER_CONFIG_PATH("", "/home/schulgong/speaker_config.json", ""),
+    CONFIGURATION_PATH("", "/home/schulgong/configuration.json", ""),
     SPEAKER_RINGTONE(
             "https://" + ReadHostIp.readHostIp() + ":8080" + "/api/speaker/play/ringtone/", "", ""),
     SPEAKER_PLAYLIST(
