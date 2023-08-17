@@ -14,7 +14,7 @@ Schulgong is an innovative project aimed at simplifying school notifications and
 
 ## Prerequisites
 
-- [Java 11](https://www.oracle.com/java/technologies/javase-jdk11-downloads.html) or later
+- [Java 17](https://www.oracle.com/java/technologies/downloads/#java17)
 - [Gradle](https://gradle.org/install/)
 
 ## Getting Started
@@ -26,32 +26,56 @@ git clone https://github.com/thomasforjan/schulgong_server.git
 cd schulgong_server
 ```
 
-2. **Install Dependencies**
+2. **Build the application**
 
 ```bash
-npm install
+./gradlew build
 ```
 
 3. **Run the Application**
 
 ```bash
-npm start
+./gradlew bootRun
 ```
 
-Alternatively, for development purposes, open the client directly:
-
-```bash
-npm run client:open
-```
+The application will start, and by default, you can access it at <http://localhost:8080>.
 
 ## :nut_and_bolt: Tech Stack & Libraries
 
-- **Framework:** Angular
-- **Component Library:** Angular Material
-- **Sound Library:** Howler.js
-- **Calendar Library:** FullCalendar
-- **Recording Library:** RecordRTC
-- **Testing:** Jasmine, Karma, Cypress
+### Build Tool
+
+- [Gradle](https://gradle.org/)
+
+### Language
+
+- Java (source compatibility: Java 17)
+
+### Core Framework
+
+- [Spring Boot](https://spring.io/projects/spring-boot) - version 3.0.6
+
+### Plugins
+
+- [SpotBugs](https://spotbugs.github.io/) - Static analysis tool for Java
+- [Spotless](https://github.com/diffplug/spotless) - Code formatter and linter
+
+### Libraries
+
+- Spring Data JPA - version 3.0.6
+- [Lombok](https://projectlombok.org/) - version 1.18.22
+- [JUnit 5](https://junit.org/junit5/) (jupiter-api & jupiter-engine) - version 5.8.1
+- [MariaDB JDBC Client](https://mariadb.com/kb/en/mariadb-connector-j/) - version 3.1.3
+- [Hibernate Validator](https://hibernate.org/validator/) - version 8.0.0.Final
+- [Jakarta Persistence API](https://jakarta.ee/specifications/persistence/3.1/) - version 3.1.0
+- [Springdoc OpenAPI UI](https://springdoc.org/) - version 1.6.15
+- [Jackson](https://github.com/FasterXML/jackson) (jackson-datatype-jsr310 & jackson-databind) - version 2.15.0
+- [MySQL Connector/J](https://dev.mysql.com/doc/connector-j/en/) - version 8.0.33
+- [JAVE (Java Audio Video Encoder) Library](https://github.com/a-schild/jave2) - version 3.3.1
+- [Java JWT (JSON Web Token)](https://github.com/jwtk/jjwt) - version 0.11.5
+- [Spring Security Crypto](https://docs.spring.io/spring-security/site/docs/current/reference/html5/#crypto) - version 6.1.0
+- [Bouncy Castle Java Distribution](https://www.bouncycastle.org/java.html) - version 1.70
+- [Spring Boot Starter Security](https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-features.html#boot-features-security) - version 3.1.0
+
 
 ## :busts_in_silhouette: Contributing
 
